@@ -1838,17 +1838,36 @@ function WordMatchGame({ name, setStudents, onExit, levelId = "all" }) {
 
       {/* 문제 카드 */}
       <Card style={{ marginBottom: 14, textAlign: "center", padding: "28px 20px", background: cardBg }}>
-        <div style={{ fontSize: 12, color: T.textMid, marginBottom: 8, fontWeight: 700 }}>{hint}</div>
-        <div style={{ fontSize: isKo2En ? 40 : 36, fontWeight: 900, color: cardColor, lineHeight: 1.2 }}>
+        <div style={{ fontSize: 12, color: T.textMid, marginBottom: 8, fontWeight: 700 }}>
+          {hint}{!isKo2En && <span style={{ color: T.accent, fontWeight: 800 }}> (단어 탭하면 발음!)</span>}
+        </div>
+        <div
+          onClick={() => !isKo2En && speak(q.en)}
+          style={{
+            fontSize: isKo2En ? 40 : 36, fontWeight: 900, color: cardColor, lineHeight: 1.2,
+            cursor: !isKo2En ? "pointer" : "default",
+            userSelect: "none",
+            transition: "transform 0.1s",
+            display: "inline-block",
+          }}
+          onMouseDown={e => !isKo2En && (e.currentTarget.style.transform = "scale(0.94)")}
+          onMouseUp={e => !isKo2En && (e.currentTarget.style.transform = "scale(1)")}
+          onMouseLeave={e => !isKo2En && (e.currentTarget.style.transform = "scale(1)")}
+          onTouchStart={e => !isKo2En && (e.currentTarget.style.transform = "scale(0.94)")}
+          onTouchEnd={e => !isKo2En && (e.currentTarget.style.transform = "scale(1)")}
+          title={!isKo2En ? "탭하면 발음을 들을 수 있어요" : ""}
+        >
           {questionText}
         </div>
         {/* 영단어 보여줄 때 발음 버튼 */}
         {!isKo2En && (
-          <button onClick={() => speak(q.en)} style={{
-            marginTop: 10, background: "rgba(255,255,255,0.7)", border: "none",
-            borderRadius: 10, padding: "5px 14px", fontSize: 12,
-            fontWeight: 700, cursor: "pointer", color: T.green
-          }}>🔊 발음 듣기</button>
+          <div style={{ marginTop: 10 }}>
+            <button onClick={(e) => { e.stopPropagation(); speak(q.en); }} style={{
+              background: "rgba(255,255,255,0.7)", border: "none",
+              borderRadius: 10, padding: "5px 14px", fontSize: 12,
+              fontWeight: 700, cursor: "pointer", color: T.green
+            }}>🔊 발음 듣기</button>
+          </div>
         )}
       </Card>
 
@@ -2071,13 +2090,31 @@ function SpeedQuiz({ name, setStudents, onExit, levelId = "all" }) {
       <Card style={{ marginBottom: 14, textAlign: "center", padding: 28, background: T.yellowLight }}>
         <div style={{ fontSize: 12, color: T.textMid, marginBottom: 6 }}>
           {isKo2En ? "다음 뜻의 영어 단어는?" : "이 영어 단어의 뜻은?"}
+          {!isKo2En && <span style={{ color: T.accent, fontWeight: 800 }}> (단어 탭하면 발음!)</span>}
         </div>
-        <div style={{ fontSize: 36, fontWeight: 900, color: T.yellow, marginBottom: 8 }}>{q[q.qField]}</div>
+        <div
+          onClick={() => !isKo2En && speak(q.en)}
+          style={{
+            fontSize: 36, fontWeight: 900, color: T.yellow, marginBottom: 8,
+            cursor: !isKo2En ? "pointer" : "default",
+            userSelect: "none",
+            transition: "transform 0.1s",
+            display: "inline-block",
+          }}
+          onMouseDown={e => !isKo2En && (e.currentTarget.style.transform = "scale(0.94)")}
+          onMouseUp={e => !isKo2En && (e.currentTarget.style.transform = "scale(1)")}
+          onMouseLeave={e => !isKo2En && (e.currentTarget.style.transform = "scale(1)")}
+          onTouchStart={e => !isKo2En && (e.currentTarget.style.transform = "scale(0.94)")}
+          onTouchEnd={e => !isKo2En && (e.currentTarget.style.transform = "scale(1)")}
+          title={!isKo2En ? "탭하면 발음을 들을 수 있어요" : ""}
+        >{q[q.qField]}</div>
         {!isKo2En && (
-          <button onClick={() => speak(q.en)} style={{
-            background: "rgba(255,255,255,0.7)", border: "none", borderRadius: 10,
-            padding: "5px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: T.yellow
-          }}>🔊 발음</button>
+          <div>
+            <button onClick={(e) => { e.stopPropagation(); speak(q.en); }} style={{
+              background: "rgba(255,255,255,0.7)", border: "none", borderRadius: 10,
+              padding: "5px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: T.yellow
+            }}>🔊 발음 듣기</button>
+          </div>
         )}
       </Card>
 

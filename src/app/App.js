@@ -257,7 +257,7 @@ function StudentHome({name,bank,assignments,onLogout}) {
   if(screen==="game") return <WordGame name={name} gameType={gameType} onBack={()=>setScreen("home")} onPoints={addPoints}/>;
 
   const h=new Date().getHours();
-  const greet=h<12?"Good Morning":"h<18?Good Afternoon":"Good Evening";
+  const greet=h<12?"Good Morning":h<18?"Good Afternoon":"Good Evening";
 
   return (
     <div style={{minHeight:"100vh",background:`linear-gradient(160deg,#ffecd2 0%,#fcb69f 100%)`}}>

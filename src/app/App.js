@@ -1349,7 +1349,7 @@ function StudentManager({ students, setStudents }) {
           <Input
             value={form.name}
             onChange={e => { setForm(f => ({ ...f, name: e.target.value })); setFormErr(""); }}
-            placeholder="예: Shine"
+            placeholder="예: 김민준"
             style={{ marginBottom: 12 }}
           />
 
@@ -2189,26 +2189,80 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
 
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
-// ── 게임 1: 단어 맞추기 (뜻 보고 영단어 선택) ─────────────────────────────
+// ── 게임 1: 단어 맞추기 (방향 선택 가능) ─────────────────────────────────
+const MATCH_MODES = [
+  { id: "ko2en", label: "한글 → 영어", desc: "한글 보고 영단어 고르기", icon: "🇰🇷→🇺🇸", question: "ko", answer: "en" },
+  { id: "en2ko", label: "영어 → 한글", desc: "영단어 보고 뜻 고르기",   icon: "🇺🇸→🇰🇷", question: "en", answer: "ko" },
+  { id: "mixed", label: "랜덤 섞기",   desc: "두 방향이 랜덤으로 섞여요", icon: "🔀",      question: "mixed", answer: "mixed" },
+];
+
 function WordMatchGame({ name, setStudents, onExit, levelId = "all" }) {
+  const [mode, setMode] = useState(null); // null = 방향 선택 화면
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
-  const [feedback, setFeedback] = useState(null); // null | "correct" | "wrong"
+  const [feedback, setFeedback] = useState(null);
+  const [wrongWord, setWrongWord] = useState(null);
 
   const questions = useMemo(() => {
+    if (!mode) return [];
     const pool = getWordsByLevel(levelId);
     const picked = shuffle(pool).slice(0, 10);
     return picked.map(w => {
+      // 이 문제의 방향 결정
+      const dir = mode.id === "mixed"
+        ? (Math.random() < 0.5 ? "ko2en" : "en2ko")
+        : mode.id;
+      const qField = dir === "ko2en" ? "ko" : "en"; // 문제로 보여줄 것
+      const aField = dir === "ko2en" ? "en" : "ko"; // 정답 보기에 표시할 것
       const wrongs = shuffle(pool.filter(x => x.en !== w.en)).slice(0, 3);
       const opts = shuffle([w, ...wrongs]);
-      return { ...w, opts, ansIdx: opts.findIndex(o => o.en === w.en) };
+      return {
+        ...w, dir, qField, aField,
+        opts, ansIdx: opts.findIndex(o => o.en === w.en)
+      };
     });
-  }, [levelId]);
+  }, [mode, levelId]);
 
+  // ── 방향 선택 화면 ──
+  if (!mode) {
+    return (
+      <div style={{ minHeight: "100vh", background: T.bg, padding: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
+          <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
+        </div>
+        <div style={{ textAlign: "center", marginBottom: 24 }}>
+          <div style={{ fontSize: 40, marginBottom: 8 }}>🎯</div>
+          <div style={{ fontSize: 20, fontWeight: 900, color: T.text }}>단어 맞추기</div>
+          <div style={{ fontSize: 13, color: T.textMid, marginTop: 4 }}>어떤 방향으로 공부할까요?</div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 400, margin: "0 auto" }}>
+          {MATCH_MODES.map(m => (
+            <Card key={m.id} onClick={() => setMode(m)} style={{
+              padding: 20, display: "flex", alignItems: "center", gap: 16,
+              border: `2px solid ${T.border}`, cursor: "pointer"
+            }}>
+              <div style={{
+                width: 56, height: 56, borderRadius: 16, flexShrink: 0,
+                background: m.id === "ko2en" ? T.accentLight : m.id === "en2ko" ? T.greenLight : T.yellowLight,
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900,
+                color: m.id === "ko2en" ? T.accent : m.id === "en2ko" ? T.green : T.yellow
+              }}>{m.icon}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 16, fontWeight: 900, color: T.text, marginBottom: 3 }}>{m.label}</div>
+                <div style={{ fontSize: 12, color: T.textMid }}>{m.desc}</div>
+              </div>
+              <div style={{ fontSize: 22, color: T.textDim }}>›</div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ── 게임 종료 ──
   if (round >= questions.length) {
-    // 게임 종료 → 저장
     saveStudentRecord(setStudents, name, {
-      type: "game", gameType: "단어 맞추기",
+      type: "game", gameType: `단어맞추기(${mode.label})`,
       score, total: questions.length,
       category: questions[0]?.cat || "기타",
       points: score * 10
@@ -2216,17 +2270,21 @@ function WordMatchGame({ name, setStudents, onExit, levelId = "all" }) {
     return (
       <div style={{ minHeight: "100vh", background: T.bg, padding: "60px 20px", textAlign: "center" }}>
         <div style={{ fontSize: 64, marginBottom: 14 }}>{score >= 8 ? "🎉" : score >= 5 ? "👏" : "💪"}</div>
-        <div style={{ fontSize: 22, fontWeight: 900, color: T.text, marginBottom: 6 }}>
-          {score} / {questions.length}
-        </div>
-        <div style={{ fontSize: 14, color: T.textMid, marginBottom: 20 }}>
+        <div style={{ fontSize: 22, fontWeight: 900, color: T.text, marginBottom: 6 }}>{score} / {questions.length}</div>
+        <div style={{ fontSize: 14, color: T.textMid, marginBottom: 6 }}>
           {score >= 8 ? "정말 잘했어요!" : score >= 5 ? "좋아요!" : "다시 도전해봐요!"}
         </div>
+        <div style={{ fontSize: 12, color: T.textMid, marginBottom: 20 }}>모드: {mode.label}</div>
         <Card style={{ maxWidth: 320, margin: "0 auto 14px", background: T.yellowLight }}>
           <div style={{ fontSize: 32 }}>⭐</div>
           <div style={{ fontSize: 14, fontWeight: 800, color: T.text }}>+{score * 10} 포인트 획득!</div>
         </Card>
-        <Btn v="primary" size="lg" onClick={onExit}>홈으로</Btn>
+        <div style={{ display: "flex", gap: 10, maxWidth: 320, margin: "0 auto" }}>
+          <Btn v="secondary" size="lg" onClick={() => { setMode(null); setRound(0); setScore(0); }} style={{ flex: 1 }}>
+            🔄 다시하기
+          </Btn>
+          <Btn v="primary" size="lg" onClick={onExit} style={{ flex: 1 }}>홈으로</Btn>
+        </div>
       </div>
     );
   }
@@ -2235,43 +2293,97 @@ function WordMatchGame({ name, setStudents, onExit, levelId = "all" }) {
 
   const pick = (idx) => {
     if (feedback) return;
-    if (idx === q.ansIdx) { setScore(score + 1); setFeedback("correct"); }
-    else setFeedback("wrong");
-    setTimeout(() => { setFeedback(null); setRound(round + 1); }, 800);
+    if (idx === q.ansIdx) {
+      setScore(score + 1);
+      setFeedback("correct");
+      setWrongWord(null);
+    } else {
+      setFeedback("wrong");
+      setWrongWord(q); // 틀렸을 때 정답 표시용
+    }
+    setTimeout(() => { setFeedback(null); setWrongWord(null); setRound(round + 1); }, 1000);
   };
+
+  // 방향에 따라 문제/보기 결정
+  const questionText = q[q.qField];
+  const isKo2En = q.dir === "ko2en";
+  const cardBg  = isKo2En ? T.accentLight : T.greenLight;
+  const cardColor = isKo2En ? T.accent : T.green;
+  const hint = isKo2En ? "다음 뜻의 영어 단어는?" : "이 영어 단어의 뜻은?";
+  const dirTag = isKo2En ? "🇰🇷→🇺🇸" : "🇺🇸→🇰🇷";
 
   return (
     <div style={{ minHeight: "100vh", background: T.bg, padding: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16, alignItems: "center" }}>
+      {/* 헤더 */}
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, alignItems: "center" }}>
         <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
-        <Tag color="blue">{round + 1} / {questions.length}</Tag>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          <Tag color={isKo2En ? "blue" : "green"}>{dirTag}</Tag>
+          <Tag color="blue">{round + 1} / {questions.length}</Tag>
+        </div>
         <Tag color="yellow">⭐ {score}</Tag>
       </div>
 
-      <Card style={{ marginBottom: 16, textAlign: "center", padding: 28, background: T.accentLight }}>
-        <div style={{ fontSize: 12, color: T.textMid, marginBottom: 6 }}>다음 뜻의 영어 단어는?</div>
-        <div style={{ fontSize: 36, fontWeight: 900, color: T.accent }}>{q.ko}</div>
+      {/* 진도바 */}
+      <div style={{ height: 5, background: T.border, borderRadius: 3, marginBottom: 16, overflow: "hidden" }}>
+        <div style={{
+          height: "100%", borderRadius: 3, transition: "width 0.3s",
+          width: `${(round / questions.length) * 100}%`,
+          background: isKo2En ? T.accent : T.green
+        }} />
+      </div>
+
+      {/* 문제 카드 */}
+      <Card style={{ marginBottom: 14, textAlign: "center", padding: "28px 20px", background: cardBg }}>
+        <div style={{ fontSize: 12, color: T.textMid, marginBottom: 8, fontWeight: 700 }}>{hint}</div>
+        <div style={{ fontSize: isKo2En ? 40 : 36, fontWeight: 900, color: cardColor, lineHeight: 1.2 }}>
+          {questionText}
+        </div>
+        {/* 영단어 보여줄 때 발음 버튼 */}
+        {!isKo2En && (
+          <button onClick={() => speak(q.en)} style={{
+            marginTop: 10, background: "rgba(255,255,255,0.7)", border: "none",
+            borderRadius: 10, padding: "5px 14px", fontSize: 12,
+            fontWeight: 700, cursor: "pointer", color: T.green
+          }}>🔊 발음 듣기</button>
+        )}
       </Card>
 
+      {/* 보기 4개 */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         {q.opts.map((o, idx) => {
-          let bg = T.card, color = T.text;
-          if (feedback && idx === q.ansIdx) { bg = T.green; color = "white"; }
-          else if (feedback === "wrong" && idx !== q.ansIdx) { bg = T.card; }
+          const isCorrect = idx === q.ansIdx;
+          let bg = T.card, color = T.text, borderColor = T.border;
+          if (feedback === "correct" && isCorrect) { bg = T.green; color = "white"; borderColor = T.green; }
+          else if (feedback === "wrong" && isCorrect) { bg = T.green; color = "white"; borderColor = T.green; } // 정답 강조
+          else if (feedback === "wrong" && !isCorrect) { bg = T.card; color = T.textDim; }
           return (
-            <button key={idx} onClick={() => pick(idx)} style={{
-              padding: "20px 14px", borderRadius: 14, border: `2px solid ${T.border}`,
-              background: bg, color, fontSize: 16, fontWeight: 800, cursor: "pointer",
-              transition: "all 0.2s", boxShadow: T.shadow
-            }}>{o.en}</button>
+            <button key={idx} onClick={() => pick(idx)} disabled={!!feedback} style={{
+              padding: "18px 12px", borderRadius: 14,
+              border: `2px solid ${borderColor}`,
+              background: bg, color,
+              fontSize: 15, fontWeight: 800, cursor: feedback ? "default" : "pointer",
+              transition: "all 0.2s", boxShadow: T.shadow,
+              lineHeight: 1.3
+            }}>
+              {o[q.aField]}
+            </button>
           );
         })}
       </div>
 
+      {/* 피드백 */}
       {feedback && (
-        <div style={{ textAlign: "center", marginTop: 20, fontSize: 24, fontWeight: 900,
-          color: feedback === "correct" ? T.green : T.red }}>
-          {feedback === "correct" ? "✓ 정답!" : "✗ 오답"}
+        <div style={{
+          textAlign: "center", marginTop: 14, padding: "10px 16px",
+          borderRadius: 12, fontSize: 14, fontWeight: 900,
+          background: feedback === "correct" ? T.greenLight : T.redLight,
+          color: feedback === "correct" ? T.green : T.red
+        }}>
+          {feedback === "correct"
+            ? `✓ 정답! ${isKo2En ? q.en : q.ko}`
+            : `✗ 정답은 "${isKo2En ? q.en : q.ko}" 이에요`
+          }
         </div>
       )}
     </div>
@@ -2343,24 +2455,29 @@ function SpellingGame({ name, setStudents, onExit, levelId = "all" }) {
   );
 }
 
-// ── 게임 3: 스피드 퀴즈 (10초 제한) ───────────────────────────────────────
+// ── 게임 3: 스피드 퀴즈 (10초 + 방향 선택) ───────────────────────────────
 function SpeedQuiz({ name, setStudents, onExit, levelId = "all" }) {
+  const [mode, setMode] = useState(null); // null = 방향 선택
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(10);
 
   const questions = useMemo(() => {
+    if (!mode) return [];
     const pool = getWordsByLevel(levelId);
     const picked = shuffle(pool).slice(0, 10);
     return picked.map(w => {
-      const wrongs = shuffle(pool.filter(x => x.ko !== w.ko)).slice(0, 3);
+      const dir = mode === "mixed" ? (Math.random() < 0.5 ? "ko2en" : "en2ko") : mode;
+      const qField = dir === "ko2en" ? "ko" : "en";
+      const aField = dir === "ko2en" ? "en" : "ko";
+      const wrongs = shuffle(pool.filter(x => x.en !== w.en)).slice(0, 3);
       const opts = shuffle([w, ...wrongs]);
-      return { ...w, opts, ansIdx: opts.findIndex(o => o.ko === w.ko) };
+      return { ...w, dir, qField, aField, opts, ansIdx: opts.findIndex(o => o.en === w.en) };
     });
-  }, [levelId]);
+  }, [mode, levelId]);
 
   useEffect(() => {
-    if (round >= questions.length) return;
+    if (!mode || round >= questions.length) return;
     setTime(10);
     const interval = setInterval(() => {
       setTime(t => {
@@ -2369,7 +2486,42 @@ function SpeedQuiz({ name, setStudents, onExit, levelId = "all" }) {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [round, questions.length]);
+  }, [round, mode, questions.length]);
+
+  // 방향 선택 화면
+  if (!mode) {
+    return (
+      <div style={{ minHeight: "100vh", background: T.bg, padding: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
+          <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
+        </div>
+        <div style={{ textAlign: "center", marginBottom: 24 }}>
+          <div style={{ fontSize: 40, marginBottom: 8 }}>⚡</div>
+          <div style={{ fontSize: 20, fontWeight: 900, color: T.text }}>스피드 퀴즈</div>
+          <div style={{ fontSize: 13, color: T.textMid, marginTop: 4 }}>어떤 방향으로 풀까요? (10초 제한!)</div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 400, margin: "0 auto" }}>
+          {[
+            { id: "ko2en", label: "한글 → 영어", icon: "🇰🇷→🇺🇸", bg: T.accentLight, color: T.accent },
+            { id: "en2ko", label: "영어 → 한글", icon: "🇺🇸→🇰🇷", bg: T.greenLight, color: T.green },
+            { id: "mixed", label: "랜덤 섞기",   icon: "🔀",      bg: T.yellowLight, color: T.yellow },
+          ].map(m => (
+            <Card key={m.id} onClick={() => setMode(m.id)} style={{
+              padding: 18, display: "flex", alignItems: "center", gap: 14, cursor: "pointer"
+            }}>
+              <div style={{
+                width: 52, height: 52, borderRadius: 14, background: m.bg,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 22, fontWeight: 900, color: m.color, flexShrink: 0
+              }}>{m.icon}</div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>{m.label}</div>
+              <div style={{ marginLeft: "auto", fontSize: 20, color: T.textDim }}>›</div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (round >= questions.length) {
     saveStudentRecord(setStudents, name, {
@@ -2382,15 +2534,19 @@ function SpeedQuiz({ name, setStudents, onExit, levelId = "all" }) {
       <div style={{ minHeight: "100vh", background: T.bg, padding: "60px 20px", textAlign: "center" }}>
         <div style={{ fontSize: 64, marginBottom: 14 }}>⚡</div>
         <div style={{ fontSize: 22, fontWeight: 900 }}>{score} / {questions.length}</div>
-        <Card style={{ maxWidth: 320, margin: "20px auto", background: T.yellowLight }}>
+        <Card style={{ maxWidth: 320, margin: "20px auto 14px", background: T.yellowLight }}>
           <div style={{ fontSize: 14, fontWeight: 800 }}>⭐ +{score * 12} 포인트</div>
         </Card>
-        <Btn v="primary" size="lg" onClick={onExit}>홈으로</Btn>
+        <div style={{ display: "flex", gap: 10, maxWidth: 320, margin: "0 auto" }}>
+          <Btn v="secondary" size="lg" onClick={() => { setMode(null); setRound(0); setScore(0); }} style={{ flex: 1 }}>🔄</Btn>
+          <Btn v="primary" size="lg" onClick={onExit} style={{ flex: 1 }}>홈으로</Btn>
+        </div>
       </div>
     );
   }
 
   const q = questions[round];
+  const isKo2En = q.dir === "ko2en";
 
   const pick = (idx) => {
     if (idx === q.ansIdx) setScore(score + 1);
@@ -2399,31 +2555,36 @@ function SpeedQuiz({ name, setStudents, onExit, levelId = "all" }) {
 
   return (
     <div style={{ minHeight: "100vh", background: T.bg, padding: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
         <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
         <Tag color={time <= 3 ? "red" : "yellow"}>⏱️ {time}초</Tag>
         <Tag color="yellow">⭐ {score}</Tag>
       </div>
 
-      <div style={{ height: 6, background: T.border, borderRadius: 3, marginBottom: 16, overflow: "hidden" }}>
-        <div style={{ height: "100%", width: `${time * 10}%`, background: time <= 3 ? T.red : T.accent, transition: "width 1s linear" }} />
+      <div style={{ height: 6, background: T.border, borderRadius: 3, marginBottom: 14, overflow: "hidden" }}>
+        <div style={{ height: "100%", width: `${time * 10}%`, background: time <= 3 ? T.red : T.yellow, transition: "width 1s linear" }} />
       </div>
 
-      <Card style={{ marginBottom: 16, textAlign: "center", padding: 28, background: T.yellowLight }}>
-        <div style={{ fontSize: 12, color: T.textMid, marginBottom: 6 }}>이 단어의 뜻은?</div>
-        <div style={{ fontSize: 36, fontWeight: 900, color: T.yellow, marginBottom: 8 }}>{q.en}</div>
-        <button onClick={() => speak(q.en)} style={{
-          background: "rgba(255,255,255,0.7)", border: "none", borderRadius: 10,
-          padding: "6px 14px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.yellow
-        }}>🔊 발음</button>
+      <Card style={{ marginBottom: 14, textAlign: "center", padding: 28, background: T.yellowLight }}>
+        <div style={{ fontSize: 12, color: T.textMid, marginBottom: 6 }}>
+          {isKo2En ? "다음 뜻의 영어 단어는?" : "이 영어 단어의 뜻은?"}
+        </div>
+        <div style={{ fontSize: 36, fontWeight: 900, color: T.yellow, marginBottom: 8 }}>{q[q.qField]}</div>
+        {!isKo2En && (
+          <button onClick={() => speak(q.en)} style={{
+            background: "rgba(255,255,255,0.7)", border: "none", borderRadius: 10,
+            padding: "5px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: T.yellow
+          }}>🔊 발음</button>
+        )}
       </Card>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         {q.opts.map((o, idx) => (
           <button key={idx} onClick={() => pick(idx)} style={{
-            padding: "20px 14px", borderRadius: 14, border: `2px solid ${T.border}`,
-            background: T.card, fontSize: 16, fontWeight: 800, cursor: "pointer", boxShadow: T.shadow
-          }}>{o.ko}</button>
+            padding: "18px 12px", borderRadius: 14, border: `2px solid ${T.border}`,
+            background: T.card, fontSize: 15, fontWeight: 800, cursor: "pointer",
+            boxShadow: T.shadow, lineHeight: 1.3
+          }}>{o[q.aField]}</button>
         ))}
       </div>
     </div>

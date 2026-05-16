@@ -14,6 +14,10 @@ import {
   WeeklyLeague, SentenceGame, ParentViewer, ReportPrint,
   ScheduleManager, ScheduleBanner
 } from "./features";
+import {
+  MemoryCardGame, DailyChallenge, WrongNoteGame, AnagramGame,
+  TypingRace, WordRelay, WordTwenty, WordWorldRPG
+} from "./games";
 
 // ── 음성 합성 (발음 기능) ─────────────────────────────────────────────────
 function speak(text) {
@@ -2769,6 +2773,15 @@ function StudentHome({ name, bank, setStudents, students, onLogout }) {
   if (screen === "game-speed")    return <SpeedQuiz     name={name} setStudents={setStudents} onExit={exitGame} levelId={selectedLevel} />;
   if (screen === "game-flash")    return <FlashCard     name={name} setStudents={setStudents} onExit={exitGame} levelId={selectedLevel} />;
   if (screen === "game-sentence") return <SentenceGame  name={name} setStudents={setStudents} onExit={exitGame} />;
+  // 신규 8개 게임
+  if (screen === "game-memory")   return <MemoryCardGame name={name} setStudents={setStudents} onExit={exitGame} />;
+  if (screen === "game-daily")    return <DailyChallenge name={name} setStudents={setStudents} onExit={exitGame} />;
+  if (screen === "game-wrong")    return <WrongNoteGame  name={name} students={students} setStudents={setStudents} onExit={exitGame} />;
+  if (screen === "game-anagram")  return <AnagramGame    name={name} setStudents={setStudents} onExit={exitGame} />;
+  if (screen === "game-typing")   return <TypingRace     name={name} setStudents={setStudents} onExit={exitGame} />;
+  if (screen === "game-relay")    return <WordRelay      name={name} setStudents={setStudents} onExit={exitGame} />;
+  if (screen === "game-twenty")   return <WordTwenty     name={name} setStudents={setStudents} onExit={exitGame} />;
+  if (screen === "game-rpg")      return <WordWorldRPG   name={name} setStudents={setStudents} onExit={exitGame} />;
   if (screen === "quiz" && quizSet) return <StudentQuiz name={name} setStudents={setStudents} qset={quizSet} onExit={() => { setScreen("home"); setQuizSet(null); }} />;
 
   const hour = new Date().getHours();
@@ -2877,21 +2890,45 @@ function StudentHome({ name, bank, setStudents, students, onLogout }) {
             {/* 목표 위젯 */}
             <StudentGoalWidget studentName={name} goals={goals} />
 
-            {/* 게임 카드 5개 */}
+            {/* 기본 단어 게임 */}
             <div style={{ fontSize: 12, fontWeight: 800, color: T.textMid, marginBottom: 8, letterSpacing: 0.5 }}>🎮 단어 게임</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 18 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
               {[
-                { id: "game-match",    icon: "🎯", name: "단어 맞추기",  sub: "뜻 보고 단어 선택",   bg: T.accentLight },
-                { id: "game-spell",    icon: "🔤", name: "스펠링",        sub: "철자 직접 입력",       bg: T.greenLight },
-                { id: "game-speed",    icon: "⚡", name: "스피드 퀴즈",  sub: "10초 안에!",           bg: T.yellowLight },
-                { id: "game-flash",    icon: "🧩", name: "플래시카드",   sub: "🔊 발음 포함",         bg: T.pinkLight },
-                { id: "game-sentence", icon: "📝", name: "문장 빈칸",    sub: "문장에 알맞은 단어",   bg: T.purpleLight },
+                { id:"game-match",    icon:"🎯", name:"단어 맞추기",  sub:"뜻↔영어 선택",     bg:T.accentLight },
+                { id:"game-spell",    icon:"🔤", name:"스펠링",        sub:"철자 직접 입력",    bg:T.greenLight },
+                { id:"game-speed",    icon:"⚡", name:"스피드 퀴즈",  sub:"10초 안에!",        bg:T.yellowLight },
+                { id:"game-flash",    icon:"🧩", name:"플래시카드",   sub:"🔊 발음 포함",      bg:T.pinkLight },
+                { id:"game-sentence", icon:"📝", name:"문장 빈칸",    sub:"문장 속 단어 찾기", bg:T.purpleLight },
               ].map(g => (
                 <Card key={g.id}
                   onClick={() => g.id === "game-sentence" ? setScreen("game-sentence") : startGame(g)}
-                  style={{ padding: 16, textAlign: "center" }}>
-                  <div style={{ width: 56, height: 56, borderRadius: 16, background: g.bg, margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>{g.icon}</div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>{g.name}</div>
+                  style={{ padding: 14, textAlign: "center" }}>
+                  <div style={{ width: 50, height: 50, borderRadius: 14, background: g.bg, margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>{g.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: T.text }}>{g.name}</div>
+                  <div style={{ fontSize: 10, color: T.textMid, marginTop: 2 }}>{g.sub}</div>
+                </Card>
+              ))}
+            </div>
+
+            {/* 신규 게임 */}
+            <div style={{ fontSize: 12, fontWeight: 800, color: T.textMid, marginBottom: 8, letterSpacing: 0.5 }}>🆕 새로운 게임</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
+              {[
+                { id:"game-daily",   icon:"📅", name:"데일리 챌린지", sub:"오늘의 5단어",    bg:T.yellowLight, badge:"매일 새로워요!" },
+                { id:"game-rpg",     icon:"🗺️", name:"단어 월드 RPG", sub:"보스를 물리쳐요!", bg:T.purpleLight, badge:"🔥 인기" },
+                { id:"game-memory",  icon:"🧠", name:"메모리 카드",   sub:"짝 맞추기",       bg:T.accentLight },
+                { id:"game-anagram", icon:"🔤", name:"철자 조립",     sub:"섞인 철자 맞추기", bg:T.greenLight },
+                { id:"game-typing",  icon:"⌨️", name:"타이핑 레이스", sub:"단어가 내려와요!", bg:T.pinkLight },
+                { id:"game-relay",   icon:"🔗", name:"단어 릴레이",  sub:"콤보를 이어가요!", bg:T.tealLight||T.accentLight },
+                { id:"game-twenty",  icon:"🔍", name:"단어 스무고개", sub:"힌트로 추리해요!", bg:T.orangeLight },
+                { id:"game-wrong",   icon:"📒", name:"오답 노트",     sub:"틀린 단어 복습",   bg:T.redLight },
+              ].map(g => (
+                <Card key={g.id} onClick={() => setScreen(g.id)} style={{ padding: 14, textAlign: "center", position: "relative" }}>
+                  {g.badge && (
+                    <div style={{ position: "absolute", top: 6, right: 6, background: T.accent, color: "white", fontSize: 9, fontWeight: 800, padding: "2px 6px", borderRadius: 6 }}>{g.badge}</div>
+                  )}
+                  <div style={{ width: 50, height: 50, borderRadius: 14, background: g.bg, margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>{g.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: T.text }}>{g.name}</div>
                   <div style={{ fontSize: 10, color: T.textMid, marginTop: 2 }}>{g.sub}</div>
                 </Card>
               ))}

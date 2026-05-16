@@ -315,6 +315,10 @@ export function DailyChallenge({ name, setStudents, onExit }) {
 
   return (
     <div style={{minHeight:"100vh",background:T.bg,padding:16}}>
+      {/* 상단 종료 버튼 */}
+      <div style={{display:"flex",justifyContent:"flex-start",marginBottom:10}}>
+        <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
+      </div>
       {/* 헤더 */}
       <div style={{background:`linear-gradient(135deg,${T.orange},${T.yellow})`,borderRadius:14,padding:"12px 16px",marginBottom:16,color:"white"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
@@ -685,7 +689,8 @@ export function TypingRace({ name, setStudents, onExit }) {
 
   return (
     <div style={{minHeight:"100vh",background:T.bg,padding:14}}>
-      <div style={{display:"flex",justifyContent:"space-between",marginBottom:8,alignItems:"center"}}>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:8,alignItems:"center",gap:8}}>
+        <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
         <span style={{fontSize:13}}>{livesDisplay}</span>
         <span style={{fontSize:11,fontWeight:800,color:T.purple,background:T.purpleLight,padding:"3px 8px",borderRadius:8}}>Lv.{level}</span>
         <span style={{fontSize:13,fontWeight:800,color:T.accent}}>💥{score}</span>
@@ -1015,9 +1020,10 @@ export function WordWorldRPG({ name, setStudents, onExit }) {
             <div style={{fontSize:32}}>⭐</div>
             <div style={{fontSize:18,fontWeight:900,color:T.text}}>+{score*20+(cleared?50:0)} 포인트</div>
           </Card>
-          <div style={{display:"flex",gap:10,maxWidth:280,margin:"0 auto"}}>
-            <Btn v="secondary" size="lg" onClick={()=>startBattle(selectedWorld)} style={{flex:1}}>🔄 재도전</Btn>
-            <Btn v="primary" size="lg" onClick={()=>setScreen("worldMap")} style={{flex:1}}>🗺️ 월드맵</Btn>
+          <div style={{display:"flex",gap:10,maxWidth:340,margin:"0 auto",flexWrap:"wrap"}}>
+            <Btn v="secondary" size="lg" onClick={()=>startBattle(selectedWorld)} style={{flex:1,minWidth:90}}>🔄 재도전</Btn>
+            <Btn v="secondary" size="lg" onClick={()=>setScreen("worldMap")} style={{flex:1,minWidth:90}}>🗺️ 월드맵</Btn>
+            <Btn v="primary" size="lg" onClick={onExit} style={{flex:1,minWidth:90}}>🏠 홈으로</Btn>
           </div>
         </div>
       );

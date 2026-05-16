@@ -2471,44 +2471,37 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
             {/* 목표 위젯 */}
             <StudentGoalWidget studentName={name} goals={goals} />
 
-            {/* 기본 단어 게임 */}
-            <div style={{ fontSize: 12, fontWeight: 800, color: T.textMid, marginBottom: 8, letterSpacing: 0.5 }}>🎮 단어 게임</div>
+            {/* 게임 모음 */}
+            <div style={{ fontSize: 12, fontWeight: 800, color: T.textMid, marginBottom: 8, letterSpacing: 0.5 }}>🎮 게임</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
               {[
-                { id:"game-match",    icon:"🎯", name:"단어 맞추기",  sub:"뜻↔영어 선택",     bg:T.accentLight },
-                { id:"game-spell",    icon:"🔤", name:"스펠링",        sub:"철자 직접 입력",    bg:T.greenLight },
-                { id:"game-speed",    icon:"⚡", name:"스피드 퀴즈",  sub:"10초 안에!",        bg:T.yellowLight },
-                { id:"game-flash",    icon:"🧩", name:"플래시카드",   sub:"🔊 발음 포함",      bg:T.pinkLight },
-                { id:"game-sentence", icon:"📝", name:"문장 빈칸",    sub:"문장 속 단어 찾기", bg:T.purpleLight },
+                // 기본 단어 학습 게임
+                { id:"game-match",    icon:"🎯", name:"단어 맞추기",   sub:"뜻↔영어 선택",     bg:T.accentLight, isLevel:true },
+                { id:"game-spell",    icon:"🔤", name:"스펠링",         sub:"철자 직접 입력",    bg:T.greenLight,  isLevel:true },
+                { id:"game-speed",    icon:"⚡", name:"스피드 퀴즈",   sub:"10초 안에!",        bg:T.yellowLight, isLevel:true },
+                { id:"game-flash",    icon:"🧩", name:"플래시카드",    sub:"🔊 발음 포함",      bg:T.pinkLight,   isLevel:true },
+                // 매일/도전 게임 (배지 표시)
+                { id:"game-daily",    icon:"📅", name:"데일리 챌린지", sub:"오늘의 5단어",      bg:T.yellowLight, badge:"매일 새로워요!" },
+                { id:"game-rpg",      icon:"🗺️", name:"단어 월드 RPG", sub:"보스를 물리쳐요!", bg:T.purpleLight, badge:"🔥 인기" },
+                // 신규 게임들
+                { id:"game-sentence", icon:"📝", name:"문장 빈칸",     sub:"문장 속 단어 찾기", bg:T.purpleLight },
+                { id:"game-memory",   icon:"🧠", name:"메모리 카드",   sub:"짝 맞추기",         bg:T.accentLight },
+                { id:"game-anagram",  icon:"🔤", name:"철자 조립",     sub:"섞인 철자 맞추기",  bg:T.greenLight },
+                { id:"game-typing",   icon:"⌨️", name:"타이핑 레이스", sub:"단어가 내려와요!",  bg:T.pinkLight },
+                { id:"game-relay",    icon:"🔗", name:"단어 릴레이",   sub:"콤보를 이어가요!",  bg:T.tealLight },
+                { id:"game-twenty",   icon:"🔍", name:"단어 스무고개", sub:"힌트로 추리해요!",  bg:T.orangeLight },
+                { id:"game-picture",  icon:"🖼️", name:"그림 단어",     sub:"그림 보고 맞추기",  bg:T.yellowLight },
+                { id:"game-lines",    icon:"🔗", name:"단어 연결",     sub:"영어-한글 매칭",    bg:T.purpleLight },
+                { id:"game-search",   icon:"🔍", name:"단어 찾기",     sub:"숨겨진 단어 찾기",  bg:T.greenLight },
+                { id:"game-dictation",icon:"🎤", name:"받아쓰기",      sub:"듣고 받아써요",     bg:T.accentLight },
+                { id:"game-wrong",    icon:"📒", name:"오답 노트",     sub:"틀린 단어 복습",    bg:T.redLight },
               ].map(g => (
                 <Card key={g.id}
-                  onClick={() => g.id === "game-sentence" ? setScreen("game-sentence") : startGame(g)}
-                  style={{ padding: 14, textAlign: "center" }}>
-                  <div style={{ width: 50, height: 50, borderRadius: 14, background: g.bg, margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>{g.icon}</div>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: T.text }}>{g.name}</div>
-                  <div style={{ fontSize: 10, color: T.textMid, marginTop: 2 }}>{g.sub}</div>
-                </Card>
-              ))}
-            </div>
-
-            {/* 신규 게임 */}
-            <div style={{ fontSize: 12, fontWeight: 800, color: T.textMid, marginBottom: 8, letterSpacing: 0.5 }}>🆕 새로운 게임</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
-              {[
-                { id:"game-daily",   icon:"📅", name:"데일리 챌린지", sub:"오늘의 5단어",    bg:T.yellowLight, badge:"매일 새로워요!" },
-                { id:"game-rpg",     icon:"🗺️", name:"단어 월드 RPG", sub:"보스를 물리쳐요!", bg:T.purpleLight, badge:"🔥 인기" },
-                { id:"game-memory",  icon:"🧠", name:"메모리 카드",   sub:"짝 맞추기",       bg:T.accentLight },
-                { id:"game-anagram", icon:"🔤", name:"철자 조립",     sub:"섞인 철자 맞추기", bg:T.greenLight },
-                { id:"game-typing",  icon:"⌨️", name:"타이핑 레이스", sub:"단어가 내려와요!", bg:T.pinkLight },
-                { id:"game-relay",    icon:"🔗", name:"단어 릴레이",  sub:"콤보를 이어가요!", bg:T.tealLight },
-                { id:"game-twenty",  icon:"🔍", name:"단어 스무고개", sub:"힌트로 추리해요!", bg:T.orangeLight },
-                { id:"game-wrong",   icon:"📒", name:"오답 노트",     sub:"틀린 단어 복습",   bg:T.redLight },
-                { id:"game-picture", icon:"🖼️", name:"그림 단어",     sub:"그림 보고 맞추기", bg:T.yellowLight },
-                { id:"game-lines",   icon:"🔗", name:"단어 연결",     sub:"영어-한글 매칭",   bg:T.purpleLight },
-                { id:"game-search",  icon:"🔍", name:"단어 찾기",     sub:"숨겨진 단어 찾기", bg:T.greenLight },
-                { id:"game-dictation",icon:"🎤",name:"받아쓰기",       sub:"듣고 받아써요",    bg:T.accentLight },
-              ].map(g => (
-                <Card key={g.id} onClick={() => setScreen(g.id)} style={{ padding: 14, textAlign: "center", position: "relative" }}>
+                  onClick={() => {
+                    if (g.isLevel) startGame(g);          // 레벨 선택이 필요한 게임
+                    else setScreen(g.id);                  // 바로 시작
+                  }}
+                  style={{ padding: 14, textAlign: "center", position: "relative" }}>
                   {g.badge && (
                     <div style={{ position: "absolute", top: 6, right: 6, background: T.accent, color: "white", fontSize: 9, fontWeight: 800, padding: "2px 6px", borderRadius: 6 }}>{g.badge}</div>
                   )}

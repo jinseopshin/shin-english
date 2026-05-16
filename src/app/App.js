@@ -6,6 +6,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   AreaChart, Area
 } from "recharts";
+import { QUESTION_BANK } from "./questionData";
 
 // ══════════════════════════════════════════════════════════════════════════
 //   ANGELA'S ENGLISH ACADEMY - 통합 App.js
@@ -108,37 +109,8 @@ const WORDS = [
   { en: "pencil", ko: "연필", cat: "학교" },
 ];
 
-// ── INIT 문제은행 ─────────────────────────────────────────────────────────
-const INIT_BANK = {
-  bp: {
-    id: "bp", title: "Be동사 현재시제", grade: "초등5", tag: "be동사",
-    questions: [
-      { id: 1, q: "I ______ a student.", opts: ["am","is","are","was","were"], ans: 1, exp: "I → am" },
-      { id: 2, q: "She ______ my best friend.", opts: ["am","are","is","was","were"], ans: 3, exp: "3인칭 단수 → is" },
-      { id: 3, q: "They ______ soccer players.", opts: ["am","is","are","was","were"], ans: 3, exp: "복수 주어 → are" },
-      { id: 4, q: "He ______ a kind teacher.", opts: ["am","are","is","was","were"], ans: 3, exp: "He → is" },
-      { id: 5, q: "______ you a new student?", opts: ["Am","Is","Are","Was","Were"], ans: 3, exp: "의문문 You → Are" },
-    ]
-  },
-  vpa: {
-    id: "vpa", title: "일반동사 과거시제", grade: "중1", tag: "일반동사",
-    questions: [
-      { id: 1, q: "I ______ pizza for lunch yesterday.", opts: ["eat","eats","ate","am eat","do eat"], ans: 3, exp: "eat → ate" },
-      { id: 2, q: "She ______ to school by bus last week.", opts: ["go","goes","went","goed","going"], ans: 3, exp: "go → went" },
-      { id: 3, q: "Did you sleep well? Yes, ______.", opts: ["I did","I does","I do","I was","I slept"], ans: 1, exp: "Yes, I did." },
-      { id: 4, q: "He ______ his homework last night.", opts: ["do","does","did","done","doing"], ans: 3, exp: "과거 → did" },
-      { id: 5, q: "We ______ a movie yesterday.", opts: ["watch","watches","watched","watching","watchs"], ans: 3, exp: "watch → watched" },
-    ]
-  },
-  mod: {
-    id: "mod", title: "조동사 can/may", grade: "초등6", tag: "조동사",
-    questions: [
-      { id: 1, q: "I ______ swim very well.", opts: ["can","cans","caning","could be","be able"], ans: 1, exp: "can + 동사원형" },
-      { id: 2, q: "______ I borrow your pen?", opts: ["Am","Do","May","Will","Is"], ans: 3, exp: "허락 → May I" },
-      { id: 3, q: "She ______ speak three languages.", opts: ["can","cans","is can","can to","could to"], ans: 1, exp: "can + 동사원형" },
-    ]
-  },
-};
+// ── INIT 문제은행 (questionData.js에서 import - 900문제) ─────────────────
+const INIT_BANK = QUESTION_BANK;
 
 // ── UI 컴포넌트 ───────────────────────────────────────────────────────────
 function Btn({ children, onClick, v = "primary", size = "md", style = {}, disabled, type = "button" }) {
@@ -1849,6 +1821,24 @@ export default function App() {
   const [exams, setExams] = useStorage("angela_exams", []);
   const [savedPw, setSavedPw] = useStorage("angela_pw", "1111");
   const [students, setStudents] = useStorage("angela_students", {});
+
+  // ── 자동 마이그레이션: 기본 세트가 5문제 이하면 900문제로 교체 ─────────
+  useEffect(() => {
+    const needsMigration =
+      (bank.bp && bank.bp.questions && bank.bp.questions.length < 50) ||
+      (bank.vpa && bank.vpa.questions && bank.vpa.questions.length < 50) ||
+      (bank.mod && bank.mod.questions && bank.mod.questions.length < 50);
+
+    if (needsMigration) {
+      // 사용자가 추가한 다른 세트는 보존, 기본 3세트만 새 데이터로 교체
+      const userSets = {};
+      Object.entries(bank).forEach(([k, v]) => {
+        if (k !== "bp" && k !== "vpa" && k !== "mod") userSets[k] = v;
+      });
+      setBank({ ...INIT_BANK, ...userSets });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 학생 첫 입장 시 등록
   const enterAsStudent = (name) => {

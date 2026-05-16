@@ -8,6 +8,22 @@ import { ALL_WORDS, getWordsByLevel } from "./wordData";
 //                  오답노트 / 애너그램 / 타이핑레이스 / 릴레이 / 스무고개
 // ══════════════════════════════════════════════════════════════════════════
 
+// 영어 발음 재생 헬퍼
+function speak(text) {
+  if (typeof window === "undefined" || !window.speechSynthesis) return;
+  try {
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "en-US";
+    utter.rate = 0.9;
+    utter.pitch = 1.0;
+    utter.volume = 1.0;
+    window.speechSynthesis.speak(utter);
+  } catch (e) {
+    console.warn("Speech synthesis error:", e);
+  }
+}
+
 const T = {
   bg:"#f0f7ff", card:"#ffffff", border:"#dce8ff",
   accent:"#4f8ef7", accentLight:"#e8f0ff",
@@ -1211,9 +1227,34 @@ export function PictureWordGame({ name, setStudents, onExit }) {
         <div style={{height:"100%",width:`${(round/questions.length)*100}%`,background:mode==="en"?T.accent:T.green,borderRadius:3,transition:"width 0.3s"}}/>
       </div>
       <Card style={{marginBottom:14,textAlign:"center",padding:"32px 16px",background:mode==="en"?T.accentLight:T.greenLight}}>
-        <div style={{fontSize:10,color:T.textMid,fontWeight:700,marginBottom:8}}>이 그림의 {mode==="en"?"영어 단어는?":"한글 뜻은?"}</div>
-        <div style={{fontSize:90,lineHeight:1,marginBottom:8}}>{q.emoji}</div>
-        <div style={{fontSize:12,color:T.textMid}}>{mode==="en"?q.ko:q.en}</div>
+        <div style={{fontSize:10,color:T.textMid,fontWeight:700,marginBottom:8}}>이 그림의 {mode==="en"?"영어 단어는?":"한글 뜻은?"} <span style={{color:T.accent,fontWeight:800}}>(그림 탭하면 발음!)</span></div>
+        <div
+          onClick={()=>speak(q.en)}
+          style={{fontSize:90,lineHeight:1,marginBottom:8,cursor:"pointer",userSelect:"none",transition:"transform 0.1s"}}
+          onMouseDown={e=>e.currentTarget.style.transform="scale(0.92)"}
+          onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}
+          onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}
+          onTouchStart={e=>e.currentTarget.style.transform="scale(0.92)"}
+          onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"}
+          title="탭하면 발음을 들을 수 있어요"
+        >{q.emoji}</div>
+        <div style={{fontSize:12,color:T.textMid,marginBottom:10}}>{mode==="en"?q.ko:q.en}</div>
+        <button
+          onClick={(e)=>{e.stopPropagation();speak(q.en);}}
+          style={{
+            background:"rgba(255,255,255,0.85)",
+            border:`2px solid ${mode==="en"?T.accent:T.green}`,
+            borderRadius:10,
+            padding:"6px 16px",
+            fontSize:13,
+            fontWeight:800,
+            cursor:"pointer",
+            color:mode==="en"?T.accent:T.green,
+            display:"inline-flex",
+            alignItems:"center",
+            gap:6,
+          }}
+        >🔊 발음 듣기</button>
       </Card>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
         {q.opts.map((o,idx) => {

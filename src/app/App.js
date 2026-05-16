@@ -1349,7 +1349,7 @@ function StudentManager({ students, setStudents }) {
           <Input
             value={form.name}
             onChange={e => { setForm(f => ({ ...f, name: e.target.value })); setFormErr(""); }}
-            placeholder="예: 김민준"
+            placeholder="예: Shine"
             style={{ marginBottom: 12 }}
           />
 

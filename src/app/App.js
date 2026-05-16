@@ -12,11 +12,13 @@ import {
   GroupManager, BadgeDisplay, BadgeCelebration, getEarnedBadges,
   NoticeManager, NoticeBanner, GoalManager, StudentGoalWidget,
   WeeklyLeague, SentenceGame, ParentViewer, ReportPrint,
-  ScheduleManager, ScheduleBanner
+  ScheduleManager, ScheduleBanner,
+  StudentDetailReport, AttendanceManager
 } from "./features";
 import {
   MemoryCardGame, DailyChallenge, WrongNoteGame, AnagramGame,
-  TypingRace, WordRelay, WordTwenty, WordWorldRPG, recordWrong
+  TypingRace, WordRelay, WordTwenty, WordWorldRPG, recordWrong,
+  PictureWordGame, WordMatchLines, WordSearchGame, DictationGame
 } from "./games";
 import { AIQuestionGenerator } from "./aiQuestions";
 
@@ -1646,7 +1648,7 @@ function TeacherHome({ bank, exams, students, onNav }) {
   );
 }
 
-function TeacherSettings({ savedPw, setSavedPw }) {
+function TeacherSettings({ savedPw, setSavedPw, darkMode, setDarkMode }) {
   const [cur, setCur] = useState("");
   const [neu, setNeu] = useState("");
   const [msg, setMsg] = useState("");
@@ -1661,13 +1663,32 @@ function TeacherSettings({ savedPw, setSavedPw }) {
   };
 
   return (
-    <Card>
-      <div style={{ fontSize: 14, fontWeight: 800, color: T.text, marginBottom: 14 }}>🔑 비밀번호 변경</div>
-      <Input type="password" value={cur} onChange={e => setCur(e.target.value)} placeholder="현재 비밀번호" style={{ marginBottom: 8 }} />
-      <Input type="password" value={neu} onChange={e => setNeu(e.target.value)} placeholder="새 비밀번호 (4자 이상)" style={{ marginBottom: 10 }} />
-      <Btn v="primary" size="md" onClick={change} style={{ width: "100%" }}>변경하기</Btn>
-      {msg && <div style={{ fontSize: 12, color: msg.startsWith("✅") ? T.green : T.red, marginTop: 8, textAlign: "center", fontWeight: 700 }}>{msg}</div>}
-    </Card>
+    <div>
+      {/* 다크모드 토글 */}
+      <Card style={{ marginBottom: 12, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: T.text }}>🌙 다크 모드</div>
+          <div style={{ fontSize: 11, color: T.textMid, marginTop: 2 }}>눈이 편한 어두운 화면</div>
+        </div>
+        <button onClick={() => setDarkMode && setDarkMode(d => !d)} style={{
+          width: 50, height: 28, borderRadius: 14, border: "none", cursor: "pointer",
+          background: darkMode ? T.accent : T.border, position: "relative", transition: "background 0.2s"
+        }}>
+          <div style={{
+            position: "absolute", top: 3, transition: "left 0.2s",
+            left: darkMode ? 25 : 3, width: 22, height: 22,
+            borderRadius: "50%", background: "white"
+          }} />
+        </button>
+      </Card>
+      <Card>
+        <div style={{ fontSize: 14, fontWeight: 800, color: T.text, marginBottom: 14 }}>🔑 비밀번호 변경</div>
+        <Input type="password" value={cur} onChange={e => setCur(e.target.value)} placeholder="현재 비밀번호" style={{ marginBottom: 8 }} />
+        <Input type="password" value={neu} onChange={e => setNeu(e.target.value)} placeholder="새 비밀번호 (4자 이상)" style={{ marginBottom: 10 }} />
+        <Btn v="primary" size="md" onClick={change} style={{ width: "100%" }}>변경하기</Btn>
+        {msg && <div style={{ fontSize: 12, color: msg.startsWith("✅") ? T.green : T.red, marginTop: 8, textAlign: "center", fontWeight: 700 }}>{msg}</div>}
+      </Card>
+    </div>
   );
 }
 
@@ -2148,7 +2169,7 @@ function AssignmentManager({ students, bank, assignments, setAssignments }) {
 }
 
 
-function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStudents, savedPw, setSavedPw }) {
+function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStudents, savedPw, setSavedPw, darkMode, setDarkMode }) {
   const [screen, setScreen] = useState("dashboard");
   const [viewExamId, setViewExamId] = useState(null);
   const [assignments, setAssignments] = useStorage("angela_assignments", []);
@@ -2156,6 +2177,8 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
   const [notices,     setNotices]     = useStorage("angela_notices",     []);
   const [goals,       setGoals]       = useStorage("angela_goals",       []);
   const [schedules,   setSchedules]   = useStorage("angela_schedules",   []);
+  const [attendance,  setAttendance]  = useStorage("angela_attendance",  {});
+  const [reportStudent, setReportStudent] = useState(null);
 
   const onNav = (s, id) => { setScreen(s); if (id) setViewExamId(id); };
   const examView = exams.find(e => e.id === viewExamId);
@@ -2174,23 +2197,25 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
 
   // ── 화면별 정보 (제목 + 뒤로가기 대상) ──
   const SCREEN_INFO_MAP = {
-    dashboard:    { title:"대시보드",       back: null },
-    manage:       { title:"학생 관리",       back: "dashboard" },
-    assign:       { title:"과제 배정",       back: "dashboard" },
-    students:     { title:"학습 통계",       back: "dashboard" },
-    bank:         { title:"문제 은행",       back: "dashboard" },
-    "exam-builder":{ title:"시험지 출제",    back: "exams" },
-    exams:        { title:"시험지 목록",     back: "dashboard" },
-    "exam-view":  { title:"시험지 출력",     back: "exams" },
-    settings:     { title:"설정",           back: "more" },
-    more:         { title:"더보기",          back: "dashboard" },
-    groups:       { title:"반별 그룹 관리",  back: "more" },
-    goals:        { title:"목표 설정",       back: "more" },
-    notice:       { title:"공지 & 메시지",   back: "more" },
-    schedule:     { title:"수업 일정",       back: "more" },
-    league:       { title:"주간 리그",       back: "more" },
-    report:       { title:"월간 성적표",     back: "more" },
-    parent:       { title:"학부모 뷰어",     back: "more" },
+    dashboard:    { title:"대시보드",         back: null },
+    manage:       { title:"학생 관리",         back: "dashboard" },
+    assign:       { title:"과제 배정",         back: "dashboard" },
+    students:     { title:"학습 통계",         back: "dashboard" },
+    bank:         { title:"문제 은행",         back: "dashboard" },
+    "exam-builder":{ title:"시험지 출제",      back: "exams" },
+    exams:        { title:"시험지 목록",       back: "dashboard" },
+    "exam-view":  { title:"시험지 출력",       back: "exams" },
+    settings:     { title:"설정",             back: "more" },
+    more:         { title:"더보기",            back: "dashboard" },
+    groups:       { title:"반별 그룹 관리",    back: "more" },
+    goals:        { title:"목표 설정",         back: "more" },
+    notice:       { title:"공지 & 메시지",     back: "more" },
+    schedule:     { title:"수업 일정",         back: "more" },
+    league:       { title:"주간 리그",         back: "more" },
+    report:       { title:"월간 성적표",       back: "more" },
+    parent:       { title:"학부모 뷰어",       back: "more" },
+    attendance:   { title:"출석 기록",         back: "more" },
+    "student-report": { title:"학생 상세 리포트", back: "students" },
   };
 
   const curInfo = SCREEN_INFO_MAP[screen] || { title: screen, back: "dashboard" };
@@ -2199,7 +2224,6 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
     <div style={{ minHeight: "100vh", background: T.bg, paddingBottom: 80 }}>
       {/* 상단 헤더 */}
       <div style={{ background: T.card, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 50, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
-        {/* 뒤로가기 버튼 — 대시보드가 아닐 때만 표시 */}
         {curInfo.back !== null ? (
           <button onClick={() => onNav(curInfo.back)} style={{ display:"flex", alignItems:"center", gap:4, background:"none", border:"none", cursor:"pointer", color:T.accent, fontSize:13, fontWeight:700, padding:"4px 8px", borderRadius:8, flexShrink:0 }}>
             ← 뒤로
@@ -2207,8 +2231,6 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
         ) : (
           <div style={{ fontSize: 22 }}>👩‍🏫</div>
         )}
-
-        {/* 현재 화면 제목 */}
         <div style={{ flex: 1, minWidth: 0 }}>
           {curInfo.back === null ? (
             <>
@@ -2221,7 +2243,10 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
             </div>
           )}
         </div>
-
+        <button onClick={() => setDarkMode && setDarkMode(d => !d)} title={darkMode?"라이트 모드":"다크 모드"}
+          style={{ background:"none", border:"none", cursor:"pointer", fontSize:18, padding:"4px 6px", borderRadius:8 }}>
+          {darkMode ? "☀️" : "🌙"}
+        </button>
         <Btn v="ghost" size="sm" onClick={onLogout}>로그아웃</Btn>
       </div>
 
@@ -2229,12 +2254,12 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
         {screen === "dashboard"  && <TeacherHome bank={bank} exams={exams} students={students} onNav={onNav} />}
         {screen === "manage"     && <StudentManager students={students} setStudents={setStudents} />}
         {screen === "assign"     && <AssignmentManager students={students} bank={bank} assignments={assignments} setAssignments={setAssignments} />}
-        {screen === "students"   && <StatsDashboard students={students} />}
+        {screen === "students"   && <StatsDashboard students={students} onSelectStudent={s=>{setReportStudent(s);onNav("student-report");}} />}
         {screen === "bank"       && <QuestionBank bank={bank} setBank={setBank} />}
         {screen === "exam-builder" && <ExamBuilder bank={bank} setExams={setExams} onNav={onNav} />}
         {screen === "exams"      && <ExamList exams={exams} setExams={setExams} onNav={onNav} />}
         {screen === "exam-view"  && examView && <ExamPrintView exam={examView} onBack={() => onNav("exams")} />}
-        {screen === "settings"   && <TeacherSettings savedPw={savedPw} setSavedPw={setSavedPw} />}
+        {screen === "settings"   && <TeacherSettings savedPw={savedPw} setSavedPw={setSavedPw} darkMode={darkMode} setDarkMode={setDarkMode} />}
         {/* Phase 1 */}
         {screen === "groups"     && <GroupManager students={students} groups={groups} setGroups={setGroups} assignments={assignments} setAssignments={setAssignments} bank={bank} />}
         {screen === "goals"      && <GoalManager students={students} goals={goals} setGoals={setGoals} />}
@@ -2244,13 +2269,26 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
         {screen === "league"     && <WeeklyLeague students={students} />}
         {screen === "report"     && <ReportPrint students={students} />}
         {screen === "parent"     && <ParentViewer students={students} />}
+        {/* 신규 */}
+        {screen === "attendance"      && <AttendanceManager students={students} attendance={attendance} setAttendance={setAttendance} />}
+        {screen === "student-report"  && <StudentDetailReport student={reportStudent} onBack={() => onNav("students")} />}
         {/* 더보기 메뉴 */}
         {screen === "more" && (
           <div>
             <div style={{ fontSize: 16, fontWeight: 900, color: T.text, marginBottom: 4 }}>✨ 더 많은 기능</div>
-            <div style={{ fontSize: 11, color: T.textMid, marginBottom: 14 }}>Phase 1 & 2 신규 기능</div>
+            <div style={{ fontSize: 11, color: T.textMid, marginBottom: 14 }}>신규 기능 모음</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
-              {MORE_MENU.map(m => (
+              {[
+                { id:"groups",     icon:"👥", label:"반별 그룹 관리",  desc:"반 만들고 일괄 과제 배정" },
+                { id:"goals",      icon:"🎯", label:"목표 설정",        desc:"학생별 월간 목표 지정" },
+                { id:"notice",     icon:"💬", label:"공지 & 메시지",    desc:"학생 앱에 공지 띄우기" },
+                { id:"schedule",   icon:"📅", label:"수업 일정",        desc:"일정 → 학생 D-day 알림" },
+                { id:"league",     icon:"🏆", label:"주간 리그",        desc:"이번 주 포인트 순위" },
+                { id:"report",     icon:"📋", label:"월간 성적표",      desc:"PDF 인쇄용 성적표" },
+                { id:"parent",     icon:"👨‍👩‍👧", label:"학부모 뷰어",     desc:"자녀 학습 현황 보기" },
+                { id:"attendance", icon:"🔔", label:"출석 기록",        desc:"수업 출결 체크 & 통계" },
+                { id:"settings",   icon:"⚙️", label:"설정",            desc:"비밀번호 · 다크모드" },
+              ].map(m => (
                 <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 14, textAlign: "center" }}>
                   <div style={{ fontSize: 28, marginBottom: 8 }}>{m.icon}</div>
                   <div style={{ fontSize: 13, fontWeight: 800, color: T.text, marginBottom: 4 }}>{m.label}</div>
@@ -2795,7 +2833,7 @@ function LevelSelect({ gameInfo, onSelect, onCancel }) {
 }
 
 // ── 학생 홈 ───────────────────────────────────────────────────────────────
-function StudentHome({ name, bank, setStudents, students, onLogout }) {
+function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, setDarkMode }) {
   const [screen, setScreen] = useState("home");
   const [quizSet, setQuizSet] = useState(null);
   const [pendingGame, setPendingGame] = useState(null);
@@ -2845,6 +2883,10 @@ function StudentHome({ name, bank, setStudents, students, onLogout }) {
   if (screen === "game-relay")    return <WordRelay      name={name} setStudents={setStudents} onExit={exitGame} />;
   if (screen === "game-twenty")   return <WordTwenty     name={name} setStudents={setStudents} onExit={exitGame} />;
   if (screen === "game-rpg")      return <WordWorldRPG   name={name} setStudents={setStudents} onExit={exitGame} />;
+  if (screen === "game-picture")  return <PictureWordGame name={name} setStudents={setStudents} onExit={exitGame} />;
+  if (screen === "game-lines")    return <WordMatchLines  name={name} setStudents={setStudents} onExit={exitGame} />;
+  if (screen === "game-search")   return <WordSearchGame  name={name} setStudents={setStudents} onExit={exitGame} />;
+  if (screen === "game-dictation")return <DictationGame   name={name} setStudents={setStudents} onExit={exitGame} />;
   if (screen === "quiz" && quizSet) return <StudentQuiz name={name} setStudents={setStudents} qset={quizSet} onExit={() => { setScreen("home"); setQuizSet(null); }} />;
 
   const hour = new Date().getHours();
@@ -2870,6 +2912,9 @@ function StudentHome({ name, bank, setStudents, students, onLogout }) {
           <div style={{ fontSize: 13, fontWeight: 900, color: T.text }}>{name}님</div>
           <div style={{ fontSize: 10, color: T.textDim }}>⭐ {points}p</div>
         </div>
+        <button onClick={() => setDarkMode && setDarkMode(d => !d)} title={darkMode?"라이트":"다크"} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, padding:"4px 6px", borderRadius:8 }}>
+          {darkMode ? "☀️" : "🌙"}
+        </button>
         <Btn v="ghost" size="sm" onClick={onLogout} style={{ fontSize: 11 }}>로그아웃</Btn>
       </div>
 
@@ -3002,9 +3047,13 @@ function StudentHome({ name, bank, setStudents, students, onLogout }) {
                 { id:"game-memory",  icon:"🧠", name:"메모리 카드",   sub:"짝 맞추기",       bg:T.accentLight },
                 { id:"game-anagram", icon:"🔤", name:"철자 조립",     sub:"섞인 철자 맞추기", bg:T.greenLight },
                 { id:"game-typing",  icon:"⌨️", name:"타이핑 레이스", sub:"단어가 내려와요!", bg:T.pinkLight },
-                { id:"game-relay",   icon:"🔗", name:"단어 릴레이",  sub:"콤보를 이어가요!", bg:T.tealLight||T.accentLight },
+                { id:"game-relay",    icon:"🔗", name:"단어 릴레이",  sub:"콤보를 이어가요!", bg:T.tealLight },
                 { id:"game-twenty",  icon:"🔍", name:"단어 스무고개", sub:"힌트로 추리해요!", bg:T.orangeLight },
                 { id:"game-wrong",   icon:"📒", name:"오답 노트",     sub:"틀린 단어 복습",   bg:T.redLight },
+                { id:"game-picture", icon:"🖼️", name:"그림 단어",     sub:"그림 보고 맞추기", bg:T.yellowLight },
+                { id:"game-lines",   icon:"🔗", name:"단어 연결",     sub:"영어-한글 매칭",   bg:T.purpleLight },
+                { id:"game-search",  icon:"🔍", name:"단어 찾기",     sub:"숨겨진 단어 찾기", bg:T.greenLight },
+                { id:"game-dictation",icon:"🎤",name:"받아쓰기",       sub:"듣고 받아써요",    bg:T.accentLight },
               ].map(g => (
                 <Card key={g.id} onClick={() => setScreen(g.id)} style={{ padding: 14, textAlign: "center", position: "relative" }}>
                   {g.badge && (
@@ -3142,6 +3191,14 @@ export default function App() {
   const [exams, setExams] = useStorage("angela_exams", []);
   const [savedPw, setSavedPw] = useStorage("angela_pw", "1111");
   const [students, setStudents] = useStorage("angela_students", {});
+  const [darkMode, setDarkMode] = useStorage("angela_dark", false);
+
+  // 다크모드 적용
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
+    document.body.style.background = darkMode ? "#0f172a" : "#f0f7ff";
+  }, [darkMode]);
 
   // ── 자동 마이그레이션: 기본 세트가 5문제 이하면 900문제로 교체 ─────────
   useEffect(() => {
@@ -3190,11 +3247,13 @@ export default function App() {
     exams={exams} setExams={setExams}
     students={students} setStudents={setStudents}
     savedPw={savedPw} setSavedPw={setSavedPw}
+    darkMode={darkMode} setDarkMode={setDarkMode}
   />;
   if (mode === "student") return <StudentHome
     name={studentName} bank={bank}
     students={students} setStudents={setStudents}
     onLogout={() => setMode("landing")}
+    darkMode={darkMode} setDarkMode={setDarkMode}
   />;
   return null;
 }

@@ -1092,3 +1092,594 @@ export function WordWorldRPG({ name, setStudents, onExit }) {
 
   return null;
 }
+
+// ══════════════════════════════════════════════════════════════════════════
+//  ⑨ 그림 보고 단어 맞추기 (이모지 → 영단어)
+// ══════════════════════════════════════════════════════════════════════════
+
+const EMOJI_WORDS = [
+  {en:"dog",ko:"강아지",emoji:"🐶"},{en:"cat",ko:"고양이",emoji:"🐱"},
+  {en:"pig",ko:"돼지",emoji:"🐷"},{en:"cow",ko:"소",emoji:"🐮"},
+  {en:"rabbit",ko:"토끼",emoji:"🐰"},{en:"bear",ko:"곰",emoji:"🐻"},
+  {en:"tiger",ko:"호랑이",emoji:"🐯"},{en:"lion",ko:"사자",emoji:"🦁"},
+  {en:"elephant",ko:"코끼리",emoji:"🐘"},{en:"monkey",ko:"원숭이",emoji:"🐵"},
+  {en:"horse",ko:"말",emoji:"🐴"},{en:"sheep",ko:"양",emoji:"🐑"},
+  {en:"chicken",ko:"닭",emoji:"🐔"},{en:"duck",ko:"오리",emoji:"🦆"},
+  {en:"fish",ko:"물고기",emoji:"🐟"},{en:"frog",ko:"개구리",emoji:"🐸"},
+  {en:"snake",ko:"뱀",emoji:"🐍"},{en:"turtle",ko:"거북",emoji:"🐢"},
+  {en:"apple",ko:"사과",emoji:"🍎"},{en:"banana",ko:"바나나",emoji:"🍌"},
+  {en:"orange",ko:"오렌지",emoji:"🍊"},{en:"grape",ko:"포도",emoji:"🍇"},
+  {en:"strawberry",ko:"딸기",emoji:"🍓"},{en:"watermelon",ko:"수박",emoji:"🍉"},
+  {en:"bread",ko:"빵",emoji:"🍞"},{en:"pizza",ko:"피자",emoji:"🍕"},
+  {en:"hamburger",ko:"햄버거",emoji:"🍔"},{en:"cake",ko:"케이크",emoji:"🎂"},
+  {en:"ice cream",ko:"아이스크림",emoji:"🍦"},{en:"egg",ko:"달걀",emoji:"🥚"},
+  {en:"sun",ko:"해",emoji:"☀️"},{en:"moon",ko:"달",emoji:"🌙"},
+  {en:"star",ko:"별",emoji:"⭐"},{en:"rain",ko:"비",emoji:"🌧️"},
+  {en:"snow",ko:"눈",emoji:"❄️"},{en:"tree",ko:"나무",emoji:"🌳"},
+  {en:"flower",ko:"꽃",emoji:"🌸"},{en:"book",ko:"책",emoji:"📚"},
+  {en:"pencil",ko:"연필",emoji:"✏️"},{en:"school",ko:"학교",emoji:"🏫"},
+  {en:"car",ko:"자동차",emoji:"🚗"},{en:"bus",ko:"버스",emoji:"🚌"},
+  {en:"airplane",ko:"비행기",emoji:"✈️"},{en:"ship",ko:"배",emoji:"🚢"},
+  {en:"house",ko:"집",emoji:"🏠"},{en:"hospital",ko:"병원",emoji:"🏥"},
+  {en:"heart",ko:"심장/하트",emoji:"❤️"},{en:"fire",ko:"불",emoji:"🔥"},
+  {en:"water",ko:"물",emoji:"💧"},{en:"music",ko:"음악",emoji:"🎵"},
+];
+
+export function PictureWordGame({ name, setStudents, onExit }) {
+  const [round, setRound] = useState(0);
+  const [score, setScore] = useState(0);
+  const [picked, setPicked] = useState(null);
+  const [mode, setMode] = useState(null); // null=선택 | "en" | "ko"
+
+  const questions = useMemo(() => {
+    const pool = shuffle(EMOJI_WORDS).slice(0, 10);
+    return pool.map(w => {
+      const wrongs = shuffle(EMOJI_WORDS.filter(x => x.en !== w.en)).slice(0, 3);
+      const opts = shuffle([w, ...wrongs]);
+      return { ...w, opts };
+    });
+  }, []);
+
+  if (!mode) return (
+    <div style={{minHeight:"100vh",background:T.bg,padding:16}}>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:20}}>
+        <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
+      </div>
+      <div style={{textAlign:"center",marginBottom:24}}>
+        <div style={{fontSize:56,marginBottom:8}}>🖼️</div>
+        <div style={{fontSize:20,fontWeight:900,color:T.text}}>그림 보고 단어 맞추기</div>
+        <div style={{fontSize:13,color:T.textMid,marginTop:4}}>어떤 방향으로 풀까요?</div>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:12,maxWidth:400,margin:"0 auto"}}>
+        {[
+          {id:"en",label:"🖼️ → 🇺🇸 영어 맞추기",desc:"그림 보고 영어 단어 선택",bg:T.accentLight,c:T.accent},
+          {id:"ko",label:"🖼️ → 🇰🇷 한글 맞추기",desc:"그림 보고 한글 뜻 선택",bg:T.greenLight,c:T.green},
+        ].map(m => (
+          <Card key={m.id} onClick={()=>setMode(m.id)} style={{display:"flex",alignItems:"center",gap:14,background:m.bg,border:`2px solid ${m.c}33`}}>
+            <div style={{fontSize:28,flex:0}}>{m.id==="en"?"🇺🇸":"🇰🇷"}</div>
+            <div><div style={{fontSize:15,fontWeight:900,color:T.text}}>{m.label}</div><div style={{fontSize:12,color:T.textMid}}>{m.desc}</div></div>
+            <div style={{marginLeft:"auto",fontSize:20,color:T.textDim}}>›</div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (round >= questions.length) {
+    const pts = score * 10;
+    if (typeof setStudents === "function") {
+      setStudents(prev => {
+        const s = prev[name] || {};
+        return { ...prev, [name]: { ...s, points:(s.points||0)+pts, records:[...(s.records||[]), {type:"game",gameType:"그림단어",score,total:questions.length,points:pts,date:new Date().toISOString()}].slice(-50) }};
+      });
+    }
+    return (
+      <div style={{minHeight:"100vh",background:T.bg,padding:"60px 20px",textAlign:"center"}}>
+        <div style={{fontSize:64,marginBottom:14}}>{score>=8?"🎉":score>=5?"👏":"💪"}</div>
+        <div style={{fontSize:22,fontWeight:900,color:T.text}}>{score} / {questions.length}</div>
+        <Card style={{maxWidth:280,margin:"16px auto 20px",background:T.yellowLight,padding:14}}>
+          <div style={{fontSize:32}}>⭐</div><div style={{fontSize:16,fontWeight:900,color:T.text}}>+{pts} 포인트</div>
+        </Card>
+        <div style={{display:"flex",gap:10,maxWidth:280,margin:"0 auto"}}>
+          <Btn v="secondary" size="lg" onClick={()=>{setRound(0);setScore(0);setPicked(null);setMode(null);}} style={{flex:1}}>🔄 다시</Btn>
+          <Btn v="primary" size="lg" onClick={onExit} style={{flex:1}}>홈으로</Btn>
+        </div>
+      </div>
+    );
+  }
+
+  const q = questions[round];
+  const answered = picked !== null;
+  const ansIdx = q.opts.findIndex(o => o.en === q.en);
+
+  const pick = (idx) => {
+    if (answered) return;
+    setPicked(idx);
+    if (idx === ansIdx) setScore(s => s+1);
+    recordWrong(name, q.en, idx === ansIdx);
+    setTimeout(() => { setPicked(null); setRound(r => r+1); }, 900);
+  };
+
+  return (
+    <div style={{minHeight:"100vh",background:T.bg,padding:16}}>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:12,alignItems:"center"}}>
+        <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
+        <span style={{fontSize:12,fontWeight:700,color:T.textMid}}>{round+1}/{questions.length}</span>
+        <span style={{fontSize:12,fontWeight:700,color:T.yellow}}>⭐{score}</span>
+      </div>
+      <div style={{height:5,background:T.border,borderRadius:3,marginBottom:14,overflow:"hidden"}}>
+        <div style={{height:"100%",width:`${(round/questions.length)*100}%`,background:mode==="en"?T.accent:T.green,borderRadius:3,transition:"width 0.3s"}}/>
+      </div>
+      <Card style={{marginBottom:14,textAlign:"center",padding:"32px 16px",background:mode==="en"?T.accentLight:T.greenLight}}>
+        <div style={{fontSize:10,color:T.textMid,fontWeight:700,marginBottom:8}}>이 그림의 {mode==="en"?"영어 단어는?":"한글 뜻은?"}</div>
+        <div style={{fontSize:90,lineHeight:1,marginBottom:8}}>{q.emoji}</div>
+        <div style={{fontSize:12,color:T.textMid}}>{mode==="en"?q.ko:q.en}</div>
+      </Card>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+        {q.opts.map((o,idx) => {
+          const isAns = idx === ansIdx;
+          let bg=T.card,color=T.text,border=T.border;
+          if (answered){ if(isAns){bg=T.green;color="white";border=T.green;} else if(idx===picked){bg=T.red;color="white";border=T.red;} }
+          return <button key={idx} onClick={()=>pick(idx)} disabled={answered} style={{padding:"18px 10px",borderRadius:13,border:`2px solid ${border}`,background:bg,color,fontSize:15,fontWeight:800,cursor:answered?"default":"pointer",transition:"all 0.2s",lineHeight:1.3}}>
+            {mode==="en"?o.en:o.ko}
+          </button>;
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  ⑩ 단어-뜻 연결하기 (Match Lines)
+// ══════════════════════════════════════════════════════════════════════════
+export function WordMatchLines({ name, setStudents, onExit }) {
+  const [round, setRound] = useState(0);   // 라운드 (6단어 1세트)
+  const [score, setScore] = useState(0);
+  const [selLeft, setSelLeft] = useState(null);  // 선택된 왼쪽 idx
+  const [matched, setMatched] = useState({});    // {leftIdx: rightIdx}
+  const [wrong, setWrong] = useState(null);      // 틀린 쌍 표시용
+  const [done, setDone] = useState(false);
+
+  const ROUNDS = 3;
+  const PER = 6;
+
+  const sets = useMemo(() => {
+    const pool = shuffle(ALL_WORDS.filter(w=>!w.en.includes(" "))).slice(0, ROUNDS * PER);
+    return Array.from({length: ROUNDS}, (_, i) => {
+      const words = pool.slice(i*PER, (i+1)*PER);
+      return { left: words, right: shuffle([...words]) };
+    });
+  }, []);
+
+  const cur = sets[round];
+  const allMatched = Object.keys(matched).length === PER;
+
+  const handleLeft = (idx) => { if (matched[idx] !== undefined) return; setSelLeft(idx); };
+
+  const handleRight = (idx) => {
+    if (selLeft === null) return;
+    const correctRightIdx = cur.right.findIndex(w => w.en === cur.left[selLeft].en);
+    if (idx === correctRightIdx) {
+      setMatched(m => ({...m, [selLeft]: idx}));
+      setScore(s => s+1);
+      setSelLeft(null);
+    } else {
+      setWrong({left:selLeft, right:idx});
+      setTimeout(() => { setWrong(null); setSelLeft(null); }, 600);
+    }
+  };
+
+  const nextRound = () => {
+    if (round < ROUNDS-1) { setRound(r=>r+1); setMatched({}); setSelLeft(null); }
+    else setDone(true);
+  };
+
+  if (done) {
+    const total = ROUNDS * PER;
+    const pts = score * 10;
+    if (typeof setStudents==="function") {
+      setStudents(prev => { const s=prev[name]||{}; return {...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"단어연결",score,total,points:pts,date:new Date().toISOString()}].slice(-50)}}; });
+    }
+    return (
+      <div style={{minHeight:"100vh",background:T.bg,padding:"60px 20px",textAlign:"center"}}>
+        <div style={{fontSize:64,marginBottom:14}}>{score>=total*.8?"🎉":score>=total*.5?"👏":"💪"}</div>
+        <div style={{fontSize:22,fontWeight:900,color:T.text}}>{score} / {ROUNDS*PER}</div>
+        <Card style={{maxWidth:280,margin:"16px auto 20px",background:T.yellowLight,padding:14}}>
+          <div style={{fontSize:32}}>⭐</div><div style={{fontSize:16,fontWeight:900,color:T.text}}>+{pts} 포인트</div>
+        </Card>
+        <Btn v="primary" size="lg" onClick={onExit}>홈으로</Btn>
+      </div>
+    );
+  }
+
+  // 매칭된 왼쪽 idx → 오른쪽 idx 역방향 맵
+  const matchedRight = new Set(Object.values(matched));
+
+  return (
+    <div style={{minHeight:"100vh",background:T.bg,padding:16}}>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:12,alignItems:"center"}}>
+        <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
+        <span style={{fontSize:12,fontWeight:700,color:T.purple}}>라운드 {round+1}/{ROUNDS}</span>
+        <span style={{fontSize:12,fontWeight:700,color:T.yellow}}>⭐{score}</span>
+      </div>
+      <div style={{height:5,background:T.border,borderRadius:3,marginBottom:14,overflow:"hidden"}}>
+        <div style={{height:"100%",width:`${(Object.keys(matched).length/PER)*100}%`,background:T.purple,borderRadius:3,transition:"width 0.3s"}}/>
+      </div>
+      <div style={{fontSize:12,color:T.textMid,textAlign:"center",marginBottom:12}}>
+        왼쪽 영어 단어와 오른쪽 한글 뜻을 연결하세요
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+        {/* 왼쪽: 영어 */}
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          {cur.left.map((w,i) => {
+            const isMatched = matched[i] !== undefined;
+            const isSel = selLeft === i;
+            const isWrong = wrong?.left === i;
+            return (
+              <button key={i} onClick={()=>handleLeft(i)} style={{
+                padding:"12px 10px",borderRadius:11,fontSize:13,fontWeight:800,
+                border:`2px solid ${isWrong?T.red:isSel?T.purple:isMatched?T.green:T.border}`,
+                background:isWrong?T.redLight:isSel?T.purpleLight:isMatched?T.greenLight:T.card,
+                color:isMatched?T.green:isSel?T.purple:T.text,
+                cursor:isMatched?"default":"pointer",textAlign:"center",transition:"all 0.2s"
+              }}>{w.en}</button>
+            );
+          })}
+        </div>
+        {/* 오른쪽: 한글 */}
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          {cur.right.map((w,i) => {
+            const isMatched = matchedRight.has(i);
+            const isWrong = wrong?.right === i;
+            return (
+              <button key={i} onClick={()=>handleRight(i)} style={{
+                padding:"12px 10px",borderRadius:11,fontSize:13,fontWeight:800,
+                border:`2px solid ${isWrong?T.red:isMatched?T.green:T.border}`,
+                background:isWrong?T.redLight:isMatched?T.greenLight:T.card,
+                color:isMatched?T.green:T.text,
+                cursor:isMatched?"default":"pointer",textAlign:"center",transition:"all 0.2s"
+              }}>{w.ko}</button>
+            );
+          })}
+        </div>
+      </div>
+
+      {allMatched && (
+        <Btn v="primary" size="lg" onClick={nextRound} style={{width:"100%"}}>
+          {round<ROUNDS-1?"다음 라운드 →":"결과 보기 🎉"}
+        </Btn>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  ⑪ 단어 찾기 퍼즐 (Word Search)
+// ══════════════════════════════════════════════════════════════════════════
+function buildGrid(words, size=10) {
+  const grid = Array.from({length:size}, ()=>Array(size).fill(""));
+  const placed = [];
+  const dirs = [[0,1],[1,0],[1,1],[0,-1],[-1,0]]; // 가로/세로/대각/역방향
+
+  for (const word of words) {
+    const w = word.en.toUpperCase().replace(/\s/g,"");
+    if (w.length > size) continue;
+    let success = false;
+    for (let attempt=0; attempt<80 && !success; attempt++) {
+      const [dr,dc] = dirs[Math.floor(Math.random()*dirs.length)];
+      const maxR = dr>0?size-w.length:dr<0?w.length-1:size-1;
+      const maxC = dc>0?size-w.length:dc<0?w.length-1:size-1;
+      if (maxR<0||maxC<0) continue;
+      const r = Math.floor(Math.random()*(maxR+1))+(dr<0?w.length-1:0);
+      const c = Math.floor(Math.random()*(maxC+1))+(dc<0?w.length-1:0);
+      let ok = true;
+      for (let k=0;k<w.length;k++) {
+        const cr=r+dr*k, cc=c+dc*k;
+        if (cr<0||cr>=size||cc<0||cc>=size) {ok=false;break;}
+        if (grid[cr][cc]&&grid[cr][cc]!==w[k]) {ok=false;break;}
+      }
+      if (ok) {
+        for (let k=0;k<w.length;k++) grid[r+dr*k][c+dc*k]=w[k];
+        placed.push({word:w,original:word,r,c,dr,dc,len:w.length});
+        success = true;
+      }
+    }
+  }
+  const alpha="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  for (let r=0;r<size;r++) for (let c=0;c<size;c++)
+    if (!grid[r][c]) grid[r][c]=alpha[Math.floor(Math.random()*alpha.length)];
+  return {grid, placed};
+}
+
+export function WordSearchGame({ name, setStudents, onExit }) {
+  const SIZE = 10;
+  const WORD_COUNT = 8;
+
+  const { grid, placed, words } = useMemo(() => {
+    const ws = shuffle(ALL_WORDS.filter(w=>!w.en.includes(" ")&&w.en.length>=3&&w.en.length<=7)).slice(0, WORD_COUNT);
+    const {grid,placed} = buildGrid(ws, SIZE);
+    return {grid,placed,words:ws};
+  }, []);
+
+  const [selecting, setSelecting] = useState(false);
+  const [startCell, setStartCell] = useState(null);
+  const [curCell, setCurCell] = useState(null);
+  const [found, setFound] = useState([]); // [wordStr]
+  const [done, setDone] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const timerRef = useRef(null);
+
+  useEffect(()=>{
+    timerRef.current = setInterval(()=>setElapsed(e=>e+1),1000);
+    return ()=>clearInterval(timerRef.current);
+  },[]);
+
+  useEffect(()=>{
+    if (found.length===placed.length&&placed.length>0) {
+      clearInterval(timerRef.current);
+      setDone(true);
+    }
+  },[found,placed]);
+
+  // 현재 선택 중인 셀들 계산
+  const getSelected = () => {
+    if (!startCell||!curCell) return new Set();
+    const cells = new Set();
+    const dr = Math.sign(curCell.r-startCell.r);
+    const dc = Math.sign(curCell.c-startCell.c);
+    const steps = Math.max(Math.abs(curCell.r-startCell.r),Math.abs(curCell.c-startCell.c));
+    for (let k=0;k<=steps;k++) cells.add(`${startCell.r+dr*k},${startCell.c+dc*k}`);
+    return cells;
+  };
+
+  // 찾은 단어 셀들
+  const foundCells = useMemo(()=>{
+    const s=new Set();
+    placed.filter(p=>found.includes(p.word)).forEach(p=>{
+      for (let k=0;k<p.len;k++) s.add(`${p.r+p.dr*k},${p.c+p.dc*k}`);
+    });
+    return s;
+  },[found,placed]);
+
+  const tryMatch = (start,end) => {
+    const dr=Math.sign(end.r-start.r), dc=Math.sign(end.c-start.c);
+    const steps=Math.max(Math.abs(end.r-start.r),Math.abs(end.c-start.c));
+    let word="";
+    for (let k=0;k<=steps;k++) {
+      const r=start.r+dr*k,c=start.c+dc*k;
+      if (r<0||r>=SIZE||c<0||c>=SIZE) return;
+      word+=grid[r][c];
+    }
+    const hit=placed.find(p=>p.word===word&&!found.includes(p.word));
+    if (hit) setFound(f=>[...f,hit.word]);
+  };
+
+  const selected = getSelected();
+  const CELL = 30;
+
+  if (done) {
+    const pts = found.length * 15;
+    if (typeof setStudents==="function") {
+      setStudents(prev=>{const s=prev[name]||{};return{...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"단어찾기퍼즐",score:found.length,total:placed.length,points:pts,date:new Date().toISOString()}].slice(-50)}};});
+    }
+    return (
+      <div style={{minHeight:"100vh",background:T.bg,padding:"48px 20px",textAlign:"center"}}>
+        <div style={{fontSize:64,marginBottom:12}}>🔍</div>
+        <div style={{fontSize:20,fontWeight:900,color:T.text,marginBottom:4}}>{found.length}/{placed.length}단어 발견!</div>
+        <div style={{fontSize:13,color:T.textMid,marginBottom:16}}>⏱️ {elapsed}초</div>
+        <Card style={{maxWidth:280,margin:"0 auto 20px",background:T.yellowLight,padding:14}}>
+          <div style={{fontSize:32}}>⭐</div><div style={{fontSize:16,fontWeight:900,color:T.text}}>+{pts} 포인트</div>
+        </Card>
+        <Btn v="primary" size="lg" onClick={onExit}>홈으로</Btn>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{minHeight:"100vh",background:T.bg,padding:14}}>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:10,alignItems:"center"}}>
+        <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
+        <span style={{fontSize:12,fontWeight:700,color:T.green}}>✓ {found.length}/{placed.length}</span>
+        <span style={{fontSize:12,fontWeight:700,color:T.textMid}}>⏱️ {elapsed}초</span>
+      </div>
+
+      {/* 찾을 단어 목록 */}
+      <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:12}}>
+        {placed.map(p=>(
+          <span key={p.word} style={{fontSize:12,fontWeight:800,padding:"3px 10px",borderRadius:8,
+            background:found.includes(p.word)?T.green:T.card,
+            color:found.includes(p.word)?"white":T.text,
+            border:`1px solid ${found.includes(p.word)?T.green:T.border}`,
+            textDecoration:found.includes(p.word)?"line-through":"none"}}>
+            {p.original.en}
+          </span>
+        ))}
+      </div>
+
+      {/* 그리드 */}
+      <div style={{overflowX:"auto",marginBottom:12}}>
+        <div style={{display:"inline-block",userSelect:"none",touchAction:"none"}}>
+          {grid.map((row,r)=>(
+            <div key={r} style={{display:"flex"}}>
+              {row.map((ch,c)=>{
+                const key=`${r},${c}`;
+                const isSel=selected.has(key);
+                const isFound=foundCells.has(key);
+                return (
+                  <div key={c}
+                    onMouseDown={()=>{setSelecting(true);setStartCell({r,c});setCurCell({r,c});}}
+                    onMouseEnter={()=>{if(selecting){setCurCell({r,c});}}}
+                    onMouseUp={()=>{if(selecting&&startCell){tryMatch(startCell,{r,c});}setSelecting(false);setStartCell(null);setCurCell(null);}}
+                    onTouchStart={()=>{setSelecting(true);setStartCell({r,c});setCurCell({r,c});}}
+                    onTouchMove={(e)=>{
+                      const t=e.touches[0];
+                      const el=document.elementFromPoint(t.clientX,t.clientY);
+                      if(el?.dataset?.cell){const[cr,cc]=el.dataset.cell.split(",").map(Number);setCurCell({r:cr,c:cc});}
+                    }}
+                    onTouchEnd={()=>{if(selecting&&startCell&&curCell)tryMatch(startCell,curCell);setSelecting(false);setStartCell(null);setCurCell(null);}}
+                    data-cell={`${r},${c}`}
+                    style={{
+                      width:CELL,height:CELL,display:"flex",alignItems:"center",justifyContent:"center",
+                      fontSize:13,fontWeight:800,borderRadius:6,margin:1,cursor:"pointer",
+                      background:isFound?"#22c55e":isSel?"#a855f7":"#fff",
+                      color:isFound||isSel?"white":T.text,
+                      border:`1px solid ${isFound?"#16a34a":isSel?"#7c3aed":T.border}`,
+                      transition:"background 0.1s"
+                    }}>{ch}</div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 뜻 힌트 */}
+      <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
+        {placed.map(p=>(
+          <span key={p.word} style={{fontSize:10,color:T.textMid,padding:"2px 7px",borderRadius:6,background:T.bg,border:`1px solid ${T.border}`}}>
+            {p.original.en} = {p.original.ko}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  ⑫ 받아쓰기 (Dictation)
+// ══════════════════════════════════════════════════════════════════════════
+export function DictationGame({ name, setStudents, onExit }) {
+  const [mode, setMode] = useState(null); // null | "word" | "sentence"
+  const [round, setRound] = useState(0);
+  const [score, setScore] = useState(0);
+  const [input, setInput] = useState("");
+  const [feedback, setFeedback] = useState(null);
+  const [played, setPlayed] = useState(false);
+  const inputRef = useRef(null);
+
+  const SENTENCES = [
+    "I am a student.","She is my friend.","They are happy.",
+    "He eats breakfast every day.","We go to school together.",
+    "Can you speak English?","I like to read books.",
+    "The dog is very cute.","May I use your pencil?",
+    "She studied hard for the test.",
+  ];
+
+  const questions = useMemo(() => {
+    if (!mode) return [];
+    if (mode==="word") return shuffle(ALL_WORDS.filter(w=>!w.en.includes(" "))).slice(0,10);
+    return shuffle(SENTENCES).slice(0,8).map(s=>({en:s,ko:"문장 받아쓰기"}));
+  },[mode]);
+
+  const speakQ = () => {
+    if (!questions[round]) return;
+    const text = questions[round].en;
+    if (!isBrowser||!window.speechSynthesis) { alert("이 브라우저는 음성을 지원하지 않아요"); return; }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang="en-US"; u.rate=mode==="word"?0.8:0.7;
+    window.speechSynthesis.speak(u);
+    setPlayed(true);
+    setTimeout(()=>inputRef.current?.focus(), 300);
+  };
+
+  const check = () => {
+    if (!input.trim()) return;
+    const ans = questions[round].en.toLowerCase().replace(/[.,!?]/g,"").trim();
+    const inp = input.toLowerCase().replace(/[.,!?]/g,"").trim();
+    const correct = ans===inp;
+    setFeedback(correct?"correct":"wrong");
+    if (correct) setScore(s=>s+1);
+    recordWrong(name, questions[round].en, correct);
+  };
+
+  const next = () => { setFeedback(null); setInput(""); setPlayed(false); setRound(r=>r+1); };
+
+  if (!mode) return (
+    <div style={{minHeight:"100vh",background:T.bg,padding:16}}>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:20}}>
+        <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
+      </div>
+      <div style={{textAlign:"center",marginBottom:24}}>
+        <div style={{fontSize:52,marginBottom:8}}>🎤</div>
+        <div style={{fontSize:20,fontWeight:900,color:T.text}}>받아쓰기</div>
+        <div style={{fontSize:13,color:T.textMid,marginTop:4}}>듣고 영어로 써보세요!</div>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:12,maxWidth:400,margin:"0 auto"}}>
+        {[
+          {id:"word",label:"🔤 단어 받아쓰기",desc:"영어 단어를 듣고 타이핑",bg:T.accentLight,c:T.accent},
+          {id:"sentence",label:"📝 문장 받아쓰기",desc:"영어 문장을 듣고 타이핑",bg:T.purpleLight,c:T.purple},
+        ].map(m=>(
+          <Card key={m.id} onClick={()=>setMode(m.id)} style={{display:"flex",alignItems:"center",gap:14,background:m.bg,border:`2px solid ${m.c}33`}}>
+            <div style={{fontSize:28}}>{m.id==="word"?"🔤":"📝"}</div>
+            <div><div style={{fontSize:15,fontWeight:900,color:T.text}}>{m.label}</div><div style={{fontSize:12,color:T.textMid}}>{m.desc}</div></div>
+            <div style={{marginLeft:"auto",fontSize:20,color:T.textDim}}>›</div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (round>=questions.length) {
+    const total=questions.length;
+    const pts=score*12;
+    if (typeof setStudents==="function") {
+      setStudents(prev=>{const s=prev[name]||{};return{...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"받아쓰기",score,total,points:pts,date:new Date().toISOString()}].slice(-50)}};});
+    }
+    return (
+      <div style={{minHeight:"100vh",background:T.bg,padding:"60px 20px",textAlign:"center"}}>
+        <div style={{fontSize:64,marginBottom:14}}>{score>=total*.8?"🎉":score>=total*.5?"👏":"💪"}</div>
+        <div style={{fontSize:22,fontWeight:900,color:T.text}}>{score}/{total}</div>
+        <Card style={{maxWidth:280,margin:"16px auto 20px",background:T.yellowLight,padding:14}}>
+          <div style={{fontSize:32}}>⭐</div><div style={{fontSize:16,fontWeight:900,color:T.text}}>+{pts} 포인트</div>
+        </Card>
+        <div style={{display:"flex",gap:10,maxWidth:280,margin:"0 auto"}}>
+          <Btn v="secondary" size="lg" onClick={()=>{setRound(0);setScore(0);setInput("");setFeedback(null);setPlayed(false);setMode(null);}} style={{flex:1}}>🔄 다시</Btn>
+          <Btn v="primary" size="lg" onClick={onExit} style={{flex:1}}>홈으로</Btn>
+        </div>
+      </div>
+    );
+  }
+
+  const q = questions[round];
+  return (
+    <div style={{minHeight:"100vh",background:T.bg,padding:16}}>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:12,alignItems:"center"}}>
+        <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
+        <span style={{fontSize:12,fontWeight:700,color:mode==="word"?T.accent:T.purple}}>{round+1}/{questions.length}</span>
+        <span style={{fontSize:12,fontWeight:700,color:T.yellow}}>⭐{score}</span>
+      </div>
+      <div style={{height:5,background:T.border,borderRadius:3,marginBottom:20,overflow:"hidden"}}>
+        <div style={{height:"100%",width:`${(round/questions.length)*100}%`,background:mode==="word"?T.accent:T.purple,borderRadius:3,transition:"width 0.3s"}}/>
+      </div>
+
+      {/* 듣기 버튼 */}
+      <Card style={{marginBottom:16,textAlign:"center",padding:"28px 20px",background:mode==="word"?T.accentLight:T.purpleLight}}>
+        <div style={{fontSize:13,color:T.textMid,fontWeight:700,marginBottom:12}}>
+          {mode==="word"?"단어를 듣고 영어로 써보세요":"문장을 듣고 영어로 받아쓰세요"}
+        </div>
+        <button onClick={speakQ} style={{width:72,height:72,borderRadius:"50%",border:"none",fontSize:36,cursor:"pointer",background:mode==="word"?T.accent:T.purple,color:"white",boxShadow:T.shadow,marginBottom:8}}>🔊</button>
+        <div style={{fontSize:12,color:T.textMid}}>버튼을 눌러 듣기</div>
+        {feedback==="correct"&&<div style={{marginTop:8,fontSize:13,fontWeight:900,color:T.green}}>정답: {q.en}</div>}
+        {feedback==="wrong"&&<div style={{marginTop:8,fontSize:13,fontWeight:900,color:T.red}}>정답: <strong>{q.en}</strong></div>}
+        {q.ko&&mode==="word"&&<div style={{marginTop:6,fontSize:12,color:T.textMid}}>힌트: {q.ko}</div>}
+      </Card>
+
+      <input ref={inputRef} value={input} onChange={e=>setInput(e.target.value)}
+        onKeyDown={e=>{if(e.key==="Enter"&&!feedback){check();}else if(e.key==="Enter"&&feedback)next();}}
+        placeholder={played?"영어로 입력하세요...":"🔊 버튼을 먼저 눌러주세요"}
+        disabled={!!feedback||!played}
+        style={{width:"100%",boxSizing:"border-box",padding:"14px 16px",borderRadius:12,border:`2px solid ${feedback==="correct"?T.green:feedback==="wrong"?T.red:T.accent}`,fontSize:16,outline:"none",marginBottom:10,fontWeight:700}}
+      />
+
+      {!feedback ? (
+        <Btn v="primary" size="lg" onClick={check} disabled={!input.trim()||!played} style={{width:"100%"}}>✓ 확인 (Enter)</Btn>
+      ) : (
+        <Btn v={feedback==="correct"?"success":"danger"} size="lg" onClick={next} style={{width:"100%"}}>
+          {feedback==="correct"?"✓ 정답! → 다음":"✗ 오답 → 다음"}
+        </Btn>
+      )}
+    </div>
+  );
+}

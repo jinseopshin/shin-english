@@ -1101,3 +1101,335 @@ export function ScheduleBanner({ schedules }) {
     </div>
   );
 }
+
+// ══════════════════════════════════════════════════════════════════════════
+//  학생별 상세 리포트 (선생님용)
+// ══════════════════════════════════════════════════════════════════════════
+export function StudentDetailReport({ student, onBack }) {
+  if (!student) return null;
+  const records = student.records || [];
+  const assignRecs = records.filter(r=>r.type==="assignment");
+  const gameRecs   = records.filter(r=>r.type==="game");
+
+  // 과제별 정답률
+  const bySet = {};
+  assignRecs.forEach(r=>{
+    const k = r.setTitle||r.bankId||"기타";
+    if(!bySet[k]) bySet[k]={correct:0,total:0,count:0};
+    bySet[k].correct+=r.score||0;
+    bySet[k].total+=r.total||0;
+    bySet[k].count++;
+  });
+
+  // 게임별 통계
+  const byGame = {};
+  gameRecs.forEach(r=>{
+    const k=r.gameType||"기타";
+    if(!byGame[k]) byGame[k]={correct:0,total:0,count:0};
+    byGame[k].correct+=r.score||0;
+    byGame[k].total+=r.total||0;
+    byGame[k].count++;
+  });
+
+  // 최근 30일 일별 활동
+  const daily = {};
+  records.forEach(r=>{
+    const d=r.date?.slice(0,10);
+    if(d) daily[d]=(daily[d]||0)+1;
+  });
+  const last14 = Array.from({length:14},(_,i)=>{
+    const d=new Date(); d.setDate(d.getDate()-13+i);
+    const key=d.toISOString().slice(0,10);
+    return {date:key,day:["일","월","화","수","목","금","토"][d.getDay()],count:daily[key]||0};
+  });
+
+  const totalAcc = records.filter(r=>r.total>0).length
+    ? Math.round(records.filter(r=>r.total>0).reduce((a,r)=>a+(r.score/r.total*100),0)/records.filter(r=>r.total>0).length) : 0;
+
+  return (
+    <div>
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
+        <button onClick={onBack} style={{background:"none",border:"none",color:T.accent,fontSize:13,fontWeight:700,cursor:"pointer",padding:"4px 8px",borderRadius:8}}>← 뒤로</button>
+        <div style={{fontSize:26}}>{student.avatar||"🧑"}</div>
+        <div>
+          <div style={{fontSize:16,fontWeight:900,color:T.text}}>{student.name} 상세 리포트</div>
+          <div style={{fontSize:11,color:T.textMid}}>{student.grade||""} · 가입일 {student.joinDate||"-"}</div>
+        </div>
+      </div>
+
+      {/* 핵심 지표 */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:14}}>
+        {[
+          {label:"평균 정답률",val:`${totalAcc}%`,bg:T.accentLight,c:T.accent},
+          {label:"총 포인트",val:`${student.points||0}p`,bg:T.yellowLight,c:T.yellow},
+          {label:"전체 활동",val:`${records.length}회`,bg:T.greenLight,c:T.green},
+        ].map((m,i)=>(
+          <div key={i} style={{background:m.bg,borderRadius:12,padding:"12px 8px",textAlign:"center"}}>
+            <div style={{fontSize:18,fontWeight:900,color:m.c}}>{m.val}</div>
+            <div style={{fontSize:10,color:T.textMid,fontWeight:700,marginTop:2}}>{m.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* 최근 2주 활동 히트맵 */}
+      <div style={{background:T.card,borderRadius:14,padding:14,marginBottom:14,border:`1px solid ${T.border}`}}>
+        <div style={{fontSize:13,fontWeight:800,color:T.text,marginBottom:10}}>📅 최근 2주 활동</div>
+        <div style={{display:"flex",gap:4}}>
+          {last14.map((d,i)=>(
+            <div key={i} style={{flex:1,textAlign:"center"}}>
+              <div style={{height:32,borderRadius:6,background:d.count===0?T.bg:d.count===1?T.accentLight:d.count<=3?T.accent:"#1d4ed8",marginBottom:3}} title={`${d.date}: ${d.count}회`}/>
+              <div style={{fontSize:9,color:T.textDim}}>{d.day}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{display:"flex",gap:8,marginTop:8,fontSize:10,color:T.textMid,alignItems:"center"}}>
+          <span>없음</span>
+          {[T.bg,T.accentLight,T.accent,"#1d4ed8"].map((c,i)=>(
+            <div key={i} style={{width:12,height:12,borderRadius:3,background:c}}/>
+          ))}
+          <span>많음</span>
+        </div>
+      </div>
+
+      {/* 과제별 성적 */}
+      {Object.entries(bySet).length>0&&(
+        <div style={{background:T.card,borderRadius:14,padding:14,marginBottom:14,border:`1px solid ${T.border}`}}>
+          <div style={{fontSize:13,fontWeight:800,color:T.text,marginBottom:10}}>📝 과제별 정답률</div>
+          {Object.entries(bySet).sort((a,b)=>a[1].correct/a[1].total-b[1].correct/b[1].total).map(([k,v])=>{
+            const pct=v.total>0?Math.round(v.correct/v.total*100):0;
+            return (
+              <div key={k} style={{marginBottom:10}}>
+                <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
+                  <span style={{fontSize:12,fontWeight:700,color:T.text,maxWidth:"70%",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{k}</span>
+                  <span style={{fontSize:12,fontWeight:900,color:pct>=80?T.green:pct>=60?T.yellow:T.red}}>{pct}% ({v.count}회)</span>
+                </div>
+                <div style={{height:6,background:T.border,borderRadius:3,overflow:"hidden"}}>
+                  <div style={{height:"100%",width:`${pct}%`,background:pct>=80?T.green:pct>=60?T.yellow:T.red,borderRadius:3}}/>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* 게임별 통계 */}
+      {Object.entries(byGame).length>0&&(
+        <div style={{background:T.card,borderRadius:14,padding:14,marginBottom:14,border:`1px solid ${T.border}`}}>
+          <div style={{fontSize:13,fontWeight:800,color:T.text,marginBottom:10}}>🎮 게임별 참여</div>
+          {Object.entries(byGame).sort((a,b)=>b[1].count-a[1].count).map(([k,v])=>{
+            const pct=v.total>0?Math.round(v.correct/v.total*100):0;
+            return (
+              <div key={k} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"7px 0",borderBottom:`1px solid ${T.border}`}}>
+                <span style={{fontSize:12,fontWeight:700,color:T.text}}>{k}</span>
+                <div style={{display:"flex",gap:8,fontSize:11}}>
+                  <span style={{color:T.textMid}}>{v.count}회</span>
+                  {v.total>0&&<span style={{color:pct>=80?T.green:pct>=60?T.yellow:T.red,fontWeight:800}}>{pct}%</span>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* 최근 10개 기록 */}
+      <div style={{background:T.card,borderRadius:14,padding:14,border:`1px solid ${T.border}`}}>
+        <div style={{fontSize:13,fontWeight:800,color:T.text,marginBottom:10}}>📋 최근 학습 기록</div>
+        {records.length===0
+          ? <div style={{textAlign:"center",fontSize:12,color:T.textDim,padding:16}}>기록이 없어요</div>
+          : records.slice(-10).reverse().map((r,i)=>{
+              const pct=r.total>0?Math.round(r.score/r.total*100):null;
+              return (
+                <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0",borderBottom:i<9?`1px solid ${T.border}`:"none"}}>
+                  <span style={{fontSize:16}}>{r.type==="game"?"🎮":"📝"}</span>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:12,fontWeight:700,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.gameType||r.setTitle||r.type}</div>
+                    <div style={{fontSize:10,color:T.textMid}}>{r.date?.slice(0,10)}</div>
+                  </div>
+                  {pct!==null&&<span style={{fontSize:12,fontWeight:900,color:pct>=80?T.green:pct>=60?T.yellow:T.red,flexShrink:0}}>{pct}%</span>}
+                </div>
+              );
+            })
+        }
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  출석 & 수업 참여 기록 (선생님용)
+// ══════════════════════════════════════════════════════════════════════════
+export function AttendanceManager({ students, attendance, setAttendance }) {
+  const [selDate, setSelDate] = useState(new Date().toISOString().slice(0,10));
+  const [view, setView] = useState("today"); // today | history | stats
+
+  const studentList = Object.values(students||{});
+  const today = new Date().toISOString().slice(0,10);
+
+  // 오늘 출석 데이터
+  const todayData = attendance[selDate] || {};
+
+  const mark = (name, status) => {
+    setAttendance(prev=>({
+      ...prev,
+      [selDate]: { ...(prev[selDate]||{}), [name]: status }
+    }));
+  };
+
+  const markAll = (status) => {
+    const all = {};
+    studentList.forEach(s=>{ all[s.name]=status; });
+    setAttendance(prev=>({...prev,[selDate]:all}));
+  };
+
+  // 학생별 출석 통계 계산
+  const getStats = (name) => {
+    const dates = Object.keys(attendance);
+    const present = dates.filter(d=>attendance[d]?.[name]==="present").length;
+    const absent  = dates.filter(d=>attendance[d]?.[name]==="absent").length;
+    const late    = dates.filter(d=>attendance[d]?.[name]==="late").length;
+    const total   = present+absent+late;
+    return {present,absent,late,total,rate:total>0?Math.round(present/total*100):0};
+  };
+
+  const STATUS = {
+    present: {label:"출석",color:T.green,bg:T.greenLight,emoji:"✅"},
+    late:    {label:"지각",color:T.yellow,bg:T.yellowLight,emoji:"⏰"},
+    absent:  {label:"결석",color:T.red,bg:T.redLight,emoji:"❌"},
+  };
+
+  return (
+    <div>
+      <div style={{fontSize:16,fontWeight:900,color:T.text,marginBottom:4}}>🔔 출석 & 수업 기록</div>
+      <div style={{fontSize:11,color:T.textMid,marginBottom:14}}>날짜별 출석을 기록하고 통계를 확인하세요</div>
+
+      {/* 탭 */}
+      <div style={{display:"flex",gap:6,marginBottom:14,background:T.card,padding:5,borderRadius:12,boxShadow:T.shadow}}>
+        {[{id:"today",label:"📋 출석 체크"},{id:"history",label:"📅 기록 보기"},{id:"stats",label:"📊 통계"}].map(t=>(
+          <button key={t.id} onClick={()=>setView(t.id)} style={{flex:1,padding:"9px 6px",borderRadius:8,border:"none",cursor:"pointer",fontSize:12,fontWeight:800,background:view===t.id?T.accent:"transparent",color:view===t.id?"white":T.textMid}}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* 출석 체크 탭 */}
+      {view==="today"&&(
+        <div>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12,flexWrap:"wrap"}}>
+            <input type="date" value={selDate} onChange={e=>setSelDate(e.target.value)}
+              style={{padding:"8px 10px",borderRadius:9,border:`1.5px solid ${T.border}`,fontSize:13,flex:1}}/>
+            <div style={{display:"flex",gap:6}}>
+              <button onClick={()=>markAll("present")} style={{padding:"7px 10px",borderRadius:8,border:`1px solid ${T.green}`,background:T.greenLight,color:T.green,fontSize:11,fontWeight:700,cursor:"pointer"}}>전체 출석</button>
+              <button onClick={()=>markAll("absent")} style={{padding:"7px 10px",borderRadius:8,border:`1px solid ${T.red}`,background:T.redLight,color:T.red,fontSize:11,fontWeight:700,cursor:"pointer"}}>전체 결석</button>
+            </div>
+          </div>
+
+          {studentList.length===0
+            ? <div style={{padding:32,textAlign:"center",color:T.textDim,fontSize:12}}>등록된 학생이 없어요</div>
+            : studentList.map(s=>{
+                const cur = todayData[s.name];
+                return (
+                  <div key={s.name} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:`1px solid ${T.border}`}}>
+                    <div style={{fontSize:22,flexShrink:0}}>{s.avatar||"🧑"}</div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:13,fontWeight:800,color:T.text}}>{s.name}</div>
+                      <div style={{fontSize:10,color:T.textMid}}>{s.grade||""}</div>
+                    </div>
+                    <div style={{display:"flex",gap:5}}>
+                      {Object.entries(STATUS).map(([k,v])=>(
+                        <button key={k} onClick={()=>mark(s.name,k)} style={{
+                          padding:"5px 8px",borderRadius:8,border:`1.5px solid ${cur===k?v.color:T.border}`,
+                          background:cur===k?v.bg:T.card,color:cur===k?v.color:T.textMid,
+                          fontSize:11,fontWeight:800,cursor:"pointer",transition:"all 0.15s"
+                        }}>{v.emoji}</button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })
+          }
+
+          {/* 요약 */}
+          {studentList.length>0&&(
+            <div style={{display:"flex",gap:10,marginTop:12,padding:"10px 14px",background:T.bg,borderRadius:12}}>
+              {Object.entries(STATUS).map(([k,v])=>{
+                const cnt=Object.values(todayData).filter(s=>s===k).length;
+                return <div key={k} style={{flex:1,textAlign:"center"}}>
+                  <div style={{fontSize:16,fontWeight:900,color:v.color}}>{cnt}</div>
+                  <div style={{fontSize:10,color:T.textMid,fontWeight:700}}>{v.label}</div>
+                </div>;
+              })}
+              <div style={{flex:1,textAlign:"center"}}>
+                <div style={{fontSize:16,fontWeight:900,color:T.textMid}}>{studentList.length-Object.values(todayData).length}</div>
+                <div style={{fontSize:10,color:T.textMid,fontWeight:700}}>미처리</div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 기록 탭 */}
+      {view==="history"&&(
+        <div>
+          {Object.keys(attendance).length===0
+            ? <div style={{padding:32,textAlign:"center",color:T.textDim,fontSize:12}}>출석 기록이 없어요</div>
+            : Object.keys(attendance).sort().reverse().slice(0,20).map(date=>{
+                const dayData=attendance[date];
+                const p=Object.values(dayData).filter(s=>s==="present").length;
+                const a=Object.values(dayData).filter(s=>s==="absent").length;
+                const l=Object.values(dayData).filter(s=>s==="late").length;
+                return (
+                  <div key={date} style={{padding:"10px 0",borderBottom:`1px solid ${T.border}`,display:"flex",alignItems:"center",gap:12}}>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:13,fontWeight:800,color:T.text}}>{date}</div>
+                      <div style={{fontSize:11,color:T.textMid,marginTop:2}}>
+                        ✅{p}명 ❌{a}명 ⏰{l}명
+                      </div>
+                    </div>
+                    <div style={{fontSize:14,fontWeight:900,color:T.green}}>
+                      {p+a+l>0?Math.round(p/(p+a+l)*100):0}%
+                    </div>
+                  </div>
+                );
+              })
+          }
+        </div>
+      )}
+
+      {/* 통계 탭 */}
+      {view==="stats"&&(
+        <div>
+          {studentList.length===0
+            ? <div style={{padding:32,textAlign:"center",color:T.textDim,fontSize:12}}>학생이 없어요</div>
+            : studentList.map(s=>{
+                const st=getStats(s.name);
+                return (
+                  <div key={s.name} style={{background:T.card,borderRadius:12,padding:12,marginBottom:10,border:`1px solid ${T.border}`}}>
+                    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+                      <div style={{fontSize:22}}>{s.avatar||"🧑"}</div>
+                      <div style={{flex:1}}>
+                        <div style={{fontSize:13,fontWeight:800,color:T.text}}>{s.name}</div>
+                        <div style={{fontSize:10,color:T.textMid}}>{st.total}회 수업 중</div>
+                      </div>
+                      <div style={{fontSize:18,fontWeight:900,color:st.rate>=90?T.green:st.rate>=70?T.yellow:T.red}}>{st.rate}%</div>
+                    </div>
+                    <div style={{display:"flex",gap:8}}>
+                      {[
+                        {label:"출석",val:st.present,c:T.green,bg:T.greenLight},
+                        {label:"지각",val:st.late,c:T.yellow,bg:T.yellowLight},
+                        {label:"결석",val:st.absent,c:T.red,bg:T.redLight},
+                      ].map((m,i)=>(
+                        <div key={i} style={{flex:1,textAlign:"center",background:m.bg,borderRadius:8,padding:"6px 4px"}}>
+                          <div style={{fontSize:15,fontWeight:900,color:m.c}}>{m.val}</div>
+                          <div style={{fontSize:10,color:T.textMid,fontWeight:700}}>{m.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })
+          }
+        </div>
+      )}
+    </div>
+  );
+}

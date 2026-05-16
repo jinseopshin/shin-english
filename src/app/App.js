@@ -2319,6 +2319,17 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
   const onLevelSelected = (levelId) => { setSelectedLevel(levelId); setScreen(pendingGame.id); };
   const exitGame = () => { setScreen("home"); setPendingGame(null); };
 
+  // 키보드 단축키: Alt+← 뒤로가기 (모든 conditional return 위에 있어야 Hook Rule 준수)
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.altKey && e.key === "ArrowLeft") exitGame();
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("keydown", handler);
+      return () => window.removeEventListener("keydown", handler);
+    }
+  }, []);
+
   if (screen === "level-select" && pendingGame) return <LevelSelect gameInfo={pendingGame} onSelect={onLevelSelected} onCancel={exitGame} />;
   if (screen === "game-match")    return <WordMatchGame name={name} setStudents={setStudents} onExit={exitGame} levelId={selectedLevel} />;
   if (screen === "game-spell")    return <SpellingGame  name={name} setStudents={setStudents} onExit={exitGame} levelId={selectedLevel} />;
@@ -2342,15 +2353,6 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
 
   const hour = new Date().getHours();
   const greet = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
-
-  // 키보드 단축키: Alt+← 뒤로가기
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.altKey && e.key === "ArrowLeft") exitGame();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, []);
 
   return (
     <>

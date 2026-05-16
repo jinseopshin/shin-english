@@ -2160,26 +2160,68 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
   const onNav = (s, id) => { setScreen(s); if (id) setViewExamId(id); };
   const examView = exams.find(e => e.id === viewExamId);
 
-  // ── "더보기" 메뉴 ──
-  const MORE_MENU = [
-    { id:"groups",   icon:"👥", label:"반별 그룹 관리",    desc:"반 만들고 한 번에 과제 배정" },
-    { id:"goals",    icon:"🎯", label:"목표 설정",          desc:"학생별 월간 목표 지정" },
-    { id:"notice",   icon:"💬", label:"공지 & 메시지",      desc:"학생 앱에 공지 띄우기" },
-    { id:"schedule", icon:"📅", label:"수업 일정",          desc:"일정 등록 → 학생 D-day 알림" },
-    { id:"league",   icon:"🏆", label:"주간 리그",          desc:"이번 주 포인트 순위" },
-    { id:"report",   icon:"📋", label:"월간 성적표",        desc:"PDF 인쇄용 성적표 생성" },
-    { id:"parent",   icon:"👨‍👩‍👧", label:"학부모 뷰어",       desc:"자녀 학습 현황 보기" },
-    { id:"settings", icon:"⚙️", label:"설정",              desc:"비밀번호 변경" },
-  ];
+  // 키보드 단축키: Alt+← 뒤로가기
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.altKey && e.key === "ArrowLeft") {
+        const info = SCREEN_INFO_MAP[screen];
+        if (info?.back) onNav(info.back);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [screen]);
+
+  // ── 화면별 정보 (제목 + 뒤로가기 대상) ──
+  const SCREEN_INFO_MAP = {
+    dashboard:    { title:"대시보드",       back: null },
+    manage:       { title:"학생 관리",       back: "dashboard" },
+    assign:       { title:"과제 배정",       back: "dashboard" },
+    students:     { title:"학습 통계",       back: "dashboard" },
+    bank:         { title:"문제 은행",       back: "dashboard" },
+    "exam-builder":{ title:"시험지 출제",    back: "exams" },
+    exams:        { title:"시험지 목록",     back: "dashboard" },
+    "exam-view":  { title:"시험지 출력",     back: "exams" },
+    settings:     { title:"설정",           back: "more" },
+    more:         { title:"더보기",          back: "dashboard" },
+    groups:       { title:"반별 그룹 관리",  back: "more" },
+    goals:        { title:"목표 설정",       back: "more" },
+    notice:       { title:"공지 & 메시지",   back: "more" },
+    schedule:     { title:"수업 일정",       back: "more" },
+    league:       { title:"주간 리그",       back: "more" },
+    report:       { title:"월간 성적표",     back: "more" },
+    parent:       { title:"학부모 뷰어",     back: "more" },
+  };
+
+  const curInfo = SCREEN_INFO_MAP[screen] || { title: screen, back: "dashboard" };
 
   return (
     <div style={{ minHeight: "100vh", background: T.bg, paddingBottom: 80 }}>
+      {/* 상단 헤더 */}
       <div style={{ background: T.card, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 50, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ fontSize: 22 }}>👩‍🏫</div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 900, color: T.text }}>Angela's Academy</div>
-          <div style={{ fontSize: 10, color: T.textDim }}>선생님 모드</div>
+        {/* 뒤로가기 버튼 — 대시보드가 아닐 때만 표시 */}
+        {curInfo.back !== null ? (
+          <button onClick={() => onNav(curInfo.back)} style={{ display:"flex", alignItems:"center", gap:4, background:"none", border:"none", cursor:"pointer", color:T.accent, fontSize:13, fontWeight:700, padding:"4px 8px", borderRadius:8, flexShrink:0 }}>
+            ← 뒤로
+          </button>
+        ) : (
+          <div style={{ fontSize: 22 }}>👩‍🏫</div>
+        )}
+
+        {/* 현재 화면 제목 */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {curInfo.back === null ? (
+            <>
+              <div style={{ fontSize: 14, fontWeight: 900, color: T.text }}>Angela's Academy</div>
+              <div style={{ fontSize: 10, color: T.textDim }}>선생님 모드</div>
+            </>
+          ) : (
+            <div style={{ fontSize: 15, fontWeight: 900, color: T.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+              {curInfo.title}
+            </div>
+          )}
         </div>
+
         <Btn v="ghost" size="sm" onClick={onLogout}>로그아웃</Btn>
       </div>
 
@@ -2808,17 +2850,37 @@ function StudentHome({ name, bank, setStudents, students, onLogout }) {
   const hour = new Date().getHours();
   const greet = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
 
+  // 키보드 단축키: Alt+← 뒤로가기
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.altKey && e.key === "ArrowLeft") exitGame();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
   return (
     <>
     <div style={{ minHeight: "100vh", background: T.bg, paddingBottom: 40 }}>
+
+      {/* 상단 헤더 — 항상 표시 */}
+      <div style={{ background: T.card, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 50, padding: "8px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ fontSize: 18 }}>🧒</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 13, fontWeight: 900, color: T.text }}>{name}님</div>
+          <div style={{ fontSize: 10, color: T.textDim }}>⭐ {points}p</div>
+        </div>
+        <Btn v="ghost" size="sm" onClick={onLogout} style={{ fontSize: 11 }}>로그아웃</Btn>
+      </div>
+
       <div style={{
         background: `linear-gradient(135deg, ${T.pink} 0%, ${T.accent} 100%)`,
-        padding: "20px 16px 28px", color: "white"
+        padding: "16px 16px 24px", color: "white"
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <div style={{ fontSize: 11, opacity: 0.9 }}>{greet} 👋</div>
-            <div style={{ fontSize: 22, fontWeight: 900, marginTop: 2 }}>{name}님</div>
+            <div style={{ fontSize: 20, fontWeight: 900, marginTop: 2 }}>{name}님</div>
             <div style={{ fontSize: 11, opacity: 0.85, marginTop: 4 }}>오늘도 영어 공부 화이팅!</div>
           </div>
           <div style={{ textAlign: "center", background: "rgba(255,255,255,0.2)", borderRadius: 14, padding: "10px 14px" }}>
@@ -2961,7 +3023,7 @@ function StudentHome({ name, bank, setStudents, students, onLogout }) {
           <BadgeDisplay student={me} />
         )}
 
-        <Btn v="ghost" size="md" onClick={onLogout} style={{ width: "100%", marginTop: 20 }}>로그아웃</Btn>
+        <Btn v="ghost" size="md" onClick={onLogout} style={{ width: "100%", marginTop: 20, color: T.textDim, fontSize: 12 }}>← 로그아웃</Btn>
       </div>
     </div>
 

@@ -81,20 +81,29 @@ const AVATARS = ["🦊","🐰","🐻","🦁","🐼","🐨","🦝","🐯","🐶",
 let _uid = Date.now();
 const uid = () => (++_uid).toString(36);
 
-// localStorage 훅
+// localStorage 훅 — SSR/hydration 안전 버전
+// 서버와 클라이언트 첫 렌더를 항상 initial로 맞추고,
+// 마운트 후 useEffect에서 localStorage 값으로 교체
 function useStorage(key, initial) {
-  const [val, setVal] = useState(() => {
-    if (typeof window === "undefined") return initial;
+  const [val, setVal] = useState(initial); // 항상 initial로 시작 (hydration 일치)
+  const [hydrated, setHydrated] = useState(false);
+
+  // 마운트 후 한 번만 localStorage에서 읽기
+  useEffect(() => {
     try {
       const v = window.localStorage.getItem(key);
-      return v ? JSON.parse(v) : initial;
-    } catch { return initial; }
-  });
+      if (v !== null) setVal(JSON.parse(v));
+    } catch {}
+    setHydrated(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+
+  // 값이 바뀌면 저장 (hydration 완료 후에만)
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      try { window.localStorage.setItem(key, JSON.stringify(val)); } catch {}
-    }
-  }, [key, val]);
+    if (!hydrated) return;
+    try { window.localStorage.setItem(key, JSON.stringify(val)); } catch {}
+  }, [key, val, hydrated]);
+
   return [val, setVal];
 }
 

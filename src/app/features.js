@@ -29,6 +29,87 @@ const T = {
 
 const GRADES = ["유치원","초등1","초등2","초등3","초등4","초등5","초등6","중1","중2","중3"];
 
+// ── 학생 통계 계산 (학생 화면/선생님 화면 공용) ──
+export const LEVEL_INFO = {
+  A: { color: T.green, bg: T.greenLight, label: "상위", icon: "🥇" },
+  B: { color: T.accent, bg: T.accentLight, label: "중위", icon: "🥈" },
+  C: { color: T.orange, bg: T.orangeLight, label: "기초", icon: "🥉" },
+};
+
+export function getLevel(accuracy) {
+  if (accuracy >= 80) return "A";
+  if (accuracy >= 60) return "B";
+  return "C";
+}
+
+export function computeStudentStats(s) {
+  const records = s.records || [];
+  if (records.length === 0) {
+    return {
+      accuracy: 0, totalGames: 0, totalAssign: 0,
+      avgGameScore: 0, streak: 0, lastActive: "신규",
+      level: "C", gameCount: {}, catAccuracy: {}
+    };
+  }
+  let totalCorrect = 0, totalQ = 0;
+  const gameCount = {};
+  const catStats = {};
+  let totalGames = 0, totalAssign = 0;
+  let gameScoreSum = 0, gameScoreN = 0;
+
+  records.forEach(r => {
+    totalCorrect += r.score || 0;
+    totalQ += r.total || 0;
+    if (r.type === "game") {
+      totalGames++;
+      gameCount[r.gameType] = (gameCount[r.gameType] || 0) + 1;
+      if (r.total > 0) {
+        gameScoreSum += Math.round(r.score / r.total * 100);
+        gameScoreN++;
+      }
+    } else if (r.type === "assignment") {
+      totalAssign++;
+    }
+    if (r.category && r.total > 0) {
+      catStats[r.category] = catStats[r.category] || { correct: 0, total: 0 };
+      catStats[r.category].correct += r.score || 0;
+      catStats[r.category].total += r.total || 0;
+    }
+  });
+
+  const accuracy = totalQ > 0 ? Math.round(totalCorrect / totalQ * 100) : 0;
+  const avgGameScore = gameScoreN > 0 ? Math.round(gameScoreSum / gameScoreN) : 0;
+
+  const dates = [...new Set(records.map(r => r.date?.slice(0, 10)))].sort().reverse();
+  let streak = 0;
+  const today = new Date().toISOString().slice(0, 10);
+  let cursor = new Date();
+  for (let i = 0; i < dates.length; i++) {
+    const dStr = cursor.toISOString().slice(0, 10);
+    if (dates.includes(dStr)) { streak++; cursor.setDate(cursor.getDate() - 1); }
+    else if (i === 0 && dates[0] !== today) { break; }
+    else break;
+  }
+
+  const lastDate = records[records.length - 1]?.date?.slice(0, 10);
+  let lastActive = "신규";
+  if (lastDate === today) lastActive = "오늘";
+  else if (lastDate) {
+    const diff = Math.floor((new Date(today) - new Date(lastDate)) / (1000 * 60 * 60 * 24));
+    lastActive = diff === 1 ? "어제" : `${diff}일 전`;
+  }
+
+  const catAccuracy = {};
+  Object.entries(catStats).forEach(([k, v]) => {
+    catAccuracy[k] = v.total > 0 ? Math.round(v.correct / v.total * 100) : 0;
+  });
+
+  return {
+    accuracy, totalGames, totalAssign, avgGameScore, streak,
+    lastActive, level: getLevel(accuracy), gameCount, catAccuracy
+  };
+}
+
 // ── 공통 UI ────────────────────────────────────────────────────────────────
 function Btn({ children, onClick, v="primary", size="md", style={}, disabled }) {
   const vs = {

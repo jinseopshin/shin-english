@@ -792,9 +792,33 @@ export function WordRelay({ name, setStudents, onExit }) {
 
       <Card style={{marginBottom:12,textAlign:"center",padding:"20px 16px",background:T.tealLight}}>
         <div style={{fontSize:11,color:T.teal,fontWeight:800,marginBottom:6}}>
-          {prev?`'${prev.en.slice(-1).toUpperCase()}'로 시작하는 단어의 뜻은?`:"첫 번째 단어의 뜻은?"}
+          {prev?`'${prev.en.slice(-1).toUpperCase()}'로 시작하는 단어의 뜻은?`:"첫 번째 단어의 뜻은?"} <span style={{color:T.accent,fontWeight:800}}>(단어 탭하면 발음!)</span>
         </div>
-        <div style={{fontSize:36,fontWeight:900,color:T.teal}}>{q.en}</div>
+        <div
+          onClick={()=>speak(q.en)}
+          style={{fontSize:36,fontWeight:900,color:T.teal,cursor:"pointer",userSelect:"none",transition:"transform 0.1s",display:"inline-block"}}
+          onMouseDown={e=>e.currentTarget.style.transform="scale(0.94)"}
+          onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}
+          onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}
+          onTouchStart={e=>e.currentTarget.style.transform="scale(0.94)"}
+          onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"}
+          title="탭하면 발음을 들을 수 있어요"
+        >{q.en}</div>
+        <div style={{marginTop:10}}>
+          <button
+            onClick={(e)=>{e.stopPropagation();speak(q.en);}}
+            style={{
+              background:"rgba(255,255,255,0.9)",
+              border:`2px solid ${T.teal}`,
+              borderRadius:10,
+              padding:"5px 14px",
+              fontSize:12,
+              fontWeight:800,
+              cursor:"pointer",
+              color:T.teal,
+            }}
+          >🔊 발음 듣기</button>
+        </div>
       </Card>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
         {q.opts.map((o,idx)=>{

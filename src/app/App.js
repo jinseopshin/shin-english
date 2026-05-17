@@ -77,6 +77,35 @@ const AVATARS = ["🦊","🐰","🐻","🦁","🐼","🐨","🦝","🐯","🐶",
 let _uid = Date.now();
 const uid = () => (++_uid).toString(36);
 
+// ── 화면 크기 감지 훅 (반응형) ────────────────────────────────────────────
+// 모바일(<640) / 태블릿(640-1023) / 노트북(1024-1439) / 대형(≥1440)
+function useResponsive() {
+  const [size, setSize] = useState({
+    width: typeof window === "undefined" ? 1024 : window.innerWidth,
+    isMobile: false,
+    isTablet: false,
+    isDesktop: true,
+    isLarge: false,
+  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const update = () => {
+      const w = window.innerWidth;
+      setSize({
+        width: w,
+        isMobile: w < 640,
+        isTablet: w >= 640 && w < 1024,
+        isDesktop: w >= 1024 && w < 1440,
+        isLarge: w >= 1440,
+      });
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  return size;
+}
+
 // localStorage 훅 — SSR/hydration 안전 버전
 // 서버와 클라이언트 첫 렌더를 항상 initial로 맞추고,
 // 마운트 후 useEffect에서 localStorage 값으로 교체
@@ -976,7 +1005,7 @@ function TeacherHome({ bank, exams, students, onNav }) {
         <div style={{ fontSize: 11, opacity: 0.85, marginTop: 6 }}>오늘도 멋진 수업 화이팅!</div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginBottom: 16 }}>
+      <div className="grid-2" style={{ marginBottom: 16 }}>
         <Card style={{ padding: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ fontSize: 28 }}>👥</div>
@@ -1000,7 +1029,7 @@ function TeacherHome({ bank, exams, students, onNav }) {
       </div>
 
       <div style={{ fontSize: 13, fontWeight: 800, color: T.textMid, marginBottom: 10, letterSpacing: 0.5 }}>빠른 실행</div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
+      <div className="grid-2">
         {[
           { id: "dashboard", icon: "📊", label: "학생 대시보드", color: T.accent, bg: T.accentLight },
           { id: "students", icon: "👥", label: "학생 통계 보기", color: T.purple, bg: T.purpleLight },
@@ -1595,7 +1624,8 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
   return (
     <div style={{ minHeight: "100vh", background: T.bg, paddingBottom: 80 }}>
       {/* 상단 헤더 */}
-      <div style={{ background: T.card, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 50, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+      <div className="topbar" style={{ background: T.card, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 50 }}>
+       <div className="top-bar-inner">
         {curInfo.back !== null ? (
           <button onClick={() => onNav(curInfo.back)} style={{ display:"flex", alignItems:"center", gap:4, background:"none", border:"none", cursor:"pointer", color:T.accent, fontSize:13, fontWeight:700, padding:"4px 8px", borderRadius:8, flexShrink:0 }}>
             ← 뒤로
@@ -1620,9 +1650,10 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
           {darkMode ? "☀️" : "🌙"}
         </button>
         <Btn v="ghost" size="sm" onClick={onLogout}>로그아웃</Btn>
+       </div>
       </div>
 
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "16px 12px" }}>
+      <div className="app-container">
         {screen === "dashboard"  && <TeacherHome bank={bank} exams={exams} students={students} onNav={onNav} />}
         {screen === "manage"     && <StudentManager students={students} setStudents={setStudents} />}
         {screen === "assign"     && <AssignmentManager students={students} bank={bank} assignments={assignments} setAssignments={setAssignments} />}
@@ -1649,7 +1680,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
           <div>
             <div style={{ fontSize: 16, fontWeight: 900, color: T.text, marginBottom: 4 }}>✨ 더 많은 기능</div>
             <div style={{ fontSize: 11, color: T.textMid, marginBottom: 14 }}>신규 기능 모음</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
+            <div className="grid-2">
               {[
                 { id:"groups",     icon:"👥", label:"반별 그룹 관리",  desc:"반 만들고 일괄 과제 배정" },
                 { id:"goals",      icon:"🎯", label:"목표 설정",        desc:"학생별 월간 목표 지정" },
@@ -1673,7 +1704,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
       </div>
 
       {/* 하단 네비 */}
-      <div className="no-print" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: T.card, borderTop: `1px solid ${T.border}`, display: "flex", zIndex: 100, boxShadow: "0 -2px 12px rgba(59,110,248,0.08)" }}>
+      <div className="no-print bottom-nav">
         {TEACHER_NAV.map(n => (
           <button key={n.id} onClick={() => onNav(n.id)} style={{ flex: 1, background: "none", border: "none", padding: "8px 2px 14px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
             <div style={{ fontSize: 20, transition: "transform 0.15s", transform: screen === n.id ? "scale(1.2)" : "scale(1)" }}>{n.icon}</div>
@@ -2317,7 +2348,8 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
     <div style={{ minHeight: "100vh", background: T.bg, paddingBottom: 40 }}>
 
       {/* 상단 헤더 — 항상 표시 */}
-      <div style={{ background: T.card, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 50, padding: "8px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+      <div className="topbar" style={{ background: T.card, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 50 }}>
+       <div className="top-bar-inner">
         <div style={{ fontSize: 18 }}>🧒</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 13, fontWeight: 900, color: T.text }}>{name}님</div>
@@ -2327,12 +2359,14 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
           {darkMode ? "☀️" : "🌙"}
         </button>
         <Btn v="ghost" size="sm" onClick={onLogout} style={{ fontSize: 11 }}>로그아웃</Btn>
+       </div>
       </div>
 
       <div style={{
         background: `linear-gradient(135deg, ${T.pink} 0%, ${T.accent} 100%)`,
         padding: "16px 16px 24px", color: "white"
       }}>
+       <div style={{ width: "100%", maxWidth: 1280, margin: "0 auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <div style={{ fontSize: 11, opacity: 0.9 }}>{greet} 👋</div>
@@ -2344,13 +2378,14 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
             <div style={{ fontSize: 10, opacity: 0.85 }}>⭐ 포인트</div>
           </div>
         </div>
+       </div>
       </div>
 
       {/* 공지/일정 배너 */}
       <NoticeBanner notices={notices} />
       <ScheduleBanner schedules={schedules} />
 
-      <div style={{ padding: "16px 12px", maxWidth: 480, margin: "0 auto" }}>
+      <div className="app-container">
         {/* 배정된 과제 */}
         {(() => {
           const myAssigns = (typeof window !== "undefined"
@@ -2431,7 +2466,7 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
 
             {/* 게임 모음 */}
             <div style={{ fontSize: 12, fontWeight: 800, color: T.textMid, marginBottom: 8, letterSpacing: 0.5 }}>🎮 게임</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
+            <div className="grid-2" style={{ marginBottom: 16 }}>
               {[
                 // 기본 단어 학습 게임
                 { id:"game-match",    icon:"🎯", name:"단어 맞추기",   sub:"뜻↔영어 선택",     bg:T.accentLight, isLevel:true },

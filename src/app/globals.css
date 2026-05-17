@@ -2,10 +2,121 @@
 body { font-family: 'Noto Sans KR', -apple-system, sans-serif; background: #f0f4ff; }
 input, textarea, select { font-family: inherit; }
 
+/* ───────── 반응형 컨테이너 ─────────
+   모바일: 양쪽 12px 여백
+   태블릿(≥640): 양쪽 20px, 최대 720px
+   노트북(≥1024): 최대 1100px 중앙
+   대형(≥1440): 최대 1280px 중앙 */
+.app-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px 12px 80px;
+}
+@media (min-width: 640px) {
+  .app-container { padding: 20px 20px 90px; max-width: 720px; }
+}
+@media (min-width: 1024px) {
+  .app-container { padding: 24px 24px 100px; max-width: 1100px; }
+}
+@media (min-width: 1440px) {
+  .app-container { max-width: 1280px; }
+}
+
+/* ───────── 자동 적응 그리드 (1→2→3→4열) ───────── */
+.auto-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 480px) {
+  .auto-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+}
+@media (min-width: 900px) {
+  .auto-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+}
+@media (min-width: 1280px) {
+  .auto-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+}
+
+/* 2열 고정 (모바일에서도 2열) */
+.grid-2 {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+}
+@media (min-width: 900px) {
+  .grid-2 { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+}
+@media (min-width: 1280px) {
+  .grid-2 { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+}
+
+/* 통계 대시보드 — 모바일 2열, 데스크톱 4열 */
+.stat-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+}
+@media (min-width: 768px) {
+  .stat-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+}
+
+/* 하단 네비 */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-top: 1px solid #dce8ff;
+  display: flex;
+  z-index: 100;
+  box-shadow: 0 -2px 12px rgba(59,110,248,0.08);
+}
+@media (min-width: 1024px) {
+  .bottom-nav {
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 1100px;
+    border-radius: 18px 18px 0 0;
+    border: 1px solid #dce8ff;
+    border-bottom: none;
+  }
+}
+@media (min-width: 1440px) {
+  .bottom-nav { max-width: 1280px; }
+}
+
+/* 상단 바 안쪽 */
+.top-bar-inner {
+  width: 100%;
+  margin: 0 auto;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+@media (min-width: 640px) {
+  .top-bar-inner { padding: 12px 20px; max-width: 720px; }
+}
+@media (min-width: 1024px) {
+  .top-bar-inner { padding: 14px 24px; max-width: 1100px; }
+}
+@media (min-width: 1440px) {
+  .top-bar-inner { max-width: 1280px; }
+}
+
+/* 시험지 인쇄용 */
+.exam-print-body {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
 @media print {
   .no-print { display: none !important; }
-  .bottomnav { display: none !important; }
+  .bottomnav, .bottom-nav { display: none !important; }
   .topbar { display: none !important; }
   body { background: white !important; }
+  .app-container { max-width: none !important; padding: 0 !important; }
   @page { margin: 15mm 15mm; size: A4; }
 }

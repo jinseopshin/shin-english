@@ -704,7 +704,7 @@ const TEACHER_NAV = [
 //   학생 관리 화면 (선생님용)
 // ══════════════════════════════════════════════════════════════════════════
 function StudentManager({ students, setStudents }) {
-  const [mode, setMode] = useState("list"); // list | add | edit
+  const [mode, setMode] = useState("list"); // list | add | edit | csv
   const [editTarget, setEditTarget] = useState(null);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("name"); // name | grade | points | recent
@@ -713,7 +713,116 @@ function StudentManager({ students, setStudents }) {
   const [form, setForm] = useState({ name: "", grade: "초등5", avatar: "🦊", memo: "" });
   const [formErr, setFormErr] = useState("");
 
+  // CSV 일괄 등록 상태
+  const [csvText, setCsvText] = useState("");
+  const [csvPreview, setCsvPreview] = useState([]);
+  const [csvMsg, setCsvMsg] = useState("");
+
   const studentList = Object.values(students || {});
+
+  // ── CSV 파일 업로드 ─────────────────────────────────────────
+  const handleCsvFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      // UTF-8 BOM 제거 (엑셀 호환)
+      let text = ev.target.result || "";
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+      setCsvText(text);
+      parseCsv(text);
+    };
+    reader.readAsText(file, "UTF-8");
+    e.target.value = "";
+  };
+
+  // CSV 파싱 (간단 버전 — 쉼표 구분, 줄바꿈으로 행 구분)
+  const parseCsv = (text) => {
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    if (lines.length === 0) { setCsvPreview([]); return; }
+
+    // 첫 줄이 헤더인지 자동 감지 (이름/name 포함 여부)
+    const firstLine = lines[0].toLowerCase();
+    const hasHeader = firstLine.includes("이름") || firstLine.includes("name");
+    const dataLines = hasHeader ? lines.slice(1) : lines;
+
+    const rows = dataLines.map(line => {
+      const cols = line.split(/[,\t]/).map(c => c.trim().replace(/^"|"$/g, ""));
+      return {
+        name: cols[0] || "",
+        grade: cols[1] || "초등5",
+        memo: cols[2] || "",
+        // 중복 체크
+        duplicate: !!students[cols[0]?.trim()],
+        valid: cols[0]?.trim().length >= 2,
+      };
+    });
+    setCsvPreview(rows);
+  };
+
+  // CSV로 일괄 등록 실행
+  const applyCsv = () => {
+    const validRows = csvPreview.filter(r => r.valid && !r.duplicate);
+    if (validRows.length === 0) { setCsvMsg("등록할 학생이 없어요"); return; }
+    if (!confirm(`${validRows.length}명의 학생을 등록할까요?`)) return;
+
+    setStudents(prev => {
+      const next = { ...prev };
+      validRows.forEach(r => {
+        next[r.name] = {
+          name: r.name,
+          grade: r.grade || "초등5",
+          avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)],
+          memo: r.memo || "",
+          joinDate: new Date().toISOString().slice(0, 10),
+          points: 0,
+          records: []
+        };
+      });
+      return next;
+    });
+    setCsvMsg(`✅ ${validRows.length}명 등록 완료!`);
+    setTimeout(() => { setMode("list"); setCsvText(""); setCsvPreview([]); setCsvMsg(""); }, 1500);
+  };
+
+  // CSV 템플릿 다운로드
+  const downloadTemplate = () => {
+    const csv = "이름,학년,메모\n홍길동,초등3,영어초보\n김민수,초등5,발음좋음\n이서연,중1,단어부족";
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "학생명단_양식.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // 학습 기록 CSV 내보내기 (전체 학생 또는 한 명)
+  const exportStudentsCSV = () => {
+    const rows = [
+      ["이름","학년","가입일","총 포인트","활동수","최근 활동","평균 정답률"],
+    ];
+    studentList.forEach(s => {
+      const records = s.records || [];
+      const accuracies = records.filter(r => r.total > 0).map(r => r.score / r.total);
+      const avgAcc = accuracies.length > 0
+        ? Math.round(accuracies.reduce((a,b) => a+b, 0) / accuracies.length * 100) + "%"
+        : "-";
+      const last = records.slice(-1)[0]?.date?.slice(0, 10) || "-";
+      rows.push([
+        s.name, s.grade || "-", s.joinDate || "-",
+        s.points || 0, records.length, last, avgAcc
+      ]);
+    });
+    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `학생목록_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const filtered = studentList
     .filter(s => !search || s.name.includes(search))
@@ -800,6 +909,111 @@ function StudentManager({ students, setStudents }) {
   };
 
   // ── 학생 추가/편집 폼 ──
+  // ── CSV 일괄 등록 화면 ────────────────────────────────
+  if (mode === "csv") {
+    const validCount = csvPreview.filter(r => r.valid && !r.duplicate).length;
+    const dupCount = csvPreview.filter(r => r.duplicate).length;
+    const invalidCount = csvPreview.filter(r => !r.valid).length;
+
+    return (
+      <div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+          <Btn v="ghost" size="sm" onClick={() => { setMode("list"); setCsvText(""); setCsvPreview([]); setCsvMsg(""); }}>← 뒤로</Btn>
+          <div style={{ fontSize: 16, fontWeight: 900, color: T.text }}>📥 CSV로 학생 일괄 등록</div>
+        </div>
+
+        <Card style={{ marginBottom: 12, padding: 14, background: T.accentLight }}>
+          <div style={{ fontSize: 12, color: T.text, lineHeight: 1.6 }}>
+            <strong>📋 사용 방법:</strong><br/>
+            ① 엑셀에서 <strong>이름,학년,메모</strong> 순서로 적고 CSV로 저장<br/>
+            ② 아래 버튼으로 파일 업로드 (또는 텍스트 직접 입력)<br/>
+            ③ 미리보기 확인 후 등록
+          </div>
+          <button onClick={downloadTemplate} style={{
+            marginTop: 10, background: T.card, border: `1px solid ${T.accent}`,
+            borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 700, color: T.accent, cursor: "pointer"
+          }}>📄 양식 다운로드 (CSV 파일)</button>
+        </Card>
+
+        <Card style={{ marginBottom: 12, padding: 14 }}>
+          <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 8, color: T.text }}>1. 파일 업로드 또는 텍스트 붙여넣기</div>
+          <label style={{
+            display: "block", width: "100%", textAlign: "center", marginBottom: 8,
+            background: T.accent, color: "white", border: "none", borderRadius: 10,
+            padding: "10px", fontSize: 12, fontWeight: 800, cursor: "pointer"
+          }}>
+            📂 CSV 파일 선택
+            <input type="file" accept=".csv,text/csv" onChange={handleCsvFile} style={{ display: "none" }} />
+          </label>
+          <textarea
+            value={csvText}
+            onChange={e => { setCsvText(e.target.value); parseCsv(e.target.value); }}
+            placeholder={"또는 여기에 직접 입력 (한 줄에 한 명):\n이름,학년,메모\n홍길동,초등3,영어초보\n김민수,초등5,발음좋음"}
+            style={{
+              width: "100%", minHeight: 100, padding: 10, borderRadius: 8,
+              border: `1px solid ${T.border}`, fontSize: 12, fontFamily: "monospace",
+              background: T.bg, color: T.text, resize: "vertical"
+            }}
+          />
+        </Card>
+
+        {csvPreview.length > 0 && (
+          <Card style={{ marginBottom: 12, padding: 14 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 8, color: T.text }}>2. 미리보기 ({csvPreview.length}행)</div>
+            <div style={{ display: "flex", gap: 6, marginBottom: 10, fontSize: 11, flexWrap: "wrap" }}>
+              <span style={{ background: T.greenLight, color: T.green, padding: "3px 8px", borderRadius: 6, fontWeight: 700 }}>✅ 등록 가능 {validCount}</span>
+              {dupCount > 0 && <span style={{ background: T.yellowLight, color: T.orange, padding: "3px 8px", borderRadius: 6, fontWeight: 700 }}>⚠️ 중복 {dupCount}</span>}
+              {invalidCount > 0 && <span style={{ background: T.redLight, color: T.red, padding: "3px 8px", borderRadius: 6, fontWeight: 700 }}>❌ 오류 {invalidCount}</span>}
+            </div>
+            <div style={{ maxHeight: 240, overflowY: "auto", border: `1px solid ${T.border}`, borderRadius: 8 }}>
+              <table style={{ width: "100%", fontSize: 11, borderCollapse: "collapse" }}>
+                <thead style={{ background: T.bg, position: "sticky", top: 0 }}>
+                  <tr>
+                    <th style={{ padding: 6, textAlign: "left", borderBottom: `1px solid ${T.border}` }}>상태</th>
+                    <th style={{ padding: 6, textAlign: "left", borderBottom: `1px solid ${T.border}` }}>이름</th>
+                    <th style={{ padding: 6, textAlign: "left", borderBottom: `1px solid ${T.border}` }}>학년</th>
+                    <th style={{ padding: 6, textAlign: "left", borderBottom: `1px solid ${T.border}` }}>메모</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {csvPreview.map((r, i) => (
+                    <tr key={i} style={{
+                      background: r.duplicate ? T.yellowLight : !r.valid ? T.redLight : "transparent",
+                      borderBottom: `1px solid ${T.border}`
+                    }}>
+                      <td style={{ padding: 6, fontWeight: 700 }}>
+                        {!r.valid ? "❌" : r.duplicate ? "⚠️" : "✅"}
+                      </td>
+                      <td style={{ padding: 6, fontWeight: 700 }}>{r.name || "(빈 이름)"}</td>
+                      <td style={{ padding: 6 }}>{r.grade}</td>
+                      <td style={{ padding: 6, color: T.textMid }}>{r.memo}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        )}
+
+        {csvPreview.length > 0 && (
+          <button onClick={applyCsv} disabled={validCount === 0} style={{
+            width: "100%", background: validCount === 0 ? T.border : T.green,
+            color: "white", border: "none", borderRadius: 12, padding: 14,
+            fontSize: 14, fontWeight: 900, cursor: validCount === 0 ? "not-allowed" : "pointer"
+          }}>
+            ✅ {validCount}명 등록하기
+          </button>
+        )}
+        {csvMsg && (
+          <div style={{ textAlign: "center", marginTop: 10, fontSize: 13, fontWeight: 700,
+            color: csvMsg.startsWith("✅") ? T.green : T.red }}>
+            {csvMsg}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   if (mode === "add" || mode === "edit") {
     const isEdit = mode === "edit";
     return (
@@ -907,7 +1121,19 @@ function StudentManager({ students, setStudents }) {
           <div style={{ fontSize: 16, fontWeight: 900, color: T.text }}>👤 학생 관리</div>
           <div style={{ fontSize: 11, color: T.textMid, marginTop: 2 }}>총 {studentList.length}명 등록됨</div>
         </div>
-        <Btn v="primary" size="md" onClick={openAdd}>+ 학생 추가</Btn>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          <button onClick={() => setMode("csv")} title="CSV로 일괄 등록"
+            style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: "8px 10px", fontSize: 11, fontWeight: 800, cursor: "pointer", color: T.text }}>
+            📥 CSV 등록
+          </button>
+          {studentList.length > 0 && (
+            <button onClick={exportStudentsCSV} title="학생 목록 엑셀로 내보내기"
+              style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: "8px 10px", fontSize: 11, fontWeight: 800, cursor: "pointer", color: T.text }}>
+              📤 내보내기
+            </button>
+          )}
+          <Btn v="primary" size="md" onClick={openAdd}>+ 학생 추가</Btn>
+        </div>
       </div>
 
       {/* 검색 */}
@@ -1234,6 +1460,7 @@ function TeacherSettings({ savedPw, setSavedPw, darkMode, setDarkMode }) {
   const [cur, setCur] = useState("");
   const [neu, setNeu] = useState("");
   const [msg, setMsg] = useState("");
+  const [backupMsg, setBackupMsg] = useState("");
 
   const change = () => {
     if (cur !== savedPw) { setMsg("현재 비밀번호가 틀려요!"); return; }
@@ -1243,6 +1470,83 @@ function TeacherSettings({ savedPw, setSavedPw, darkMode, setDarkMode }) {
     setMsg("✅ 변경되었어요!");
     setTimeout(() => setMsg(""), 2000);
   };
+
+  // ── 데이터 백업 (JSON 다운로드) ─────────────────────────────
+  const exportData = () => {
+    if (typeof window === "undefined") return;
+    const allKeys = [
+      "angela_students", "angela_bank", "angela_exams",
+      "angela_assignments", "angela_groups", "angela_notices",
+      "angela_goals", "angela_schedules", "angela_attendance",
+    ];
+    const data = {};
+    allKeys.forEach(k => {
+      try { data[k] = JSON.parse(localStorage.getItem(k) || "null"); } catch { data[k] = null; }
+    });
+    const backup = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      app: "Angela's English Academy",
+      data,
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `angela-backup-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setBackupMsg("✅ 백업 파일이 다운로드되었어요");
+    setTimeout(() => setBackupMsg(""), 3000);
+  };
+
+  // ── 데이터 복원 (JSON 업로드) ─────────────────────────────
+  const importData = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!confirm("⚠️ 복원하면 현재 모든 데이터가 백업 파일로 교체됩니다.\n계속할까요?\n\n(혹시 모르니 먼저 백업 다운로드 받아두시는 걸 권장해요)")) {
+      e.target.value = "";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const backup = JSON.parse(ev.target.result);
+        if (!backup.data || backup.app !== "Angela's English Academy") {
+          throw new Error("올바른 백업 파일이 아니에요");
+        }
+        Object.entries(backup.data).forEach(([key, value]) => {
+          if (value !== null && value !== undefined) {
+            localStorage.setItem(key, JSON.stringify(value));
+          }
+        });
+        setBackupMsg("✅ 복원 완료! 새로고침합니다...");
+        setTimeout(() => window.location.reload(), 1200);
+      } catch (err) {
+        setBackupMsg("❌ 복원 실패: " + err.message);
+        setTimeout(() => setBackupMsg(""), 3000);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
+  // 데이터 통계
+  const stats = (typeof window !== "undefined") ? (() => {
+    try {
+      const students = JSON.parse(localStorage.getItem("angela_students") || "{}");
+      const bank = JSON.parse(localStorage.getItem("angela_bank") || "{}");
+      const exams = JSON.parse(localStorage.getItem("angela_exams") || "[]");
+      return {
+        students: Object.keys(students).length,
+        banks: Object.keys(bank).length,
+        questions: Object.values(bank).reduce((a, b) => a + (b.questions?.length || 0), 0),
+        exams: exams.length,
+      };
+    } catch { return null; }
+  })() : null;
 
   return (
     <div>
@@ -1263,6 +1567,43 @@ function TeacherSettings({ savedPw, setSavedPw, darkMode, setDarkMode }) {
           }} />
         </button>
       </Card>
+
+      {/* 데이터 백업 / 복원 — 가장 중요! */}
+      <Card style={{ marginBottom: 12, padding: 16, background: T.greenLight, border: `2px solid ${T.green}` }}>
+        <div style={{ fontSize: 14, fontWeight: 900, color: T.text, marginBottom: 4 }}>💾 데이터 백업 & 복원</div>
+        <div style={{ fontSize: 11, color: T.textMid, marginBottom: 12, lineHeight: 1.5 }}>
+          모든 학생 / 문제집 / 시험지 / 숙제 데이터를 파일로 저장하거나 복원해요.<br/>
+          <strong style={{ color: T.red }}>⚠️ 브라우저 데이터를 청소하면 모두 사라지니 정기적으로 백업하세요!</strong>
+        </div>
+        {stats && (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, marginBottom: 12, background: T.card, padding: 10, borderRadius: 10, fontSize: 11 }}>
+            <div style={{ textAlign: "center" }}><div style={{ fontWeight: 900, color: T.accent, fontSize: 16 }}>{stats.students}</div><div style={{ color: T.textMid, fontSize: 9 }}>학생</div></div>
+            <div style={{ textAlign: "center" }}><div style={{ fontWeight: 900, color: T.accent, fontSize: 16 }}>{stats.banks}</div><div style={{ color: T.textMid, fontSize: 9 }}>문제집</div></div>
+            <div style={{ textAlign: "center" }}><div style={{ fontWeight: 900, color: T.accent, fontSize: 16 }}>{stats.questions}</div><div style={{ color: T.textMid, fontSize: 9 }}>문항</div></div>
+            <div style={{ textAlign: "center" }}><div style={{ fontWeight: 900, color: T.accent, fontSize: 16 }}>{stats.exams}</div><div style={{ color: T.textMid, fontSize: 9 }}>시험지</div></div>
+          </div>
+        )}
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={exportData} style={{
+            flex: 1, background: T.green, color: "white", border: "none", borderRadius: 10,
+            padding: "12px", fontSize: 13, fontWeight: 800, cursor: "pointer"
+          }}>📥 백업 다운로드</button>
+          <label style={{
+            flex: 1, background: T.card, color: T.text, border: `2px solid ${T.green}`, borderRadius: 10,
+            padding: "10px", fontSize: 13, fontWeight: 800, cursor: "pointer", textAlign: "center"
+          }}>
+            📤 복원 업로드
+            <input type="file" accept=".json,application/json" onChange={importData} style={{ display: "none" }} />
+          </label>
+        </div>
+        {backupMsg && (
+          <div style={{ fontSize: 12, marginTop: 10, textAlign: "center", fontWeight: 700,
+            color: backupMsg.startsWith("✅") ? T.green : backupMsg.startsWith("❌") ? T.red : T.textMid }}>
+            {backupMsg}
+          </div>
+        )}
+      </Card>
+
       <Card>
         <div style={{ fontSize: 14, fontWeight: 800, color: T.text, marginBottom: 14 }}>🔑 비밀번호 변경</div>
         <Input type="password" value={cur} onChange={e => setCur(e.target.value)} placeholder="현재 비밀번호" style={{ marginBottom: 8 }} />

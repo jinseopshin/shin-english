@@ -2110,6 +2110,8 @@ export function WordHomeworkManager({ students, setStudents, onNav }) {
   const studentList = Object.values(students || {});
   const [step, setStep] = useState("list"); // list | create | print
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedStudents, setSelectedStudents] = useState([]); // 일괄 배정용
+  const [batchMode, setBatchMode] = useState(false);
   const [levelId, setLevelId] = useState("elem1");
   const [catFilter, setCatFilter] = useState("all");
   const [picked, setPicked] = useState({}); // { en: true }
@@ -2118,9 +2120,28 @@ export function WordHomeworkManager({ students, setStudents, onNav }) {
   // 학생 선택 시 학년에 맞는 추천 레벨 자동 세팅
   const pickStudent = (s) => {
     setSelectedStudent(s.name);
+    setSelectedStudents([s.name]);
+    setBatchMode(false);
     setLevelId(gradeToLevelId(s.grade));
     setPicked({});
     setTitle(`${s.name} 단어숙제 ${new Date().toISOString().slice(5,10)}`);
+    setStep("create");
+  };
+
+  // 일괄 모드: 여러 학생 선택 토글
+  const toggleStudentInBatch = (name) => {
+    setSelectedStudents(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]);
+  };
+
+  // 일괄 배정 시작
+  const startBatch = () => {
+    if (selectedStudents.length === 0) { alert("학생을 1명 이상 선택해주세요"); return; }
+    // 첫 학생의 학년 기준으로 추천
+    const firstGrade = students[selectedStudents[0]]?.grade;
+    setLevelId(gradeToLevelId(firstGrade));
+    setSelectedStudent(null); // 일괄 모드 표시
+    setPicked({});
+    setTitle(`단어숙제 ${new Date().toISOString().slice(5,10)}`);
     setStep("create");
   };
 
@@ -2140,28 +2161,40 @@ export function WordHomeworkManager({ students, setStudents, onNav }) {
 
   // 단어 숙제 저장 (학생에게 배정)
   const saveHomework = () => {
-    if (!selectedStudent) return;
     if (pickedCount === 0) { alert("최소 1개 이상의 단어를 선택해주세요"); return; }
-    const stu = students[selectedStudent];
-    if (stu?.wordHomework?.active) {
-      if (!confirm(`${selectedStudent} 학생에게 이미 진행 중인 숙제가 있습니다. 덮어쓸까요?`)) return;
+    // 배정 대상: 단일 또는 다수
+    const targets = selectedStudent ? [selectedStudent] : selectedStudents;
+    if (targets.length === 0) return;
+
+    // 진행중 숙제 있는 학생들 확인
+    const hasActive = targets.filter(name => students[name]?.wordHomework?.active);
+    if (hasActive.length > 0) {
+      if (!confirm(`${hasActive.length}명의 학생에게 이미 진행 중인 숙제가 있습니다.\n(${hasActive.join(", ")})\n덮어쓸까요?`)) return;
     }
+
     const pickedWords = candidateWords.filter(w => picked[w.en]);
-    const homework = {
-      id: "hw_" + Date.now().toString(36),
-      title: title || `${selectedStudent} 단어숙제`,
-      createdAt: new Date().toISOString(),
-      levelId,
-      words: pickedWords.map(w => ({ en: w.en, ko: w.ko, cat: w.cat, mastered: false, correct: 0, wrong: 0 })),
-      active: true,
-    };
-    setStudents(prev => ({
-      ...prev,
-      [selectedStudent]: { ...prev[selectedStudent], wordHomework: homework }
-    }));
-    alert(`${selectedStudent} 학생에게 ${pickedWords.length}개 단어 숙제를 배정했어요!`);
+    setStudents(prev => {
+      const next = { ...prev };
+      targets.forEach(name => {
+        if (!next[name]) return;
+        const homework = {
+          id: "hw_" + Date.now().toString(36) + "_" + name,
+          title: title || `${name} 단어숙제`,
+          createdAt: new Date().toISOString(),
+          levelId,
+          words: pickedWords.map(w => ({ en: w.en, ko: w.ko, cat: w.cat, mastered: false, correct: 0, wrong: 0 })),
+          active: true,
+        };
+        next[name] = { ...next[name], wordHomework: homework };
+      });
+      return next;
+    });
+
+    alert(`${targets.length}명에게 ${pickedWords.length}개 단어 숙제를 배정했어요!`);
     setStep("list");
     setSelectedStudent(null);
+    setSelectedStudents([]);
+    setBatchMode(false);
     setPicked({});
   };
 
@@ -2179,10 +2212,54 @@ export function WordHomeworkManager({ students, setStudents, onNav }) {
   if (step === "list") {
     return (
       <div>
-        <div style={{ fontSize: 18, fontWeight: 900, color: T.text, marginBottom: 4 }}>📚 단어 숙제 만들기</div>
-        <div style={{ fontSize: 12, color: T.textMid, marginBottom: 16 }}>
-          학생을 선택하면 학년에 맞는 단어를 추천해드려요. 원하는 단어를 골라 숙제로 배정하세요.
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4, gap: 8 }}>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>📚 단어 숙제 만들기</div>
+            <div style={{ fontSize: 12, color: T.textMid, marginTop: 4 }}>
+              {batchMode ? "📋 여러 학생에게 같은 숙제를 한 번에 배정합니다" : "학생을 선택해 학년에 맞는 단어로 숙제를 만드세요"}
+            </div>
+          </div>
+          {studentList.length > 0 && (
+            <button onClick={() => { setBatchMode(b => !b); setSelectedStudents([]); }} style={{
+              background: batchMode ? T.purple : T.card,
+              color: batchMode ? "white" : T.text,
+              border: `1px solid ${batchMode ? T.purple : T.border}`,
+              borderRadius: 10, padding: "8px 12px", fontSize: 11, fontWeight: 800,
+              cursor: "pointer", whiteSpace: "nowrap"
+            }}>
+              {batchMode ? "✕ 일괄 종료" : "👥 여러 명에게"}
+            </button>
+          )}
         </div>
+
+        {/* 일괄 배정 모드 액션 바 */}
+        {batchMode && (
+          <div style={{
+            background: T.purpleLight, borderRadius: 12, padding: 12, marginTop: 14, marginBottom: 14,
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10
+          }}>
+            <div style={{ fontSize: 12, color: T.text }}>
+              <span style={{ fontWeight: 900, color: T.purple, fontSize: 16 }}>{selectedStudents.length}</span>
+              <span style={{ fontWeight: 700 }}> / {studentList.length}명 선택됨</span>
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              <button onClick={() => setSelectedStudents(studentList.map(s => s.name))} style={{
+                background: T.card, border: `1px solid ${T.purple}`, borderRadius: 8,
+                padding: "4px 10px", fontSize: 11, fontWeight: 700, color: T.purple, cursor: "pointer"
+              }}>전체</button>
+              <button onClick={() => setSelectedStudents([])} style={{
+                background: T.card, border: `1px solid ${T.border}`, borderRadius: 8,
+                padding: "4px 10px", fontSize: 11, fontWeight: 700, color: T.textMid, cursor: "pointer"
+              }}>해제</button>
+              <button onClick={startBatch} disabled={selectedStudents.length === 0} style={{
+                background: selectedStudents.length === 0 ? T.border : T.purple,
+                color: "white", border: "none", borderRadius: 8,
+                padding: "4px 12px", fontSize: 11, fontWeight: 800,
+                cursor: selectedStudents.length === 0 ? "not-allowed" : "pointer"
+              }}>다음 →</button>
+            </div>
+          </div>
+        )}
 
         {studentList.length === 0 ? (
           <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: 30, textAlign: "center" }}>
@@ -2196,22 +2273,43 @@ export function WordHomeworkManager({ students, setStudents, onNav }) {
               const active = hw?.active;
               const total = hw?.words?.length || 0;
               const done = hw?.words?.filter(w => w.mastered).length || 0;
+              const isChecked = selectedStudents.includes(s.name);
               return (
-                <div key={s.name} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: 14 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: active ? 10 : 0 }}>
+                <div key={s.name}
+                  onClick={batchMode ? () => toggleStudentInBatch(s.name) : undefined}
+                  style={{
+                    background: batchMode && isChecked ? T.purpleLight : T.card,
+                    border: `${batchMode && isChecked ? 2 : 1}px solid ${batchMode && isChecked ? T.purple : T.border}`,
+                    borderRadius: 14, padding: 14,
+                    cursor: batchMode ? "pointer" : "default",
+                    transition: "all 0.12s"
+                  }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: active && !batchMode ? 10 : 0 }}>
+                    {batchMode && (
+                      <div style={{
+                        width: 22, height: 22, borderRadius: 6,
+                        border: `2px solid ${isChecked ? T.purple : T.border}`,
+                        background: isChecked ? T.purple : "transparent",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        color: "white", fontSize: 14, fontWeight: 900
+                      }}>{isChecked && "✓"}</div>
+                    )}
                     <div style={{ fontSize: 26 }}>{s.avatar || "🙂"}</div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 14, fontWeight: 900, color: T.text }}>{s.name}</div>
-                      <div style={{ fontSize: 11, color: T.textMid }}>{s.grade || "학년 미지정"}</div>
+                      <div style={{ fontSize: 11, color: T.textMid }}>
+                        {s.grade || "학년 미지정"}
+                        {active && <span style={{ marginLeft: 8, color: T.green, fontWeight: 700 }}>· 진행중 {done}/{total}</span>}
+                      </div>
                     </div>
-                    {!active && (
+                    {!batchMode && !active && (
                       <button onClick={() => pickStudent(s)} style={{
                         background: T.accent, color: "white", border: "none", borderRadius: 10,
                         padding: "8px 14px", fontSize: 12, fontWeight: 800, cursor: "pointer"
                       }}>+ 숙제 만들기</button>
                     )}
                   </div>
-                  {active && (
+                  {!batchMode && active && (
                     <div style={{ background: T.greenLight, borderRadius: 10, padding: 10, fontSize: 11 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                         <div style={{ fontWeight: 800, color: T.text }}>📖 진행중: {hw.title}</div>
@@ -2243,6 +2341,7 @@ export function WordHomeworkManager({ students, setStudents, onNav }) {
 
   // ── 화면 2: 단어 선택 ──
   if (step === "create") {
+    const isBatch = !selectedStudent && selectedStudents.length > 0;
     const stu = students[selectedStudent];
     const categories = ["all", ...Array.from(new Set(getWordsForGrade(levelId).map(w => w.cat)))];
 
@@ -2253,15 +2352,29 @@ export function WordHomeworkManager({ students, setStudents, onNav }) {
           padding: "4px 0", marginBottom: 10, cursor: "pointer"
         }}>← 학생 목록으로</button>
 
-        <div style={{ background: T.accentLight, borderRadius: 14, padding: 14, marginBottom: 14 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ fontSize: 30 }}>{stu?.avatar || "🙂"}</div>
-            <div>
-              <div style={{ fontSize: 15, fontWeight: 900, color: T.text }}>{selectedStudent}</div>
-              <div style={{ fontSize: 11, color: T.textMid }}>{stu?.grade} · 추천: {HW_LEVELS.find(l => l.id === levelId)?.label}</div>
+        {isBatch ? (
+          <div style={{ background: T.purpleLight, borderRadius: 14, padding: 14, marginBottom: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ fontSize: 30 }}>👥</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 15, fontWeight: 900, color: T.text }}>일괄 배정: {selectedStudents.length}명</div>
+                <div style={{ fontSize: 11, color: T.textMid, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {selectedStudents.join(", ")}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div style={{ background: T.accentLight, borderRadius: 14, padding: 14, marginBottom: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ fontSize: 30 }}>{stu?.avatar || "🙂"}</div>
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 900, color: T.text }}>{selectedStudent}</div>
+                <div style={{ fontSize: 11, color: T.textMid }}>{stu?.grade} · 추천: {HW_LEVELS.find(l => l.id === levelId)?.label}</div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <input value={title} onChange={e => setTitle(e.target.value)} placeholder="숙제 이름 (예: 동물 단어 외우기)"
           style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: `1px solid ${T.border}`,
@@ -2342,7 +2455,7 @@ export function WordHomeworkManager({ students, setStudents, onNav }) {
             border: "none", borderRadius: 12, padding: "14px 16px",
             fontSize: 15, fontWeight: 900, cursor: pickedCount === 0 ? "not-allowed" : "pointer"
           }}>
-          📬 {selectedStudent}에게 {pickedCount}개 단어 숙제로 배정하기
+          📬 {(!selectedStudent && selectedStudents.length > 0) ? `${selectedStudents.length}명에게` : `${selectedStudent}에게`} {pickedCount}개 단어 숙제로 배정하기
         </button>
       </div>
     );
@@ -2521,17 +2634,36 @@ export function CustomExamManager({ students, setStudents, bank, onNav }) {
   const [selectedBankId, setSelectedBankId] = useState(bankList[0]?.id || null);
   const [picked, setPicked] = useState({}); // { qid: true }
   const [title, setTitle] = useState("");
+  const [search, setSearch] = useState(""); // 문제 검색
+  const [filterMode, setFilterMode] = useState("all"); // all | onlyPicked | unchecked
 
   const pickStudent = (s) => {
     setSelectedStudent(s.name);
     setSelectedBankId(bankList[0]?.id || null);
     setPicked({});
     setTitle(`${s.name} 시험 ${new Date().toISOString().slice(5,10)}`);
+    setSearch("");
+    setFilterMode("all");
     setStep("create");
   };
 
   const currentBank = selectedBankId ? bank[selectedBankId] : null;
-  const candidateQs = currentBank?.questions || [];
+  const allQs = currentBank?.questions || [];
+  // 검색 + 필터 적용
+  const candidateQs = useMemo(() => {
+    let qs = allQs;
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      qs = qs.filter(item => {
+        const inQuestion = (item.q || "").toLowerCase().includes(q);
+        const inOpts = (item.opts || []).some(o => (o || "").toLowerCase().includes(q));
+        return inQuestion || inOpts;
+      });
+    }
+    if (filterMode === "onlyPicked") qs = qs.filter(item => picked[item.id]);
+    if (filterMode === "unchecked") qs = qs.filter(item => !picked[item.id]);
+    return qs;
+  }, [allQs, search, filterMode, picked]);
   const pickedCount = Object.values(picked).filter(Boolean).length;
   const togglePick = (qid) => setPicked(p => ({ ...p, [qid]: !p[qid] }));
   const pickAll = () => {
@@ -2549,7 +2681,7 @@ export function CustomExamManager({ students, setStudents, bank, onNav }) {
     if (stu?.customExam?.active) {
       if (!confirm(`${selectedStudent} 학생에게 이미 진행 중인 시험이 있습니다. 덮어쓸까요?`)) return;
     }
-    const pickedQs = candidateQs.filter(q => picked[q.id]);
+    const pickedQs = allQs.filter(q => picked[q.id]);
     const exam = {
       id: "exam_" + Date.now().toString(36),
       title: title || `${selectedStudent} 시험`,
@@ -2694,15 +2826,51 @@ export function CustomExamManager({ students, setStudents, bank, onNav }) {
           ))}
         </select>
 
+        {/* 🔍 검색 + 필터 */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="🔍 문제 내용 검색"
+            style={{
+              flex: 1, padding: "8px 10px", borderRadius: 8,
+              border: `1px solid ${T.border}`, fontSize: 12,
+              background: T.card, color: T.text
+            }}
+          />
+          {search && (
+            <button onClick={() => setSearch("")} style={{
+              background: T.card, border: `1px solid ${T.border}`, borderRadius: 8,
+              padding: "4px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: T.textMid
+            }}>×</button>
+          )}
+        </div>
+
+        {/* 필터 토글 */}
+        <div style={{ display: "flex", gap: 4, marginBottom: 10, flexWrap: "wrap" }}>
+          {[
+            { id: "all", label: `전체 (${allQs.length})` },
+            { id: "onlyPicked", label: `✓ 선택 (${pickedCount})` },
+            { id: "unchecked", label: `미선택 (${allQs.length - pickedCount})` },
+          ].map(f => (
+            <button key={f.id} onClick={() => setFilterMode(f.id)} style={{
+              background: filterMode === f.id ? T.accent : T.card,
+              color: filterMode === f.id ? "white" : T.text,
+              border: `1px solid ${filterMode === f.id ? T.accent : T.border}`,
+              borderRadius: 8, padding: "5px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer"
+            }}>{f.label}</button>
+          ))}
+        </div>
+
         {/* 선택 컨트롤 */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, padding: "8px 0", borderTop: `1px solid ${T.border}`, borderBottom: `1px solid ${T.border}` }}>
           <div style={{ fontSize: 12, color: T.textMid }}>
             <span style={{ fontWeight: 900, color: T.accent, fontSize: 14 }}>{pickedCount}</span>
-            <span> / {candidateQs.length}문항 선택</span>
+            <span>문항 선택 중 · 보이는 문항 {candidateQs.length}개</span>
           </div>
           <div style={{ display: "flex", gap: 6 }}>
-            <button onClick={pickAll} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: "4px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: T.text }}>전체</button>
-            <button onClick={clearPick} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: "4px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: T.textMid }}>해제</button>
+            <button onClick={pickAll} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: "4px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: T.text }}>보이는 것 전체</button>
+            <button onClick={clearPick} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: "4px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: T.textMid }}>전체 해제</button>
           </div>
         </div>
 
@@ -2710,7 +2878,7 @@ export function CustomExamManager({ students, setStudents, bank, onNav }) {
         <div style={{ maxHeight: 480, overflowY: "auto", marginBottom: 14, padding: 2, display: "grid", gap: 6 }}>
           {candidateQs.length === 0 ? (
             <div style={{ padding: 30, textAlign: "center", color: T.textDim, fontSize: 12 }}>
-              이 문제집에 등록된 문제가 없어요
+              {search.trim() ? `"${search}" 검색 결과가 없어요` : "이 문제집에 등록된 문제가 없어요"}
             </div>
           ) : candidateQs.map((q, i) => {
             const isPicked = !!picked[q.id];

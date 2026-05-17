@@ -716,19 +716,6 @@ export const QUESTION_BANK = {
   },
   {
     "id": 55,
-    "q": "You ______ at school.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "was",
-      "were"
-    ],
-    "ans": 2,
-    "exp": "주어 \"You\" → are"
-  },
-  {
-    "id": 56,
     "q": "Mary ______ cute.",
     "opts": [
       "am",
@@ -741,7 +728,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"Mary\" → is"
   },
   {
-    "id": 57,
+    "id": 56,
     "q": "Mike and I ______ very nice.",
     "opts": [
       "am",
@@ -754,20 +741,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"Mike and I\" → are"
   },
   {
-    "id": 58,
-    "q": "He ______ a student.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "was",
-      "were"
-    ],
-    "ans": 1,
-    "exp": "주어 \"He\" → is"
-  },
-  {
-    "id": 59,
+    "id": 57,
     "q": "My brothers ______ from Japan.",
     "opts": [
       "am",
@@ -780,7 +754,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"My brothers\" → are"
   },
   {
-    "id": 60,
+    "id": 58,
     "q": "My parents ______ a student.",
     "opts": [
       "am",
@@ -793,7 +767,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"My parents\" → are"
   },
   {
-    "id": 61,
+    "id": 59,
     "q": "These books ______ tall.",
     "opts": [
       "am",
@@ -806,20 +780,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"These books\" → are"
   },
   {
-    "id": 62,
-    "q": "My brother ______ in Korea.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "was",
-      "were"
-    ],
-    "ans": 1,
-    "exp": "주어 \"My brother\" → is"
-  },
-  {
-    "id": 63,
+    "id": 60,
     "q": "The teachers ______ happy.",
     "opts": [
       "am",
@@ -832,7 +793,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"The teachers\" → are"
   },
   {
-    "id": 64,
+    "id": 61,
     "q": "Our teacher ______ from Japan.",
     "opts": [
       "am",
@@ -845,7 +806,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"Our teacher\" → is"
   },
   {
-    "id": 65,
+    "id": 62,
     "q": "Dr. Lee ______ happy.",
     "opts": [
       "am",
@@ -858,7 +819,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"Dr. Lee\" → is"
   },
   {
-    "id": 66,
+    "id": 63,
     "q": "The girls ______ sad.",
     "opts": [
       "am",
@@ -871,7 +832,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"The girls\" → are"
   },
   {
-    "id": 67,
+    "id": 64,
     "q": "These books ______ cute.",
     "opts": [
       "am",
@@ -884,7 +845,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"These books\" → are"
   },
   {
-    "id": 68,
+    "id": 65,
     "q": "My friend ______ my friend.",
     "opts": [
       "am",
@@ -897,7 +858,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"My friend\" → is"
   },
   {
-    "id": 69,
+    "id": 66,
     "q": "The weather ______ funny.",
     "opts": [
       "am",
@@ -910,7 +871,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"The weather\" → is"
   },
   {
-    "id": 70,
+    "id": 67,
     "q": "The cat ______ in Korea.",
     "opts": [
       "am",
@@ -923,7 +884,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"The cat\" → is"
   },
   {
-    "id": 71,
+    "id": 68,
     "q": "My favorite subject ______ my friend.",
     "opts": [
       "am",
@@ -936,7 +897,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"My favorite subject\" → is"
   },
   {
-    "id": 72,
+    "id": 69,
     "q": "That girl ______ at home.",
     "opts": [
       "am",
@@ -949,7 +910,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"That girl\" → is"
   },
   {
-    "id": 73,
+    "id": 70,
     "q": "You and Tom ______ at home.",
     "opts": [
       "am",
@@ -962,7 +923,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"You and Tom\" → are"
   },
   {
-    "id": 74,
+    "id": 71,
     "q": "Dr. Lee ______ tired.",
     "opts": [
       "am",
@@ -975,7 +936,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"Dr. Lee\" → is"
   },
   {
-    "id": 75,
+    "id": 72,
     "q": "Our teacher ______ at school.",
     "opts": [
       "am",
@@ -988,7 +949,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"Our teacher\" → is"
   },
   {
-    "id": 76,
+    "id": 73,
     "q": "You ______ smart.",
     "opts": [
       "am",
@@ -1001,20 +962,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"You\" → are"
   },
   {
-    "id": 77,
-    "q": "My family ______ my friend.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "was",
-      "were"
-    ],
-    "ans": 1,
-    "exp": "주어 \"My family\" → is"
-  },
-  {
-    "id": 78,
+    "id": 74,
     "q": "Those students ______ from Japan.",
     "opts": [
       "am",
@@ -1027,7 +975,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"Those students\" → are"
   },
   {
-    "id": 79,
+    "id": 75,
     "q": "Tom ______ a student.",
     "opts": [
       "am",
@@ -1040,7 +988,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"Tom\" → is"
   },
   {
-    "id": 80,
+    "id": 76,
     "q": "The weather ______ a student.",
     "opts": [
       "am",
@@ -1053,7 +1001,7 @@ export const QUESTION_BANK = {
     "exp": "주어 \"The weather\" → is"
   },
   {
-    "id": 81,
+    "id": 77,
     "q": "My mother ______ not cute.",
     "opts": [
       "am",
@@ -1066,7 +1014,7 @@ export const QUESTION_BANK = {
     "exp": "My mother → is not (부정문)"
   },
   {
-    "id": 82,
+    "id": 78,
     "q": "He ______ not very nice.",
     "opts": [
       "am",
@@ -1079,7 +1027,7 @@ export const QUESTION_BANK = {
     "exp": "He → is not (부정문)"
   },
   {
-    "id": 83,
+    "id": 79,
     "q": "He ______ not tired.",
     "opts": [
       "am",
@@ -1092,7 +1040,7 @@ export const QUESTION_BANK = {
     "exp": "He → is not (부정문)"
   },
   {
-    "id": 84,
+    "id": 80,
     "q": "They ______ not kind.",
     "opts": [
       "am",
@@ -1105,7 +1053,7 @@ export const QUESTION_BANK = {
     "exp": "They → are not (부정문)"
   },
   {
-    "id": 85,
+    "id": 81,
     "q": "We ______ not a doctor.",
     "opts": [
       "am",
@@ -1118,7 +1066,7 @@ export const QUESTION_BANK = {
     "exp": "We → are not (부정문)"
   },
   {
-    "id": 86,
+    "id": 82,
     "q": "You ______ not tired.",
     "opts": [
       "am",
@@ -1131,7 +1079,7 @@ export const QUESTION_BANK = {
     "exp": "You → are not (부정문)"
   },
   {
-    "id": 87,
+    "id": 83,
     "q": "It ______ not kind.",
     "opts": [
       "am",
@@ -1144,7 +1092,7 @@ export const QUESTION_BANK = {
     "exp": "It → is not (부정문)"
   },
   {
-    "id": 88,
+    "id": 84,
     "q": "My mother ______ not at home.",
     "opts": [
       "am",
@@ -1157,7 +1105,7 @@ export const QUESTION_BANK = {
     "exp": "My mother → is not (부정문)"
   },
   {
-    "id": 89,
+    "id": 85,
     "q": "We ______ not a teacher.",
     "opts": [
       "am",
@@ -1170,7 +1118,7 @@ export const QUESTION_BANK = {
     "exp": "We → are not (부정문)"
   },
   {
-    "id": 90,
+    "id": 86,
     "q": "We ______ not very nice.",
     "opts": [
       "am",
@@ -1183,7 +1131,7 @@ export const QUESTION_BANK = {
     "exp": "We → are not (부정문)"
   },
   {
-    "id": 91,
+    "id": 87,
     "q": "I ______ not angry.",
     "opts": [
       "am",
@@ -1196,7 +1144,7 @@ export const QUESTION_BANK = {
     "exp": "I → am not (부정문)"
   },
   {
-    "id": 92,
+    "id": 88,
     "q": "She ______ not cute.",
     "opts": [
       "am",
@@ -1209,7 +1157,7 @@ export const QUESTION_BANK = {
     "exp": "She → is not (부정문)"
   },
   {
-    "id": 93,
+    "id": 89,
     "q": "Tom ______ not busy.",
     "opts": [
       "am",
@@ -1222,7 +1170,7 @@ export const QUESTION_BANK = {
     "exp": "Tom → is not (부정문)"
   },
   {
-    "id": 94,
+    "id": 90,
     "q": "It ______ not from Japan.",
     "opts": [
       "am",
@@ -1235,7 +1183,7 @@ export const QUESTION_BANK = {
     "exp": "It → is not (부정문)"
   },
   {
-    "id": 95,
+    "id": 91,
     "q": "We ______ not angry.",
     "opts": [
       "am",
@@ -1248,7 +1196,7 @@ export const QUESTION_BANK = {
     "exp": "We → are not (부정문)"
   },
   {
-    "id": 96,
+    "id": 92,
     "q": "They ______ not cute.",
     "opts": [
       "am",
@@ -1261,7 +1209,7 @@ export const QUESTION_BANK = {
     "exp": "They → are not (부정문)"
   },
   {
-    "id": 97,
+    "id": 93,
     "q": "My mother ______ not hungry.",
     "opts": [
       "am",
@@ -1274,7 +1222,7 @@ export const QUESTION_BANK = {
     "exp": "My mother → is not (부정문)"
   },
   {
-    "id": 98,
+    "id": 94,
     "q": "Tom ______ not a teacher.",
     "opts": [
       "am",
@@ -1287,7 +1235,7 @@ export const QUESTION_BANK = {
     "exp": "Tom → is not (부정문)"
   },
   {
-    "id": 99,
+    "id": 95,
     "q": "You ______ not cute.",
     "opts": [
       "am",
@@ -1300,7 +1248,7 @@ export const QUESTION_BANK = {
     "exp": "You → are not (부정문)"
   },
   {
-    "id": 100,
+    "id": 96,
     "q": "The boys ______ not very nice.",
     "opts": [
       "am",
@@ -1313,7 +1261,7 @@ export const QUESTION_BANK = {
     "exp": "The boys → are not (부정문)"
   },
   {
-    "id": 101,
+    "id": 97,
     "q": "He ______ not in Korea.",
     "opts": [
       "am",
@@ -1326,7 +1274,7 @@ export const QUESTION_BANK = {
     "exp": "He → is not (부정문)"
   },
   {
-    "id": 102,
+    "id": 98,
     "q": "I ______ not smart.",
     "opts": [
       "am",
@@ -1339,7 +1287,7 @@ export const QUESTION_BANK = {
     "exp": "I → am not (부정문)"
   },
   {
-    "id": 103,
+    "id": 99,
     "q": "He ______ not my friend.",
     "opts": [
       "am",
@@ -1352,7 +1300,7 @@ export const QUESTION_BANK = {
     "exp": "He → is not (부정문)"
   },
   {
-    "id": 104,
+    "id": 100,
     "q": "You ______ not a doctor.",
     "opts": [
       "am",
@@ -1365,7 +1313,7 @@ export const QUESTION_BANK = {
     "exp": "You → are not (부정문)"
   },
   {
-    "id": 105,
+    "id": 101,
     "q": "They ______ not from Japan.",
     "opts": [
       "am",
@@ -1378,7 +1326,7 @@ export const QUESTION_BANK = {
     "exp": "They → are not (부정문)"
   },
   {
-    "id": 106,
+    "id": 102,
     "q": "Tom ______ not tired.",
     "opts": [
       "am",
@@ -1391,7 +1339,7 @@ export const QUESTION_BANK = {
     "exp": "Tom → is not (부정문)"
   },
   {
-    "id": 107,
+    "id": 103,
     "q": "It ______ not smart.",
     "opts": [
       "am",
@@ -1404,7 +1352,7 @@ export const QUESTION_BANK = {
     "exp": "It → is not (부정문)"
   },
   {
-    "id": 108,
+    "id": 104,
     "q": "We ______ not at home.",
     "opts": [
       "am",
@@ -1417,7 +1365,7 @@ export const QUESTION_BANK = {
     "exp": "We → are not (부정문)"
   },
   {
-    "id": 109,
+    "id": 105,
     "q": "They ______ not a doctor.",
     "opts": [
       "am",
@@ -1430,7 +1378,7 @@ export const QUESTION_BANK = {
     "exp": "They → are not (부정문)"
   },
   {
-    "id": 110,
+    "id": 106,
     "q": "I ______ not at home.",
     "opts": [
       "am",
@@ -1443,7 +1391,7 @@ export const QUESTION_BANK = {
     "exp": "I → am not (부정문)"
   },
   {
-    "id": 111,
+    "id": 107,
     "q": "She ______ not kind.",
     "opts": [
       "am",
@@ -1456,7 +1404,7 @@ export const QUESTION_BANK = {
     "exp": "She → is not (부정문)"
   },
   {
-    "id": 112,
+    "id": 108,
     "q": "You ______ not smart.",
     "opts": [
       "am",
@@ -1469,7 +1417,7 @@ export const QUESTION_BANK = {
     "exp": "You → are not (부정문)"
   },
   {
-    "id": 113,
+    "id": 109,
     "q": "The boys ______ not funny.",
     "opts": [
       "am",
@@ -1482,7 +1430,7 @@ export const QUESTION_BANK = {
     "exp": "The boys → are not (부정문)"
   },
   {
-    "id": 114,
+    "id": 110,
     "q": "The boys ______ not at home.",
     "opts": [
       "am",
@@ -1495,7 +1443,7 @@ export const QUESTION_BANK = {
     "exp": "The boys → are not (부정문)"
   },
   {
-    "id": 115,
+    "id": 111,
     "q": "I ______ not busy.",
     "opts": [
       "am",
@@ -1508,7 +1456,7 @@ export const QUESTION_BANK = {
     "exp": "I → am not (부정문)"
   },
   {
-    "id": 116,
+    "id": 112,
     "q": "Tom ______ not my friend.",
     "opts": [
       "am",
@@ -1521,7 +1469,7 @@ export const QUESTION_BANK = {
     "exp": "Tom → is not (부정문)"
   },
   {
-    "id": 117,
+    "id": 113,
     "q": "I ______ not sad.",
     "opts": [
       "am",
@@ -1534,7 +1482,7 @@ export const QUESTION_BANK = {
     "exp": "I → am not (부정문)"
   },
   {
-    "id": 118,
+    "id": 114,
     "q": "I ______ not in Korea.",
     "opts": [
       "am",
@@ -1547,7 +1495,7 @@ export const QUESTION_BANK = {
     "exp": "I → am not (부정문)"
   },
   {
-    "id": 119,
+    "id": 115,
     "q": "It ______ not busy.",
     "opts": [
       "am",
@@ -1560,7 +1508,7 @@ export const QUESTION_BANK = {
     "exp": "It → is not (부정문)"
   },
   {
-    "id": 120,
+    "id": 116,
     "q": "My mother ______ not in Korea.",
     "opts": [
       "am",
@@ -1573,7 +1521,7 @@ export const QUESTION_BANK = {
     "exp": "My mother → is not (부정문)"
   },
   {
-    "id": 121,
+    "id": 117,
     "q": "My mother ______ not my friend.",
     "opts": [
       "am",
@@ -1586,33 +1534,7 @@ export const QUESTION_BANK = {
     "exp": "My mother → is not (부정문)"
   },
   {
-    "id": 122,
-    "q": "She ______ not kind.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "was",
-      "were"
-    ],
-    "ans": 1,
-    "exp": "She → is not (부정문)"
-  },
-  {
-    "id": 123,
-    "q": "Tom ______ not busy.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "was",
-      "were"
-    ],
-    "ans": 1,
-    "exp": "Tom → is not (부정문)"
-  },
-  {
-    "id": 124,
+    "id": 118,
     "q": "The boys ______ not my friend.",
     "opts": [
       "am",
@@ -1625,7 +1547,7 @@ export const QUESTION_BANK = {
     "exp": "The boys → are not (부정문)"
   },
   {
-    "id": 125,
+    "id": 119,
     "q": "The boys ______ not smart.",
     "opts": [
       "am",
@@ -1638,7 +1560,7 @@ export const QUESTION_BANK = {
     "exp": "The boys → are not (부정문)"
   },
   {
-    "id": 126,
+    "id": 120,
     "q": "You ______ not in Korea.",
     "opts": [
       "am",
@@ -1651,7 +1573,7 @@ export const QUESTION_BANK = {
     "exp": "You → are not (부정문)"
   },
   {
-    "id": 127,
+    "id": 121,
     "q": "Tom ______ not cute.",
     "opts": [
       "am",
@@ -1664,7 +1586,7 @@ export const QUESTION_BANK = {
     "exp": "Tom → is not (부정문)"
   },
   {
-    "id": 128,
+    "id": 122,
     "q": "Tom ______ not funny.",
     "opts": [
       "am",
@@ -1677,7 +1599,7 @@ export const QUESTION_BANK = {
     "exp": "Tom → is not (부정문)"
   },
   {
-    "id": 129,
+    "id": 123,
     "q": "You ______ not angry.",
     "opts": [
       "am",
@@ -1690,20 +1612,7 @@ export const QUESTION_BANK = {
     "exp": "You → are not (부정문)"
   },
   {
-    "id": 130,
-    "q": "Tom ______ not cute.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "was",
-      "were"
-    ],
-    "ans": 1,
-    "exp": "Tom → is not (부정문)"
-  },
-  {
-    "id": 131,
+    "id": 124,
     "q": "______ dr. Lee smart?",
     "opts": [
       "Am",
@@ -1716,7 +1625,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 132,
+    "id": 125,
     "q": "______ my parents hungry?",
     "opts": [
       "Am",
@@ -1729,7 +1638,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 133,
+    "id": 126,
     "q": "______ the cats from Japan?",
     "opts": [
       "Am",
@@ -1742,7 +1651,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 134,
+    "id": 127,
     "q": "______ the boys hungry?",
     "opts": [
       "Am",
@@ -1755,7 +1664,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 135,
+    "id": 128,
     "q": "______ my father my friend?",
     "opts": [
       "Am",
@@ -1768,7 +1677,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 136,
+    "id": 129,
     "q": "______ those students a teacher?",
     "opts": [
       "Am",
@@ -1781,7 +1690,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 137,
+    "id": 130,
     "q": "______ my favorite subject at home?",
     "opts": [
       "Am",
@@ -1794,7 +1703,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 138,
+    "id": 131,
     "q": "______ my brother tired?",
     "opts": [
       "Am",
@@ -1807,7 +1716,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 139,
+    "id": 132,
     "q": "______ my brother from Japan?",
     "opts": [
       "Am",
@@ -1820,7 +1729,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 140,
+    "id": 133,
     "q": "______ you kind?",
     "opts": [
       "Am",
@@ -1833,7 +1742,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 141,
+    "id": 134,
     "q": "______ the girls my friend?",
     "opts": [
       "Am",
@@ -1846,7 +1755,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 142,
+    "id": 135,
     "q": "______ I a doctor?",
     "opts": [
       "Am",
@@ -1859,7 +1768,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Am + 주어 ~?"
   },
   {
-    "id": 143,
+    "id": 136,
     "q": "______ this boy angry?",
     "opts": [
       "Am",
@@ -1872,7 +1781,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 144,
+    "id": 137,
     "q": "______ my brother in Korea?",
     "opts": [
       "Am",
@@ -1885,7 +1794,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 145,
+    "id": 138,
     "q": "______ this boy funny?",
     "opts": [
       "Am",
@@ -1898,7 +1807,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 146,
+    "id": 139,
     "q": "______ her hobby sad?",
     "opts": [
       "Am",
@@ -1911,7 +1820,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 147,
+    "id": 140,
     "q": "______ it smart?",
     "opts": [
       "Am",
@@ -1924,7 +1833,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 148,
+    "id": 141,
     "q": "______ the teachers very nice?",
     "opts": [
       "Am",
@@ -1937,7 +1846,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 149,
+    "id": 142,
     "q": "______ both of them cute?",
     "opts": [
       "Am",
@@ -1950,7 +1859,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 150,
+    "id": 143,
     "q": "______ the teachers my friend?",
     "opts": [
       "Am",
@@ -1963,7 +1872,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 151,
+    "id": 144,
     "q": "______ his name smart?",
     "opts": [
       "Am",
@@ -1976,7 +1885,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 152,
+    "id": 145,
     "q": "______ he busy?",
     "opts": [
       "Am",
@@ -1989,7 +1898,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 153,
+    "id": 146,
     "q": "______ we a teacher?",
     "opts": [
       "Am",
@@ -2002,7 +1911,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 154,
+    "id": 147,
     "q": "______ math smart?",
     "opts": [
       "Am",
@@ -2015,7 +1924,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 155,
+    "id": 148,
     "q": "______ you a student?",
     "opts": [
       "Am",
@@ -2028,7 +1937,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 156,
+    "id": 149,
     "q": "______ my mother happy?",
     "opts": [
       "Am",
@@ -2041,7 +1950,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 157,
+    "id": 150,
     "q": "______ math sad?",
     "opts": [
       "Am",
@@ -2054,7 +1963,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 158,
+    "id": 151,
     "q": "______ we in Korea?",
     "opts": [
       "Am",
@@ -2067,7 +1976,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 159,
+    "id": 152,
     "q": "______ he at home?",
     "opts": [
       "Am",
@@ -2080,7 +1989,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 160,
+    "id": 153,
     "q": "______ our teacher happy?",
     "opts": [
       "Am",
@@ -2093,7 +2002,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 161,
+    "id": 154,
     "q": "______ you and Tom hungry?",
     "opts": [
       "Am",
@@ -2106,7 +2015,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 162,
+    "id": 155,
     "q": "______ my brother busy?",
     "opts": [
       "Am",
@@ -2119,7 +2028,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 163,
+    "id": 156,
     "q": "______ my parents at school?",
     "opts": [
       "Am",
@@ -2132,7 +2041,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 164,
+    "id": 157,
     "q": "______ my sister happy?",
     "opts": [
       "Am",
@@ -2145,7 +2054,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 165,
+    "id": 158,
     "q": "______ his name a doctor?",
     "opts": [
       "Am",
@@ -2158,7 +2067,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 166,
+    "id": 159,
     "q": "______ our teacher hungry?",
     "opts": [
       "Am",
@@ -2171,7 +2080,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 167,
+    "id": 160,
     "q": "______ it busy?",
     "opts": [
       "Am",
@@ -2184,7 +2093,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 168,
+    "id": 161,
     "q": "______ my mother tall?",
     "opts": [
       "Am",
@@ -2197,7 +2106,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 169,
+    "id": 162,
     "q": "______ my friend cute?",
     "opts": [
       "Am",
@@ -2210,7 +2119,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Is + 주어 ~?"
   },
   {
-    "id": 170,
+    "id": 163,
     "q": "______ the cats tired?",
     "opts": [
       "Am",
@@ -2223,7 +2132,7 @@ export const QUESTION_BANK = {
     "exp": "의문문: Are + 주어 ~?"
   },
   {
-    "id": 171,
+    "id": 164,
     "q": "A: Is this an apple? B: No, ______.",
     "opts": [
       "it isn't",
@@ -2236,7 +2145,7 @@ export const QUESTION_BANK = {
     "exp": "No, it isn't."
   },
   {
-    "id": 172,
+    "id": 165,
     "q": "A: Are you a student? B: Yes, ______.",
     "opts": [
       "I am",
@@ -2249,7 +2158,7 @@ export const QUESTION_BANK = {
     "exp": "Yes, I am."
   },
   {
-    "id": 173,
+    "id": 166,
     "q": "A: Is it a cat? B: Yes, ______.",
     "opts": [
       "it is",
@@ -2262,7 +2171,7 @@ export const QUESTION_BANK = {
     "exp": "Yes, it is."
   },
   {
-    "id": 174,
+    "id": 167,
     "q": "A: Am I correct? B: Yes, ______.",
     "opts": [
       "you are",
@@ -2275,7 +2184,7 @@ export const QUESTION_BANK = {
     "exp": "Yes, you are."
   },
   {
-    "id": 175,
+    "id": 168,
     "q": "A: Is she happy? B: No, ______.",
     "opts": [
       "she isn't",
@@ -2288,7 +2197,7 @@ export const QUESTION_BANK = {
     "exp": "No, she isn't."
   },
   {
-    "id": 176,
+    "id": 169,
     "q": "A: Is he your brother? B: Yes, ______.",
     "opts": [
       "he is",
@@ -2301,7 +2210,7 @@ export const QUESTION_BANK = {
     "exp": "Yes, he is."
   },
   {
-    "id": 177,
+    "id": 170,
     "q": "A: Are they at home? B: No, ______.",
     "opts": [
       "they aren't",
@@ -2314,20 +2223,7 @@ export const QUESTION_BANK = {
     "exp": "No, they aren't."
   },
   {
-    "id": 178,
-    "q": "A: Are you a student? B: Yes, ______.",
-    "opts": [
-      "I am",
-      "I is",
-      "I are",
-      "you am",
-      "I do"
-    ],
-    "ans": 0,
-    "exp": "Yes, I am."
-  },
-  {
-    "id": 179,
+    "id": 171,
     "q": "A: Is your mother a teacher? B: Yes, ______.",
     "opts": [
       "she is",
@@ -2340,33 +2236,7 @@ export const QUESTION_BANK = {
     "exp": "Yes, she is."
   },
   {
-    "id": 180,
-    "q": "A: Are they at home? B: No, ______.",
-    "opts": [
-      "they aren't",
-      "they isn't",
-      "they amn't",
-      "them aren't",
-      "they don't"
-    ],
-    "ans": 0,
-    "exp": "No, they aren't."
-  },
-  {
-    "id": 181,
-    "q": "A: Are you a student? B: Yes, ______.",
-    "opts": [
-      "I am",
-      "I is",
-      "I are",
-      "you am",
-      "I do"
-    ],
-    "ans": 0,
-    "exp": "Yes, I am."
-  },
-  {
-    "id": 182,
+    "id": 172,
     "q": "A: Are we late? B: No, ______.",
     "opts": [
       "we aren't",
@@ -2379,202 +2249,7 @@ export const QUESTION_BANK = {
     "exp": "No, we aren't."
   },
   {
-    "id": 183,
-    "q": "A: Is this an apple? B: No, ______.",
-    "opts": [
-      "it isn't",
-      "this isn't",
-      "it aren't",
-      "this aren't",
-      "it doesn't"
-    ],
-    "ans": 0,
-    "exp": "No, it isn't."
-  },
-  {
-    "id": 184,
-    "q": "A: Are you a student? B: Yes, ______.",
-    "opts": [
-      "I am",
-      "I is",
-      "I are",
-      "you am",
-      "I do"
-    ],
-    "ans": 0,
-    "exp": "Yes, I am."
-  },
-  {
-    "id": 185,
-    "q": "A: Is he your brother? B: Yes, ______.",
-    "opts": [
-      "he is",
-      "he are",
-      "he am",
-      "him is",
-      "he does"
-    ],
-    "ans": 0,
-    "exp": "Yes, he is."
-  },
-  {
-    "id": 186,
-    "q": "A: Are we late? B: No, ______.",
-    "opts": [
-      "we aren't",
-      "we isn't",
-      "we amn't",
-      "us aren't",
-      "we don't"
-    ],
-    "ans": 0,
-    "exp": "No, we aren't."
-  },
-  {
-    "id": 187,
-    "q": "A: Are we late? B: No, ______.",
-    "opts": [
-      "we aren't",
-      "we isn't",
-      "we amn't",
-      "us aren't",
-      "we don't"
-    ],
-    "ans": 0,
-    "exp": "No, we aren't."
-  },
-  {
-    "id": 188,
-    "q": "A: Is this an apple? B: No, ______.",
-    "opts": [
-      "it isn't",
-      "this isn't",
-      "it aren't",
-      "this aren't",
-      "it doesn't"
-    ],
-    "ans": 0,
-    "exp": "No, it isn't."
-  },
-  {
-    "id": 189,
-    "q": "A: Are you a student? B: Yes, ______.",
-    "opts": [
-      "I am",
-      "I is",
-      "I are",
-      "you am",
-      "I do"
-    ],
-    "ans": 0,
-    "exp": "Yes, I am."
-  },
-  {
-    "id": 190,
-    "q": "A: Is it a cat? B: Yes, ______.",
-    "opts": [
-      "it is",
-      "it are",
-      "it am",
-      "this is",
-      "it does"
-    ],
-    "ans": 0,
-    "exp": "Yes, it is."
-  },
-  {
-    "id": 191,
-    "q": "A: Is she happy? B: No, ______.",
-    "opts": [
-      "she isn't",
-      "she aren't",
-      "she amn't",
-      "she doesn't",
-      "her isn't"
-    ],
-    "ans": 0,
-    "exp": "No, she isn't."
-  },
-  {
-    "id": 192,
-    "q": "A: Are we late? B: No, ______.",
-    "opts": [
-      "we aren't",
-      "we isn't",
-      "we amn't",
-      "us aren't",
-      "we don't"
-    ],
-    "ans": 0,
-    "exp": "No, we aren't."
-  },
-  {
-    "id": 193,
-    "q": "A: Is she happy? B: No, ______.",
-    "opts": [
-      "she isn't",
-      "she aren't",
-      "she amn't",
-      "she doesn't",
-      "her isn't"
-    ],
-    "ans": 0,
-    "exp": "No, she isn't."
-  },
-  {
-    "id": 194,
-    "q": "A: Am I correct? B: Yes, ______.",
-    "opts": [
-      "you are",
-      "you is",
-      "I am",
-      "I are",
-      "you do"
-    ],
-    "ans": 0,
-    "exp": "Yes, you are."
-  },
-  {
-    "id": 195,
-    "q": "A: Are we late? B: No, ______.",
-    "opts": [
-      "we aren't",
-      "we isn't",
-      "we amn't",
-      "us aren't",
-      "we don't"
-    ],
-    "ans": 0,
-    "exp": "No, we aren't."
-  },
-  {
-    "id": 196,
-    "q": "A: Is this an apple? B: No, ______.",
-    "opts": [
-      "it isn't",
-      "this isn't",
-      "it aren't",
-      "this aren't",
-      "it doesn't"
-    ],
-    "ans": 0,
-    "exp": "No, it isn't."
-  },
-  {
-    "id": 197,
-    "q": "A: Are they at home? B: No, ______.",
-    "opts": [
-      "they aren't",
-      "they isn't",
-      "they amn't",
-      "them aren't",
-      "they don't"
-    ],
-    "ans": 0,
-    "exp": "No, they aren't."
-  },
-  {
-    "id": 198,
+    "id": 173,
     "q": "A: Are these your books? B: Yes, ______.",
     "opts": [
       "they are",
@@ -2587,33 +2262,7 @@ export const QUESTION_BANK = {
     "exp": "Yes, they are."
   },
   {
-    "id": 199,
-    "q": "A: Are we late? B: No, ______.",
-    "opts": [
-      "we aren't",
-      "we isn't",
-      "we amn't",
-      "us aren't",
-      "we don't"
-    ],
-    "ans": 0,
-    "exp": "No, we aren't."
-  },
-  {
-    "id": 200,
-    "q": "A: Is this an apple? B: No, ______.",
-    "opts": [
-      "it isn't",
-      "this isn't",
-      "it aren't",
-      "this aren't",
-      "it doesn't"
-    ],
-    "ans": 0,
-    "exp": "No, it isn't."
-  },
-  {
-    "id": 201,
+    "id": 174,
     "q": "\"I'm\" 의 원래 형태로 알맞은 것은?",
     "opts": [
       "I am",
@@ -2626,7 +2275,7 @@ export const QUESTION_BANK = {
     "exp": "I'm = I am"
   },
   {
-    "id": 202,
+    "id": 175,
     "q": "\"They're\" 의 원래 형태로 알맞은 것은?",
     "opts": [
       "They am",
@@ -2639,7 +2288,7 @@ export const QUESTION_BANK = {
     "exp": "They're = They are"
   },
   {
-    "id": 203,
+    "id": 176,
     "q": "\"It's\" 의 원래 형태로 알맞은 것은?",
     "opts": [
       "It am",
@@ -2652,7 +2301,7 @@ export const QUESTION_BANK = {
     "exp": "It's = It is"
   },
   {
-    "id": 204,
+    "id": 177,
     "q": "\"She's\" 의 원래 형태로 알맞은 것은?",
     "opts": [
       "She am",
@@ -2665,46 +2314,7 @@ export const QUESTION_BANK = {
     "exp": "She's = She is"
   },
   {
-    "id": 205,
-    "q": "\"She's\" 의 원래 형태로 알맞은 것은?",
-    "opts": [
-      "She am",
-      "She is",
-      "She are",
-      "She was",
-      "She has"
-    ],
-    "ans": 1,
-    "exp": "She's = She is"
-  },
-  {
-    "id": 206,
-    "q": "\"I'm\" 의 원래 형태로 알맞은 것은?",
-    "opts": [
-      "I am",
-      "I is",
-      "I are",
-      "I was",
-      "I were"
-    ],
-    "ans": 0,
-    "exp": "I'm = I am"
-  },
-  {
-    "id": 207,
-    "q": "\"It's\" 의 원래 형태로 알맞은 것은?",
-    "opts": [
-      "It am",
-      "It is",
-      "It are",
-      "It was",
-      "It has"
-    ],
-    "ans": 1,
-    "exp": "It's = It is"
-  },
-  {
-    "id": 208,
+    "id": 178,
     "q": "\"I am\" 을 줄여 쓴 형태는?",
     "opts": [
       "I'm",
@@ -2717,20 +2327,7 @@ export const QUESTION_BANK = {
     "exp": "I am = I'm"
   },
   {
-    "id": 209,
-    "q": "\"She's\" 의 원래 형태로 알맞은 것은?",
-    "opts": [
-      "She am",
-      "She is",
-      "She are",
-      "She was",
-      "She has"
-    ],
-    "ans": 1,
-    "exp": "She's = She is"
-  },
-  {
-    "id": 210,
+    "id": 179,
     "q": "\"He is not\" 을 줄여 쓴 형태는?",
     "opts": [
       "he isn't",
@@ -2743,20 +2340,7 @@ export const QUESTION_BANK = {
     "exp": "He is not = He isn't"
   },
   {
-    "id": 211,
-    "q": "\"I am\" 을 줄여 쓴 형태는?",
-    "opts": [
-      "I'm",
-      "I's",
-      "I're",
-      "I'am",
-      "Im'"
-    ],
-    "ans": 0,
-    "exp": "I am = I'm"
-  },
-  {
-    "id": 212,
+    "id": 180,
     "q": "\"We're\" 의 원래 형태로 알맞은 것은?",
     "opts": [
       "We am",
@@ -2769,46 +2353,7 @@ export const QUESTION_BANK = {
     "exp": "We're = We are"
   },
   {
-    "id": 213,
-    "q": "\"She's\" 의 원래 형태로 알맞은 것은?",
-    "opts": [
-      "She am",
-      "She is",
-      "She are",
-      "She was",
-      "She has"
-    ],
-    "ans": 1,
-    "exp": "She's = She is"
-  },
-  {
-    "id": 214,
-    "q": "\"We're\" 의 원래 형태로 알맞은 것은?",
-    "opts": [
-      "We am",
-      "We is",
-      "We are",
-      "We were",
-      "We was"
-    ],
-    "ans": 2,
-    "exp": "We're = We are"
-  },
-  {
-    "id": 215,
-    "q": "\"He is not\" 을 줄여 쓴 형태는?",
-    "opts": [
-      "he isn't",
-      "he amn't",
-      "he aren't",
-      "he wasn't",
-      "he doesn't"
-    ],
-    "ans": 0,
-    "exp": "He is not = He isn't"
-  },
-  {
-    "id": 216,
+    "id": 181,
     "q": "\"He's\" 의 원래 형태로 알맞은 것은?",
     "opts": [
       "He am",
@@ -2821,7 +2366,7 @@ export const QUESTION_BANK = {
     "exp": "He's = He is"
   },
   {
-    "id": 217,
+    "id": 182,
     "q": "\"You're\" 의 원래 형태로 알맞은 것은?",
     "opts": [
       "You am",
@@ -2834,7 +2379,7 @@ export const QUESTION_BANK = {
     "exp": "You're = You are"
   },
   {
-    "id": 218,
+    "id": 183,
     "q": "\"isn't\" 의 원래 형태로 알맞은 것은?",
     "opts": [
       "is not",
@@ -2847,98 +2392,7 @@ export const QUESTION_BANK = {
     "exp": "isn't = is not"
   },
   {
-    "id": 219,
-    "q": "\"We're\" 의 원래 형태로 알맞은 것은?",
-    "opts": [
-      "We am",
-      "We is",
-      "We are",
-      "We were",
-      "We was"
-    ],
-    "ans": 2,
-    "exp": "We're = We are"
-  },
-  {
-    "id": 220,
-    "q": "\"We're\" 의 원래 형태로 알맞은 것은?",
-    "opts": [
-      "We am",
-      "We is",
-      "We are",
-      "We were",
-      "We was"
-    ],
-    "ans": 2,
-    "exp": "We're = We are"
-  },
-  {
-    "id": 221,
-    "q": "\"It's\" 의 원래 형태로 알맞은 것은?",
-    "opts": [
-      "It am",
-      "It is",
-      "It are",
-      "It was",
-      "It has"
-    ],
-    "ans": 1,
-    "exp": "It's = It is"
-  },
-  {
-    "id": 222,
-    "q": "\"It's\" 의 원래 형태로 알맞은 것은?",
-    "opts": [
-      "It am",
-      "It is",
-      "It are",
-      "It was",
-      "It has"
-    ],
-    "ans": 1,
-    "exp": "It's = It is"
-  },
-  {
-    "id": 223,
-    "q": "\"He is not\" 을 줄여 쓴 형태는?",
-    "opts": [
-      "he isn't",
-      "he amn't",
-      "he aren't",
-      "he wasn't",
-      "he doesn't"
-    ],
-    "ans": 0,
-    "exp": "He is not = He isn't"
-  },
-  {
-    "id": 224,
-    "q": "\"isn't\" 의 원래 형태로 알맞은 것은?",
-    "opts": [
-      "is not",
-      "am not",
-      "are not",
-      "was not",
-      "were not"
-    ],
-    "ans": 0,
-    "exp": "isn't = is not"
-  },
-  {
-    "id": 225,
-    "q": "\"It's\" 의 원래 형태로 알맞은 것은?",
-    "opts": [
-      "It am",
-      "It is",
-      "It are",
-      "It was",
-      "It has"
-    ],
-    "ans": 1,
-    "exp": "It's = It is"
-  },
-  {
-    "id": 226,
+    "id": 184,
     "q": "다음 중 올바른 문장은?",
     "opts": [
       "I is happy.",
@@ -2951,7 +2405,7 @@ export const QUESTION_BANK = {
     "exp": "He + is"
   },
   {
-    "id": 227,
+    "id": 185,
     "q": "다음 중 어색한 문장은?",
     "opts": [
       "You are nice.",
@@ -2964,20 +2418,7 @@ export const QUESTION_BANK = {
     "exp": "I is → I am"
   },
   {
-    "id": 228,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "She is from Korea.",
-      "He are happy.",
-      "They is here.",
-      "I are tall.",
-      "You is kind."
-    ],
-    "ans": 0,
-    "exp": "She → is"
-  },
-  {
-    "id": 229,
+    "id": 186,
     "q": "밑줄 친 부분이 옳은 문장은?",
     "opts": [
       "He <u>are</u> tall.",
@@ -2990,189 +2431,7 @@ export const QUESTION_BANK = {
     "exp": "We → are"
   },
   {
-    "id": 230,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "You is my friend.",
-      "We are friends.",
-      "I are tired.",
-      "She am pretty.",
-      "It are big."
-    ],
-    "ans": 1,
-    "exp": "We → are"
-  },
-  {
-    "id": 231,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "I am hungry.",
-      "She is busy.",
-      "We are friends.",
-      "He are tall.",
-      "They are smart."
-    ],
-    "ans": 3,
-    "exp": "He are → He is"
-  },
-  {
-    "id": 232,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "She is from Korea.",
-      "He are happy.",
-      "They is here.",
-      "I are tall.",
-      "You is kind."
-    ],
-    "ans": 0,
-    "exp": "She → is"
-  },
-  {
-    "id": 233,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "You is my friend.",
-      "We are friends.",
-      "I are tired.",
-      "She am pretty.",
-      "It are big."
-    ],
-    "ans": 1,
-    "exp": "We → are"
-  },
-  {
-    "id": 234,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "I am hungry.",
-      "She is busy.",
-      "We are friends.",
-      "He are tall.",
-      "They are smart."
-    ],
-    "ans": 3,
-    "exp": "He are → He is"
-  },
-  {
-    "id": 235,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "They are kind.",
-      "He is my friend.",
-      "I am tall.",
-      "We am students.",
-      "She is pretty."
-    ],
-    "ans": 3,
-    "exp": "We am → We are"
-  },
-  {
-    "id": 236,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "They am students.",
-      "He are tall.",
-      "I am a boy.",
-      "She are nice.",
-      "It am red."
-    ],
-    "ans": 2,
-    "exp": "I → am"
-  },
-  {
-    "id": 237,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "They am students.",
-      "He are tall.",
-      "I am a boy.",
-      "She are nice.",
-      "It am red."
-    ],
-    "ans": 2,
-    "exp": "I → am"
-  },
-  {
-    "id": 238,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "She is from Korea.",
-      "He are happy.",
-      "They is here.",
-      "I are tall.",
-      "You is kind."
-    ],
-    "ans": 0,
-    "exp": "She → is"
-  },
-  {
-    "id": 239,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "They am students.",
-      "He are tall.",
-      "I am a boy.",
-      "She are nice.",
-      "It am red."
-    ],
-    "ans": 2,
-    "exp": "I → am"
-  },
-  {
-    "id": 240,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "I is happy.",
-      "She are tall.",
-      "We am students.",
-      "He is a doctor.",
-      "They is kind."
-    ],
-    "ans": 3,
-    "exp": "He + is"
-  },
-  {
-    "id": 241,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "I is happy.",
-      "She are tall.",
-      "We am students.",
-      "He is a doctor.",
-      "They is kind."
-    ],
-    "ans": 3,
-    "exp": "He + is"
-  },
-  {
-    "id": 242,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "I is happy.",
-      "She are tall.",
-      "We am students.",
-      "He is a doctor.",
-      "They is kind."
-    ],
-    "ans": 3,
-    "exp": "He + is"
-  },
-  {
-    "id": 243,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "You are nice.",
-      "It is a cat.",
-      "I is happy.",
-      "She is my mom.",
-      "We are tired."
-    ],
-    "ans": 2,
-    "exp": "I is → I am"
-  },
-  {
-    "id": 244,
+    "id": 187,
     "q": "다음 중 잘못된 문장은?",
     "opts": [
       "She is a girl.",
@@ -3185,85 +2444,7 @@ export const QUESTION_BANK = {
     "exp": "It → is"
   },
   {
-    "id": 245,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "They are kind.",
-      "He is my friend.",
-      "I am tall.",
-      "We am students.",
-      "She is pretty."
-    ],
-    "ans": 3,
-    "exp": "We am → We are"
-  },
-  {
-    "id": 246,
-    "q": "다음 중 잘못된 문장은?",
-    "opts": [
-      "She is a girl.",
-      "We are happy.",
-      "You are my friend.",
-      "It am small.",
-      "They are here."
-    ],
-    "ans": 3,
-    "exp": "It → is"
-  },
-  {
-    "id": 247,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "You is my friend.",
-      "We are friends.",
-      "I are tired.",
-      "She am pretty.",
-      "It are big."
-    ],
-    "ans": 1,
-    "exp": "We → are"
-  },
-  {
-    "id": 248,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "They are kind.",
-      "He is my friend.",
-      "I am tall.",
-      "We am students.",
-      "She is pretty."
-    ],
-    "ans": 3,
-    "exp": "We am → We are"
-  },
-  {
-    "id": 249,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "She is from Korea.",
-      "He are happy.",
-      "They is here.",
-      "I are tall.",
-      "You is kind."
-    ],
-    "ans": 0,
-    "exp": "She → is"
-  },
-  {
-    "id": 250,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "You are nice.",
-      "It is a cat.",
-      "I is happy.",
-      "She is my mom.",
-      "We are tired."
-    ],
-    "ans": 2,
-    "exp": "I is → I am"
-  },
-  {
-    "id": 251,
+    "id": 188,
     "q": "There ______ one boy in my bag.",
     "opts": [
       "am",
@@ -3276,7 +2457,7 @@ export const QUESTION_BANK = {
     "exp": "There + is + 단수"
   },
   {
-    "id": 252,
+    "id": 189,
     "q": "There ______ one boy under the chair.",
     "opts": [
       "am",
@@ -3289,7 +2470,7 @@ export const QUESTION_BANK = {
     "exp": "There + is + 단수"
   },
   {
-    "id": 253,
+    "id": 190,
     "q": "There ______ a book under the chair.",
     "opts": [
       "am",
@@ -3302,7 +2483,7 @@ export const QUESTION_BANK = {
     "exp": "There + is + 단수"
   },
   {
-    "id": 254,
+    "id": 191,
     "q": "There ______ a desk under the chair.",
     "opts": [
       "am",
@@ -3315,7 +2496,7 @@ export const QUESTION_BANK = {
     "exp": "There + is + 단수"
   },
   {
-    "id": 255,
+    "id": 192,
     "q": "There ______ a cat at the park.",
     "opts": [
       "am",
@@ -3328,7 +2509,7 @@ export const QUESTION_BANK = {
     "exp": "There + is + 단수"
   },
   {
-    "id": 256,
+    "id": 193,
     "q": "There ______ a flower in the box.",
     "opts": [
       "am",
@@ -3341,7 +2522,7 @@ export const QUESTION_BANK = {
     "exp": "There + is + 단수"
   },
   {
-    "id": 257,
+    "id": 194,
     "q": "There ______ a girl on the table.",
     "opts": [
       "am",
@@ -3354,7 +2535,7 @@ export const QUESTION_BANK = {
     "exp": "There + is + 단수"
   },
   {
-    "id": 258,
+    "id": 195,
     "q": "There ______ a book in the box.",
     "opts": [
       "am",
@@ -3367,7 +2548,7 @@ export const QUESTION_BANK = {
     "exp": "There + is + 단수"
   },
   {
-    "id": 259,
+    "id": 196,
     "q": "There ______ a girl in my bag.",
     "opts": [
       "am",
@@ -3380,7 +2561,7 @@ export const QUESTION_BANK = {
     "exp": "There + is + 단수"
   },
   {
-    "id": 260,
+    "id": 197,
     "q": "There ______ a cat on the desk.",
     "opts": [
       "am",
@@ -3393,7 +2574,7 @@ export const QUESTION_BANK = {
     "exp": "There + is + 단수"
   },
   {
-    "id": 261,
+    "id": 198,
     "q": "There ______ a pencil in my bag.",
     "opts": [
       "am",
@@ -3406,7 +2587,7 @@ export const QUESTION_BANK = {
     "exp": "There + is + 단수"
   },
   {
-    "id": 262,
+    "id": 199,
     "q": "There ______ a book at the park.",
     "opts": [
       "am",
@@ -3419,7 +2600,7 @@ export const QUESTION_BANK = {
     "exp": "There + is + 단수"
   },
   {
-    "id": 263,
+    "id": 200,
     "q": "There ______ four dogs in the room.",
     "opts": [
       "am",
@@ -3432,7 +2613,7 @@ export const QUESTION_BANK = {
     "exp": "There + are + 복수"
   },
   {
-    "id": 264,
+    "id": 201,
     "q": "There ______ many people in the box.",
     "opts": [
       "am",
@@ -3445,7 +2626,7 @@ export const QUESTION_BANK = {
     "exp": "There + are + 복수"
   },
   {
-    "id": 265,
+    "id": 202,
     "q": "There ______ some flowers on the desk.",
     "opts": [
       "am",
@@ -3458,7 +2639,7 @@ export const QUESTION_BANK = {
     "exp": "There + are + 복수"
   },
   {
-    "id": 266,
+    "id": 203,
     "q": "There ______ four dogs on the table.",
     "opts": [
       "am",
@@ -3471,7 +2652,7 @@ export const QUESTION_BANK = {
     "exp": "There + are + 복수"
   },
   {
-    "id": 267,
+    "id": 204,
     "q": "There ______ two boys in my bag.",
     "opts": [
       "am",
@@ -3484,7 +2665,7 @@ export const QUESTION_BANK = {
     "exp": "There + are + 복수"
   },
   {
-    "id": 268,
+    "id": 205,
     "q": "There ______ many cars under the chair.",
     "opts": [
       "am",
@@ -3497,20 +2678,7 @@ export const QUESTION_BANK = {
     "exp": "There + are + 복수"
   },
   {
-    "id": 269,
-    "q": "There ______ four dogs in the room.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "was",
-      "were"
-    ],
-    "ans": 2,
-    "exp": "There + are + 복수"
-  },
-  {
-    "id": 270,
+    "id": 206,
     "q": "There ______ five students in the room.",
     "opts": [
       "am",
@@ -3523,7 +2691,7 @@ export const QUESTION_BANK = {
     "exp": "There + are + 복수"
   },
   {
-    "id": 271,
+    "id": 207,
     "q": "There ______ some flowers in my bag.",
     "opts": [
       "am",
@@ -3536,7 +2704,7 @@ export const QUESTION_BANK = {
     "exp": "There + are + 복수"
   },
   {
-    "id": 272,
+    "id": 208,
     "q": "There ______ five students on the desk.",
     "opts": [
       "am",
@@ -3549,7 +2717,7 @@ export const QUESTION_BANK = {
     "exp": "There + are + 복수"
   },
   {
-    "id": 273,
+    "id": 209,
     "q": "There ______ many people in the room.",
     "opts": [
       "am",
@@ -3562,7 +2730,7 @@ export const QUESTION_BANK = {
     "exp": "There + are + 복수"
   },
   {
-    "id": 274,
+    "id": 210,
     "q": "There ______ many cars in the room.",
     "opts": [
       "am",
@@ -3575,7 +2743,7 @@ export const QUESTION_BANK = {
     "exp": "There + are + 복수"
   },
   {
-    "id": 275,
+    "id": 211,
     "q": "There ______ many cars in the box.",
     "opts": [
       "am",
@@ -3588,7 +2756,7 @@ export const QUESTION_BANK = {
     "exp": "There + are + 복수"
   },
   {
-    "id": 276,
+    "id": 212,
     "q": "My sister and I ______ in the same school.",
     "opts": [
       "am",
@@ -3601,7 +2769,7 @@ export const QUESTION_BANK = {
     "exp": "My sister and I → 복수 → are"
   },
   {
-    "id": 277,
+    "id": 213,
     "q": "Math and English ______ difficult subjects.",
     "opts": [
       "am",
@@ -3614,7 +2782,7 @@ export const QUESTION_BANK = {
     "exp": "복수 주어 → are"
   },
   {
-    "id": 278,
+    "id": 214,
     "q": "Korea ______ a beautiful country.",
     "opts": [
       "am",
@@ -3627,7 +2795,7 @@ export const QUESTION_BANK = {
     "exp": "Korea(나라) → is"
   },
   {
-    "id": 279,
+    "id": 215,
     "q": "I am 12 years old, and you ______ 12, too.",
     "opts": [
       "am",
@@ -3640,7 +2808,7 @@ export const QUESTION_BANK = {
     "exp": "You → are"
   },
   {
-    "id": 280,
+    "id": 216,
     "q": "Tom is happy, and Mary ______ happy, too.",
     "opts": [
       "am",
@@ -3653,7 +2821,7 @@ export const QUESTION_BANK = {
     "exp": "Mary(3인칭 단수) → is"
   },
   {
-    "id": 281,
+    "id": 217,
     "q": "Mike's parents ______ kind people.",
     "opts": [
       "am",
@@ -3666,20 +2834,7 @@ export const QUESTION_BANK = {
     "exp": "parents → 복수 → are"
   },
   {
-    "id": 282,
-    "q": "Korea ______ a beautiful country.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "do",
-      "have"
-    ],
-    "ans": 1,
-    "exp": "Korea(나라) → is"
-  },
-  {
-    "id": 283,
+    "id": 218,
     "q": "English ______ my favorite subject.",
     "opts": [
       "am",
@@ -3692,7 +2847,7 @@ export const QUESTION_BANK = {
     "exp": "English(과목) → is"
   },
   {
-    "id": 284,
+    "id": 219,
     "q": "The weather ______ very nice today.",
     "opts": [
       "am",
@@ -3705,7 +2860,7 @@ export const QUESTION_BANK = {
     "exp": "The weather → is"
   },
   {
-    "id": 285,
+    "id": 220,
     "q": "These cookies ______ delicious!",
     "opts": [
       "am",
@@ -3718,20 +2873,7 @@ export const QUESTION_BANK = {
     "exp": "These cookies(복수) → are"
   },
   {
-    "id": 286,
-    "q": "These cookies ______ delicious!",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "do",
-      "have"
-    ],
-    "ans": 2,
-    "exp": "These cookies(복수) → are"
-  },
-  {
-    "id": 287,
+    "id": 221,
     "q": "The children ______ in the playground.",
     "opts": [
       "am",
@@ -3744,98 +2886,7 @@ export const QUESTION_BANK = {
     "exp": "children → 복수 → are"
   },
   {
-    "id": 288,
-    "q": "Mike's parents ______ kind people.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "was",
-      "do"
-    ],
-    "ans": 2,
-    "exp": "parents → 복수 → are"
-  },
-  {
-    "id": 289,
-    "q": "The children ______ in the playground.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "was",
-      "do"
-    ],
-    "ans": 2,
-    "exp": "children → 복수 → are"
-  },
-  {
-    "id": 290,
-    "q": "The weather ______ very nice today.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "do",
-      "have"
-    ],
-    "ans": 1,
-    "exp": "The weather → is"
-  },
-  {
-    "id": 291,
-    "q": "Tom is happy, and Mary ______ happy, too.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "was",
-      "do"
-    ],
-    "ans": 1,
-    "exp": "Mary(3인칭 단수) → is"
-  },
-  {
-    "id": 292,
-    "q": "Mike's parents ______ kind people.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "was",
-      "do"
-    ],
-    "ans": 2,
-    "exp": "parents → 복수 → are"
-  },
-  {
-    "id": 293,
-    "q": "Math and English ______ difficult subjects.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "do",
-      "have"
-    ],
-    "ans": 2,
-    "exp": "복수 주어 → are"
-  },
-  {
-    "id": 294,
-    "q": "The children ______ in the playground.",
-    "opts": [
-      "am",
-      "is",
-      "are",
-      "was",
-      "do"
-    ],
-    "ans": 2,
-    "exp": "children → 복수 → are"
-  },
-  {
-    "id": 295,
+    "id": 222,
     "q": "That woman ______ my aunt.",
     "opts": [
       "am",
@@ -3848,69 +2899,1018 @@ export const QUESTION_BANK = {
     "exp": "That woman → is"
   },
   {
-    "id": 296,
-    "q": "Mike's parents ______ kind people.",
+    "id": 223,
+    "q": "The boys ______ sleepy.",
     "opts": [
       "am",
       "is",
       "are",
       "was",
-      "do"
+      "were"
     ],
     "ans": 2,
-    "exp": "parents → 복수 → are"
+    "exp": "주어 \"The boys\" → are"
+  },
+  {
+    "id": 224,
+    "q": "Her brother ______ happy.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Her brother\" → is"
+  },
+  {
+    "id": 225,
+    "q": "The new student ______ at school.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The new student\" → is"
+  },
+  {
+    "id": 226,
+    "q": "I ______ in the kitchen.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 0,
+    "exp": "주어 \"I\" → am"
+  },
+  {
+    "id": 227,
+    "q": "We ______ young.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"We\" → are"
+  },
+  {
+    "id": 228,
+    "q": "The dog ______ late.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The dog\" → is"
+  },
+  {
+    "id": 229,
+    "q": "I ______ sick.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 0,
+    "exp": "주어 \"I\" → am"
+  },
+  {
+    "id": 230,
+    "q": "The girl ______ sad.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The girl\" → is"
+  },
+  {
+    "id": 231,
+    "q": "My dad ______ honest.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"My dad\" → is"
+  },
+  {
+    "id": 232,
+    "q": "The girl ______ young.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The girl\" → is"
+  },
+  {
+    "id": 233,
+    "q": "They ______ happy.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"They\" → are"
+  },
+  {
+    "id": 234,
+    "q": "That man ______ sad.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"That man\" → is"
+  },
+  {
+    "id": 235,
+    "q": "These books ______ really hot.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"These books\" → are"
+  },
+  {
+    "id": 236,
+    "q": "They ______ so cold.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"They\" → are"
+  },
+  {
+    "id": 237,
+    "q": "The actor ______ kind.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The actor\" → is"
+  },
+  {
+    "id": 238,
+    "q": "The actor ______ in the kitchen.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The actor\" → is"
+  },
+  {
+    "id": 239,
+    "q": "Sora ______ very tall.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Sora\" → is"
+  },
+  {
+    "id": 240,
+    "q": "My mom ______ sick.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"My mom\" → is"
+  },
+  {
+    "id": 241,
+    "q": "The children ______ quiet.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"The children\" → are"
+  },
+  {
+    "id": 242,
+    "q": "My parents ______ really hot.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"My parents\" → are"
+  },
+  {
+    "id": 243,
+    "q": "The actor ______ busy.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The actor\" → is"
+  },
+  {
+    "id": 244,
+    "q": "The dogs ______ busy.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"The dogs\" → are"
+  },
+  {
+    "id": 245,
+    "q": "My friends ______ honest.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"My friends\" → are"
+  },
+  {
+    "id": 246,
+    "q": "It ______ sad.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"It\" → is"
+  },
+  {
+    "id": 247,
+    "q": "You and Mike ______ at school.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"You and Mike\" → are"
+  },
+  {
+    "id": 248,
+    "q": "The baby ______ sleepy.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The baby\" → is"
+  },
+  {
+    "id": 249,
+    "q": "We all ______ late.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"We all\" → are"
+  },
+  {
+    "id": 250,
+    "q": "Jinho ______ smart.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Jinho\" → is"
+  },
+  {
+    "id": 251,
+    "q": "The actor ______ sleepy.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The actor\" → is"
+  },
+  {
+    "id": 252,
+    "q": "Our teacher ______ in the kitchen.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Our teacher\" → is"
+  },
+  {
+    "id": 253,
+    "q": "Sora ______ happy.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Sora\" → is"
+  },
+  {
+    "id": 254,
+    "q": "Sora ______ famous.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Sora\" → is"
+  },
+  {
+    "id": 255,
+    "q": "Tom and I ______ friendly.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"Tom and I\" → are"
+  },
+  {
+    "id": 256,
+    "q": "The children ______ kind.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"The children\" → are"
+  },
+  {
+    "id": 257,
+    "q": "Our teacher ______ happy.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Our teacher\" → is"
+  },
+  {
+    "id": 258,
+    "q": "Sora and Jenny ______ young.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"Sora and Jenny\" → are"
+  },
+  {
+    "id": 259,
+    "q": "Mr. Kim ______ happy.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Mr. Kim\" → is"
+  },
+  {
+    "id": 260,
+    "q": "The cat ______ so cold.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The cat\" → is"
+  },
+  {
+    "id": 261,
+    "q": "You ______ brave.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"You\" → are"
+  },
+  {
+    "id": 262,
+    "q": "The cat ______ angry.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The cat\" → is"
+  },
+  {
+    "id": 263,
+    "q": "The cats ______ young.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"The cats\" → are"
+  },
+  {
+    "id": 264,
+    "q": "They ______ sad.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"They\" → are"
+  },
+  {
+    "id": 265,
+    "q": "The girls ______ sick.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"The girls\" → are"
+  },
+  {
+    "id": 266,
+    "q": "Her brother ______ tired.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Her brother\" → is"
+  },
+  {
+    "id": 267,
+    "q": "Mr. Kim ______ nervous.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Mr. Kim\" → is"
+  },
+  {
+    "id": 268,
+    "q": "His sister ______ really hot.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"His sister\" → is"
+  },
+  {
+    "id": 269,
+    "q": "The children ______ at home.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"The children\" → are"
+  },
+  {
+    "id": 270,
+    "q": "The dogs ______ sick.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"The dogs\" → are"
+  },
+  {
+    "id": 271,
+    "q": "They ______ here.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"They\" → are"
+  },
+  {
+    "id": 272,
+    "q": "Mary ______ noisy.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Mary\" → is"
+  },
+  {
+    "id": 273,
+    "q": "Tom and I ______ kind.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"Tom and I\" → are"
+  },
+  {
+    "id": 274,
+    "q": "This book ______ so cold.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"This book\" → is"
+  },
+  {
+    "id": 275,
+    "q": "We all ______ sad.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"We all\" → are"
+  },
+  {
+    "id": 276,
+    "q": "Sora and Jenny ______ really hot.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"Sora and Jenny\" → are"
+  },
+  {
+    "id": 277,
+    "q": "The room ______ smart.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The room\" → is"
+  },
+  {
+    "id": 278,
+    "q": "They ______ smart.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"They\" → are"
+  },
+  {
+    "id": 279,
+    "q": "The players ______ honest.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"The players\" → are"
+  },
+  {
+    "id": 280,
+    "q": "The baby ______ busy.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The baby\" → is"
+  },
+  {
+    "id": 281,
+    "q": "The girls ______ so cold.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"The girls\" → are"
+  },
+  {
+    "id": 282,
+    "q": "Mary ______ tired.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Mary\" → is"
+  },
+  {
+    "id": 283,
+    "q": "I ______ nervous.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 0,
+    "exp": "주어 \"I\" → am"
+  },
+  {
+    "id": 284,
+    "q": "Sora and Jenny ______ quiet.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"Sora and Jenny\" → are"
+  },
+  {
+    "id": 285,
+    "q": "The players ______ excited.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"The players\" → are"
+  },
+  {
+    "id": 286,
+    "q": "They ______ tired.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"They\" → are"
+  },
+  {
+    "id": 287,
+    "q": "The boy ______ quiet.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The boy\" → is"
+  },
+  {
+    "id": 288,
+    "q": "The children ______ friendly.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"The children\" → are"
+  },
+  {
+    "id": 289,
+    "q": "I ______ friendly.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 0,
+    "exp": "주어 \"I\" → am"
+  },
+  {
+    "id": 290,
+    "q": "The actor ______ sick.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"The actor\" → is"
+  },
+  {
+    "id": 291,
+    "q": "Our teacher ______ friendly.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Our teacher\" → is"
+  },
+  {
+    "id": 292,
+    "q": "This book ______ busy.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"This book\" → is"
+  },
+  {
+    "id": 293,
+    "q": "Mary ______ busy.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Mary\" → is"
+  },
+  {
+    "id": 294,
+    "q": "Jinho ______ tired.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"Jinho\" → is"
+  },
+  {
+    "id": 295,
+    "q": "The children ______ sick.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 2,
+    "exp": "주어 \"The children\" → are"
+  },
+  {
+    "id": 296,
+    "q": "This book ______ in the kitchen.",
+    "opts": [
+      "am",
+      "is",
+      "are",
+      "was",
+      "were"
+    ],
+    "ans": 1,
+    "exp": "주어 \"This book\" → is"
   },
   {
     "id": 297,
-    "q": "English ______ my favorite subject.",
+    "q": "My parents ______ friendly.",
     "opts": [
       "am",
       "is",
       "are",
-      "do",
-      "have"
+      "was",
+      "were"
     ],
-    "ans": 1,
-    "exp": "English(과목) → is"
+    "ans": 2,
+    "exp": "주어 \"My parents\" → are"
   },
   {
     "id": 298,
-    "q": "Tom is happy, and Mary ______ happy, too.",
+    "q": "Her brother ______ at school.",
     "opts": [
       "am",
       "is",
       "are",
       "was",
-      "do"
+      "were"
     ],
     "ans": 1,
-    "exp": "Mary(3인칭 단수) → is"
+    "exp": "주어 \"Her brother\" → is"
   },
   {
     "id": 299,
-    "q": "I am 12 years old, and you ______ 12, too.",
+    "q": "The teachers ______ angry.",
     "opts": [
       "am",
       "is",
       "are",
       "was",
-      "do"
+      "were"
     ],
     "ans": 2,
-    "exp": "You → are"
+    "exp": "주어 \"The teachers\" → are"
   },
   {
     "id": 300,
-    "q": "These cookies ______ delicious!",
+    "q": "The teachers ______ sick.",
     "opts": [
       "am",
       "is",
       "are",
-      "do",
-      "have"
+      "was",
+      "were"
     ],
     "ans": 2,
-    "exp": "These cookies(복수) → are"
+    "exp": "주어 \"The teachers\" → are"
   }
 ]
   },
@@ -4013,19 +4013,6 @@ export const QUESTION_BANK = {
   },
   {
     "id": 8,
-    "q": "She ______ milk last night.",
-    "opts": [
-      "was closeing",
-      "closes",
-      "closees",
-      "closed",
-      "closed"
-    ],
-    "ans": 3,
-    "exp": "close → closed (과거형)"
-  },
-  {
-    "id": 9,
     "q": "My mom ______ baseball last night.",
     "opts": [
       "did visit",
@@ -4038,7 +4025,7 @@ export const QUESTION_BANK = {
     "exp": "visit → visited (과거형)"
   },
   {
-    "id": 10,
+    "id": 9,
     "q": "The boys ______ tea two days ago.",
     "opts": [
       "did finish",
@@ -4051,7 +4038,7 @@ export const QUESTION_BANK = {
     "exp": "finish → finished (과거형)"
   },
   {
-    "id": 11,
+    "id": 10,
     "q": "She ______ an email last week.",
     "opts": [
       "listend",
@@ -4064,7 +4051,7 @@ export const QUESTION_BANK = {
     "exp": "listen → listened (과거형)"
   },
   {
-    "id": 12,
+    "id": 11,
     "q": "They ______ an email this morning.",
     "opts": [
       "listen",
@@ -4077,7 +4064,7 @@ export const QUESTION_BANK = {
     "exp": "listen → listened (과거형)"
   },
   {
-    "id": 13,
+    "id": 12,
     "q": "The boys ______ a movie last weekend.",
     "opts": [
       "washed",
@@ -4090,20 +4077,7 @@ export const QUESTION_BANK = {
     "exp": "wash → washed (과거형)"
   },
   {
-    "id": 14,
-    "q": "They ______ a song this morning.",
-    "opts": [
-      "liked",
-      "likees",
-      "like",
-      "likes",
-      "liked"
-    ],
-    "ans": 0,
-    "exp": "like → liked (과거형)"
-  },
-  {
-    "id": 15,
+    "id": 13,
     "q": "Mary ______ to the park two days ago.",
     "opts": [
       "was liveing",
@@ -4116,7 +4090,7 @@ export const QUESTION_BANK = {
     "exp": "live → lived (과거형)"
   },
   {
-    "id": 16,
+    "id": 14,
     "q": "They ______ breakfast two days ago.",
     "opts": [
       "was walking",
@@ -4129,20 +4103,7 @@ export const QUESTION_BANK = {
     "exp": "walk → walked (과거형)"
   },
   {
-    "id": 17,
-    "q": "You ______ English last night.",
-    "opts": [
-      "move",
-      "moved",
-      "was moveing",
-      "movees",
-      "moved"
-    ],
-    "ans": 4,
-    "exp": "move → moved (과거형)"
-  },
-  {
-    "id": 18,
+    "id": 15,
     "q": "The boys ______ a letter last week.",
     "opts": [
       "washed",
@@ -4155,20 +4116,7 @@ export const QUESTION_BANK = {
     "exp": "wash → washed (과거형)"
   },
   {
-    "id": 19,
-    "q": "My mom ______ dinner this morning.",
-    "opts": [
-      "dancees",
-      "danced",
-      "danceing",
-      "did dance",
-      "danced"
-    ],
-    "ans": 1,
-    "exp": "dance → danced (과거형)"
-  },
-  {
-    "id": 20,
+    "id": 16,
     "q": "The boys ______ my homework last Sunday.",
     "opts": [
       "danceing",
@@ -4181,7 +4129,7 @@ export const QUESTION_BANK = {
     "exp": "dance → danced (과거형)"
   },
   {
-    "id": 21,
+    "id": 17,
     "q": "We ______ English this morning.",
     "opts": [
       "staied",
@@ -4194,7 +4142,7 @@ export const QUESTION_BANK = {
     "exp": "stay → stayed (과거형)"
   },
   {
-    "id": 22,
+    "id": 18,
     "q": "I ______ tea yesterday.",
     "opts": [
       "cook",
@@ -4207,20 +4155,7 @@ export const QUESTION_BANK = {
     "exp": "cook → cooked (과거형)"
   },
   {
-    "id": 23,
-    "q": "She ______ a song this morning.",
-    "opts": [
-      "closed",
-      "did close",
-      "closees",
-      "closeing",
-      "closed"
-    ],
-    "ans": 4,
-    "exp": "close → closed (과거형)"
-  },
-  {
-    "id": 24,
+    "id": 19,
     "q": "We ______ TV this morning.",
     "opts": [
       "visits",
@@ -4233,33 +4168,7 @@ export const QUESTION_BANK = {
     "exp": "visit → visited (과거형)"
   },
   {
-    "id": 25,
-    "q": "Tom ______ a game last week.",
-    "opts": [
-      "liked",
-      "liked",
-      "likees",
-      "was likeing",
-      "likeing"
-    ],
-    "ans": 1,
-    "exp": "like → liked (과거형)"
-  },
-  {
-    "id": 26,
-    "q": "My mom ______ breakfast last night.",
-    "opts": [
-      "lived",
-      "was liveing",
-      "live",
-      "lives",
-      "lived"
-    ],
-    "ans": 4,
-    "exp": "live → lived (과거형)"
-  },
-  {
-    "id": 27,
+    "id": 20,
     "q": "We ______ milk last night.",
     "opts": [
       "did close",
@@ -4272,20 +4181,7 @@ export const QUESTION_BANK = {
     "exp": "close → closed (과거형)"
   },
   {
-    "id": 28,
-    "q": "She ______ the news yesterday.",
-    "opts": [
-      "studyes",
-      "studied",
-      "studied",
-      "was studying",
-      "studying"
-    ],
-    "ans": 1,
-    "exp": "study → studied (과거형)"
-  },
-  {
-    "id": 29,
+    "id": 21,
     "q": "Mary ______ a letter this morning.",
     "opts": [
       "arriveing",
@@ -4298,7 +4194,7 @@ export const QUESTION_BANK = {
     "exp": "arrive → arrived (과거형)"
   },
   {
-    "id": 30,
+    "id": 22,
     "q": "We ______ dinner last night.",
     "opts": [
       "movees",
@@ -4311,7 +4207,7 @@ export const QUESTION_BANK = {
     "exp": "move → moved (과거형)"
   },
   {
-    "id": 31,
+    "id": 23,
     "q": "We ______ soccer last Sunday.",
     "opts": [
       "talk",
@@ -4324,7 +4220,7 @@ export const QUESTION_BANK = {
     "exp": "talk → talked (과거형)"
   },
   {
-    "id": 32,
+    "id": 24,
     "q": "They ______ TV two days ago.",
     "opts": [
       "helpes",
@@ -4337,7 +4233,7 @@ export const QUESTION_BANK = {
     "exp": "help → helped (과거형)"
   },
   {
-    "id": 33,
+    "id": 25,
     "q": "You ______ dinner last weekend.",
     "opts": [
       "walked",
@@ -4350,7 +4246,7 @@ export const QUESTION_BANK = {
     "exp": "walk → walked (과거형)"
   },
   {
-    "id": 34,
+    "id": 26,
     "q": "We ______ TV last Sunday.",
     "opts": [
       "arrive",
@@ -4363,20 +4259,7 @@ export const QUESTION_BANK = {
     "exp": "arrive → arrived (과거형)"
   },
   {
-    "id": 35,
-    "q": "They ______ a movie last night.",
-    "opts": [
-      "moves",
-      "did move",
-      "moved",
-      "moveing",
-      "moved"
-    ],
-    "ans": 2,
-    "exp": "move → moved (과거형)"
-  },
-  {
-    "id": 36,
+    "id": 27,
     "q": "The boys ______ dinner last Sunday.",
     "opts": [
       "did finish",
@@ -4389,7 +4272,7 @@ export const QUESTION_BANK = {
     "exp": "finish → finished (과거형)"
   },
   {
-    "id": 37,
+    "id": 28,
     "q": "We ______ soccer last weekend.",
     "opts": [
       "cleand",
@@ -4402,7 +4285,7 @@ export const QUESTION_BANK = {
     "exp": "clean → cleaned (과거형)"
   },
   {
-    "id": 38,
+    "id": 29,
     "q": "He ______ a movie last night.",
     "opts": [
       "likees",
@@ -4415,7 +4298,7 @@ export const QUESTION_BANK = {
     "exp": "like → liked (과거형)"
   },
   {
-    "id": 39,
+    "id": 30,
     "q": "I ______ tea last weekend.",
     "opts": [
       "walkes",
@@ -4428,33 +4311,7 @@ export const QUESTION_BANK = {
     "exp": "walk → walked (과거형)"
   },
   {
-    "id": 40,
-    "q": "My mom ______ a letter last weekend.",
-    "opts": [
-      "did like",
-      "liked",
-      "like",
-      "liked",
-      "likeing"
-    ],
-    "ans": 3,
-    "exp": "like → liked (과거형)"
-  },
-  {
-    "id": 41,
-    "q": "He ______ a movie last Sunday.",
-    "opts": [
-      "did cry",
-      "cried",
-      "cry",
-      "cried",
-      "was crying"
-    ],
-    "ans": 3,
-    "exp": "cry → cried (과거형)"
-  },
-  {
-    "id": 42,
+    "id": 31,
     "q": "Tom ______ an email this morning.",
     "opts": [
       "watches",
@@ -4467,7 +4324,7 @@ export const QUESTION_BANK = {
     "exp": "watch → watched (과거형)"
   },
   {
-    "id": 43,
+    "id": 32,
     "q": "Tom ______ soccer two days ago.",
     "opts": [
       "was trying",
@@ -4480,7 +4337,7 @@ export const QUESTION_BANK = {
     "exp": "try → tried (과거형)"
   },
   {
-    "id": 44,
+    "id": 33,
     "q": "He ______ a movie two days ago.",
     "opts": [
       "plays",
@@ -4493,7 +4350,7 @@ export const QUESTION_BANK = {
     "exp": "play → played (과거형)"
   },
   {
-    "id": 45,
+    "id": 34,
     "q": "He ______ breakfast last night.",
     "opts": [
       "was stoping",
@@ -4506,7 +4363,7 @@ export const QUESTION_BANK = {
     "exp": "stop → stopped (과거형)"
   },
   {
-    "id": 46,
+    "id": 35,
     "q": "We ______ soccer last week.",
     "opts": [
       "stoping",
@@ -4519,7 +4376,7 @@ export const QUESTION_BANK = {
     "exp": "stop → stopped (과거형)"
   },
   {
-    "id": 47,
+    "id": 36,
     "q": "She ______ baseball last Sunday.",
     "opts": [
       "try",
@@ -4532,7 +4389,7 @@ export const QUESTION_BANK = {
     "exp": "try → tried (과거형)"
   },
   {
-    "id": 48,
+    "id": 37,
     "q": "The boys ______ a song last night.",
     "opts": [
       "cook",
@@ -4545,7 +4402,7 @@ export const QUESTION_BANK = {
     "exp": "cook → cooked (과거형)"
   },
   {
-    "id": 49,
+    "id": 38,
     "q": "Tom ______ breakfast last night.",
     "opts": [
       "talk",
@@ -4558,33 +4415,7 @@ export const QUESTION_BANK = {
     "exp": "talk → talked (과거형)"
   },
   {
-    "id": 50,
-    "q": "My mom ______ to the park last Sunday.",
-    "opts": [
-      "arrivees",
-      "arrived",
-      "arriveing",
-      "arrived",
-      "did arrive"
-    ],
-    "ans": 3,
-    "exp": "arrive → arrived (과거형)"
-  },
-  {
-    "id": 51,
-    "q": "Mary ______ water last Sunday.",
-    "opts": [
-      "lived",
-      "was liveing",
-      "lived",
-      "live",
-      "did live"
-    ],
-    "ans": 0,
-    "exp": "live → lived (과거형)"
-  },
-  {
-    "id": 52,
+    "id": 39,
     "q": "He ______ TV last week.",
     "opts": [
       "was watching",
@@ -4597,7 +4428,7 @@ export const QUESTION_BANK = {
     "exp": "watch → watched (과거형)"
   },
   {
-    "id": 53,
+    "id": 40,
     "q": "Mary ______ milk two days ago.",
     "opts": [
       "finishing",
@@ -4610,7 +4441,7 @@ export const QUESTION_BANK = {
     "exp": "finish → finished (과거형)"
   },
   {
-    "id": 54,
+    "id": 41,
     "q": "Tom ______ the news yesterday.",
     "opts": [
       "listenes",
@@ -4623,7 +4454,7 @@ export const QUESTION_BANK = {
     "exp": "listen → listened (과거형)"
   },
   {
-    "id": 55,
+    "id": 42,
     "q": "I ______ a letter last weekend.",
     "opts": [
       "live",
@@ -4636,7 +4467,7 @@ export const QUESTION_BANK = {
     "exp": "live → lived (과거형)"
   },
   {
-    "id": 56,
+    "id": 43,
     "q": "You ______ English yesterday.",
     "opts": [
       "finish",
@@ -4649,7 +4480,7 @@ export const QUESTION_BANK = {
     "exp": "finish → finished (과거형)"
   },
   {
-    "id": 57,
+    "id": 44,
     "q": "She ______ lunch last weekend.",
     "opts": [
       "listened",
@@ -4662,33 +4493,7 @@ export const QUESTION_BANK = {
     "exp": "listen → listened (과거형)"
   },
   {
-    "id": 58,
-    "q": "They ______ a song last week.",
-    "opts": [
-      "was moveing",
-      "moved",
-      "movees",
-      "moved",
-      "did move"
-    ],
-    "ans": 3,
-    "exp": "move → moved (과거형)"
-  },
-  {
-    "id": 59,
-    "q": "He ______ TV last weekend.",
-    "opts": [
-      "did love",
-      "lovees",
-      "loved",
-      "loved",
-      "was loveing"
-    ],
-    "ans": 2,
-    "exp": "love → loved (과거형)"
-  },
-  {
-    "id": 60,
+    "id": 45,
     "q": "I ______ my homework last Sunday.",
     "opts": [
       "movees",
@@ -4701,7 +4506,7 @@ export const QUESTION_BANK = {
     "exp": "move → moved (과거형)"
   },
   {
-    "id": 61,
+    "id": 46,
     "q": "We ______ a game this morning.",
     "opts": [
       "was sing",
@@ -4714,7 +4519,7 @@ export const QUESTION_BANK = {
     "exp": "sing → sang (불규칙)"
   },
   {
-    "id": 62,
+    "id": 47,
     "q": "My mom ______ a letter this morning.",
     "opts": [
       "sent",
@@ -4727,7 +4532,7 @@ export const QUESTION_BANK = {
     "exp": "send → sent (불규칙)"
   },
   {
-    "id": 63,
+    "id": 48,
     "q": "My mom ______ breakfast yesterday.",
     "opts": [
       "heared",
@@ -4740,7 +4545,7 @@ export const QUESTION_BANK = {
     "exp": "hear → heard (불규칙)"
   },
   {
-    "id": 64,
+    "id": 49,
     "q": "I ______ water two days ago.",
     "opts": [
       "write",
@@ -4753,7 +4558,7 @@ export const QUESTION_BANK = {
     "exp": "write → wrote (불규칙)"
   },
   {
-    "id": 65,
+    "id": 50,
     "q": "He ______ water last week.",
     "opts": [
       "win",
@@ -4766,7 +4571,7 @@ export const QUESTION_BANK = {
     "exp": "win → won (불규칙)"
   },
   {
-    "id": 66,
+    "id": 51,
     "q": "Tom ______ a letter last night.",
     "opts": [
       "weard",
@@ -4779,7 +4584,7 @@ export const QUESTION_BANK = {
     "exp": "wear → wore (불규칙)"
   },
   {
-    "id": 67,
+    "id": 52,
     "q": "They ______ to school last night.",
     "opts": [
       "went",
@@ -4792,7 +4597,7 @@ export const QUESTION_BANK = {
     "exp": "go → went (불규칙)"
   },
   {
-    "id": 68,
+    "id": 53,
     "q": "Mary ______ TV yesterday.",
     "opts": [
       "loseing",
@@ -4805,7 +4610,7 @@ export const QUESTION_BANK = {
     "exp": "lose → lost (불규칙)"
   },
   {
-    "id": 69,
+    "id": 54,
     "q": "You ______ milk last Sunday.",
     "opts": [
       "did",
@@ -4818,7 +4623,7 @@ export const QUESTION_BANK = {
     "exp": "do → did (불규칙)"
   },
   {
-    "id": 70,
+    "id": 55,
     "q": "Tom ______ baseball last week.",
     "opts": [
       "did speak",
@@ -4831,7 +4636,7 @@ export const QUESTION_BANK = {
     "exp": "speak → spoke (불규칙)"
   },
   {
-    "id": 71,
+    "id": 56,
     "q": "My mom ______ dinner last night.",
     "opts": [
       "sang",
@@ -4844,7 +4649,7 @@ export const QUESTION_BANK = {
     "exp": "sing → sang (불규칙)"
   },
   {
-    "id": 72,
+    "id": 57,
     "q": "Mary ______ dinner last week.",
     "opts": [
       "seeed",
@@ -4857,7 +4662,7 @@ export const QUESTION_BANK = {
     "exp": "see → saw (불규칙)"
   },
   {
-    "id": 73,
+    "id": 58,
     "q": "She ______ TV last weekend.",
     "opts": [
       "caught",
@@ -4870,7 +4675,7 @@ export const QUESTION_BANK = {
     "exp": "catch → caught (불규칙)"
   },
   {
-    "id": 74,
+    "id": 59,
     "q": "We ______ baseball this morning.",
     "opts": [
       "get",
@@ -4883,7 +4688,7 @@ export const QUESTION_BANK = {
     "exp": "get → got (불규칙)"
   },
   {
-    "id": 75,
+    "id": 60,
     "q": "We ______ water last week.",
     "opts": [
       "speaking",
@@ -4896,7 +4701,7 @@ export const QUESTION_BANK = {
     "exp": "speak → spoke (불규칙)"
   },
   {
-    "id": 76,
+    "id": 61,
     "q": "She ______ water last weekend.",
     "opts": [
       "won",
@@ -4909,7 +4714,7 @@ export const QUESTION_BANK = {
     "exp": "win → won (불규칙)"
   },
   {
-    "id": 77,
+    "id": 62,
     "q": "You ______ tea last night.",
     "opts": [
       "eates",
@@ -4922,20 +4727,7 @@ export const QUESTION_BANK = {
     "exp": "eat → ate (불규칙)"
   },
   {
-    "id": 78,
-    "q": "We ______ lunch last night.",
-    "opts": [
-      "read",
-      "reads",
-      "readed",
-      "read",
-      "did read"
-    ],
-    "ans": 3,
-    "exp": "read → read (불규칙)"
-  },
-  {
-    "id": 79,
+    "id": 63,
     "q": "My mom ______ water two days ago.",
     "opts": [
       "payd",
@@ -4948,7 +4740,7 @@ export const QUESTION_BANK = {
     "exp": "pay → paid (불규칙)"
   },
   {
-    "id": 80,
+    "id": 64,
     "q": "I ______ a song this morning.",
     "opts": [
       "comees",
@@ -4961,20 +4753,7 @@ export const QUESTION_BANK = {
     "exp": "come → came (불규칙)"
   },
   {
-    "id": 81,
-    "q": "He ______ a game last night.",
-    "opts": [
-      "did put",
-      "put",
-      "put",
-      "puting",
-      "was put"
-    ],
-    "ans": 2,
-    "exp": "put → put (불규칙)"
-  },
-  {
-    "id": 82,
+    "id": 65,
     "q": "He ______ lunch yesterday.",
     "opts": [
       "sending",
@@ -4987,7 +4766,7 @@ export const QUESTION_BANK = {
     "exp": "send → sent (불규칙)"
   },
   {
-    "id": 83,
+    "id": 66,
     "q": "I ______ a movie last Sunday.",
     "opts": [
       "did fall",
@@ -5000,20 +4779,7 @@ export const QUESTION_BANK = {
     "exp": "fall → fell (불규칙)"
   },
   {
-    "id": 84,
-    "q": "The boys ______ my homework last Sunday.",
-    "opts": [
-      "choosed",
-      "chooseed",
-      "was choose",
-      "chooses",
-      "chose"
-    ],
-    "ans": 4,
-    "exp": "choose → chose (불규칙)"
-  },
-  {
-    "id": 85,
+    "id": 67,
     "q": "I ______ the news last Sunday.",
     "opts": [
       "holded",
@@ -5026,7 +4792,7 @@ export const QUESTION_BANK = {
     "exp": "hold → held (불규칙)"
   },
   {
-    "id": 86,
+    "id": 68,
     "q": "He ______ baseball two days ago.",
     "opts": [
       "flyd",
@@ -5039,7 +4805,7 @@ export const QUESTION_BANK = {
     "exp": "fly → flew (불규칙)"
   },
   {
-    "id": 87,
+    "id": 69,
     "q": "Mary ______ tea last weekend.",
     "opts": [
       "runes",
@@ -5052,7 +4818,7 @@ export const QUESTION_BANK = {
     "exp": "run → ran (불규칙)"
   },
   {
-    "id": 88,
+    "id": 70,
     "q": "Mary ______ to the park last Sunday.",
     "opts": [
       "was lose",
@@ -5065,7 +4831,7 @@ export const QUESTION_BANK = {
     "exp": "lose → lost (불규칙)"
   },
   {
-    "id": 89,
+    "id": 71,
     "q": "I ______ milk last weekend.",
     "opts": [
       "rode",
@@ -5078,7 +4844,7 @@ export const QUESTION_BANK = {
     "exp": "ride → rode (불규칙)"
   },
   {
-    "id": 90,
+    "id": 72,
     "q": "I ______ to the park last week.",
     "opts": [
       "gived",
@@ -5091,7 +4857,7 @@ export const QUESTION_BANK = {
     "exp": "give → gave (불규칙)"
   },
   {
-    "id": 91,
+    "id": 73,
     "q": "I ______ to school last Sunday.",
     "opts": [
       "payd",
@@ -5104,7 +4870,7 @@ export const QUESTION_BANK = {
     "exp": "pay → paid (불규칙)"
   },
   {
-    "id": 92,
+    "id": 74,
     "q": "They ______ an email last Sunday.",
     "opts": [
       "drove",
@@ -5117,20 +4883,7 @@ export const QUESTION_BANK = {
     "exp": "drive → drove (불규칙)"
   },
   {
-    "id": 93,
-    "q": "We ______ baseball this morning.",
-    "opts": [
-      "swam",
-      "swimed",
-      "did swim",
-      "was swim",
-      "swims"
-    ],
-    "ans": 0,
-    "exp": "swim → swam (불규칙)"
-  },
-  {
-    "id": 94,
+    "id": 75,
     "q": "We ______ my homework yesterday.",
     "opts": [
       "did pay",
@@ -5143,7 +4896,7 @@ export const QUESTION_BANK = {
     "exp": "pay → paid (불규칙)"
   },
   {
-    "id": 95,
+    "id": 76,
     "q": "Mary ______ a song yesterday.",
     "opts": [
       "comeed",
@@ -5156,7 +4909,7 @@ export const QUESTION_BANK = {
     "exp": "come → came (불규칙)"
   },
   {
-    "id": 96,
+    "id": 77,
     "q": "Mary ______ English last weekend.",
     "opts": [
       "takeing",
@@ -5169,7 +4922,7 @@ export const QUESTION_BANK = {
     "exp": "take → took (불규칙)"
   },
   {
-    "id": 97,
+    "id": 78,
     "q": "My mom ______ breakfast two days ago.",
     "opts": [
       "did see",
@@ -5182,7 +4935,7 @@ export const QUESTION_BANK = {
     "exp": "see → saw (불규칙)"
   },
   {
-    "id": 98,
+    "id": 79,
     "q": "We ______ lunch two days ago.",
     "opts": [
       "thinking",
@@ -5195,7 +4948,7 @@ export const QUESTION_BANK = {
     "exp": "think → thought (불규칙)"
   },
   {
-    "id": 99,
+    "id": 80,
     "q": "We ______ baseball two days ago.",
     "opts": [
       "seees",
@@ -5208,7 +4961,7 @@ export const QUESTION_BANK = {
     "exp": "see → saw (불규칙)"
   },
   {
-    "id": 100,
+    "id": 81,
     "q": "He ______ a game this morning.",
     "opts": [
       "wined",
@@ -5221,20 +4974,7 @@ export const QUESTION_BANK = {
     "exp": "win → won (불규칙)"
   },
   {
-    "id": 101,
-    "q": "I ______ to school last Sunday.",
-    "opts": [
-      "keep",
-      "keepd",
-      "keeps",
-      "kept",
-      "keepes"
-    ],
-    "ans": 3,
-    "exp": "keep → kept (불규칙)"
-  },
-  {
-    "id": 102,
+    "id": 82,
     "q": "I ______ English last Sunday.",
     "opts": [
       "slept",
@@ -5247,7 +4987,7 @@ export const QUESTION_BANK = {
     "exp": "sleep → slept (불규칙)"
   },
   {
-    "id": 103,
+    "id": 83,
     "q": "You ______ dinner yesterday.",
     "opts": [
       "rides",
@@ -5260,7 +5000,7 @@ export const QUESTION_BANK = {
     "exp": "ride → rode (불규칙)"
   },
   {
-    "id": 104,
+    "id": 84,
     "q": "Mary ______ English last night.",
     "opts": [
       "did take",
@@ -5273,7 +5013,7 @@ export const QUESTION_BANK = {
     "exp": "take → took (불규칙)"
   },
   {
-    "id": 105,
+    "id": 85,
     "q": "I ______ breakfast last week.",
     "opts": [
       "did teach",
@@ -5286,7 +5026,7 @@ export const QUESTION_BANK = {
     "exp": "teach → taught (불규칙)"
   },
   {
-    "id": 106,
+    "id": 86,
     "q": "He ______ a game two days ago.",
     "opts": [
       "drived",
@@ -5299,20 +5039,7 @@ export const QUESTION_BANK = {
     "exp": "drive → drove (불규칙)"
   },
   {
-    "id": 107,
-    "q": "They ______ to school last night.",
-    "opts": [
-      "knowes",
-      "did know",
-      "was know",
-      "knowd",
-      "knew"
-    ],
-    "ans": 4,
-    "exp": "know → knew (불규칙)"
-  },
-  {
-    "id": 108,
+    "id": 87,
     "q": "My mom ______ an email last Sunday.",
     "opts": [
       "did do",
@@ -5325,7 +5052,7 @@ export const QUESTION_BANK = {
     "exp": "do → did (불규칙)"
   },
   {
-    "id": 109,
+    "id": 88,
     "q": "Tom ______ dinner yesterday.",
     "opts": [
       "found",
@@ -5338,7 +5065,7 @@ export const QUESTION_BANK = {
     "exp": "find → found (불규칙)"
   },
   {
-    "id": 110,
+    "id": 89,
     "q": "We ______ tea last week.",
     "opts": [
       "geted",
@@ -5351,7 +5078,7 @@ export const QUESTION_BANK = {
     "exp": "get → got (불규칙)"
   },
   {
-    "id": 111,
+    "id": 90,
     "q": "I ______ a book last weekend.",
     "opts": [
       "caught",
@@ -5364,7 +5091,7 @@ export const QUESTION_BANK = {
     "exp": "catch → caught (불규칙)"
   },
   {
-    "id": 112,
+    "id": 91,
     "q": "The boys ______ English two days ago.",
     "opts": [
       "rideed",
@@ -5377,7 +5104,7 @@ export const QUESTION_BANK = {
     "exp": "ride → rode (불규칙)"
   },
   {
-    "id": 113,
+    "id": 92,
     "q": "We ______ a letter this morning.",
     "opts": [
       "held",
@@ -5390,7 +5117,7 @@ export const QUESTION_BANK = {
     "exp": "hold → held (불규칙)"
   },
   {
-    "id": 114,
+    "id": 93,
     "q": "My mom ______ TV last night.",
     "opts": [
       "speak",
@@ -5403,7 +5130,7 @@ export const QUESTION_BANK = {
     "exp": "speak → spoke (불규칙)"
   },
   {
-    "id": 115,
+    "id": 94,
     "q": "We ______ a song last week.",
     "opts": [
       "catched",
@@ -5416,7 +5143,7 @@ export const QUESTION_BANK = {
     "exp": "catch → caught (불규칙)"
   },
   {
-    "id": 116,
+    "id": 95,
     "q": "He ______ TV last night.",
     "opts": [
       "puts",
@@ -5429,7 +5156,7 @@ export const QUESTION_BANK = {
     "exp": "put → put (불규칙)"
   },
   {
-    "id": 117,
+    "id": 96,
     "q": "He ______ lunch last Sunday.",
     "opts": [
       "begines",
@@ -5442,7 +5169,7 @@ export const QUESTION_BANK = {
     "exp": "begin → began (불규칙)"
   },
   {
-    "id": 118,
+    "id": 97,
     "q": "Tom ______ milk two days ago.",
     "opts": [
       "breakd",
@@ -5455,7 +5182,7 @@ export const QUESTION_BANK = {
     "exp": "break → broke (불규칙)"
   },
   {
-    "id": 119,
+    "id": 98,
     "q": "You ______ water last Sunday.",
     "opts": [
       "did make",
@@ -5468,7 +5195,7 @@ export const QUESTION_BANK = {
     "exp": "make → made (불규칙)"
   },
   {
-    "id": 120,
+    "id": 99,
     "q": "He ______ tea this morning.",
     "opts": [
       "was swim",
@@ -5481,7 +5208,7 @@ export const QUESTION_BANK = {
     "exp": "swim → swam (불규칙)"
   },
   {
-    "id": 121,
+    "id": 100,
     "q": "I ______ milk last Sunday.",
     "opts": [
       "bringd",
@@ -5494,7 +5221,7 @@ export const QUESTION_BANK = {
     "exp": "bring → brought (불규칙)"
   },
   {
-    "id": 122,
+    "id": 101,
     "q": "She ______ dinner last Sunday.",
     "opts": [
       "fell",
@@ -5507,7 +5234,7 @@ export const QUESTION_BANK = {
     "exp": "fall → fell (불규칙)"
   },
   {
-    "id": 123,
+    "id": 102,
     "q": "They ______ a song last Sunday.",
     "opts": [
       "ride",
@@ -5520,7 +5247,7 @@ export const QUESTION_BANK = {
     "exp": "ride → rode (불규칙)"
   },
   {
-    "id": 124,
+    "id": 103,
     "q": "We ______ soccer last night.",
     "opts": [
       "goes",
@@ -5533,7 +5260,7 @@ export const QUESTION_BANK = {
     "exp": "go → went (불규칙)"
   },
   {
-    "id": 125,
+    "id": 104,
     "q": "You ______ a game last week.",
     "opts": [
       "breakes",
@@ -5546,7 +5273,7 @@ export const QUESTION_BANK = {
     "exp": "break → broke (불규칙)"
   },
   {
-    "id": 126,
+    "id": 105,
     "q": "They ______ the news last week.",
     "opts": [
       "fly",
@@ -5559,7 +5286,7 @@ export const QUESTION_BANK = {
     "exp": "fly → flew (불규칙)"
   },
   {
-    "id": 127,
+    "id": 106,
     "q": "He ______ dinner this morning.",
     "opts": [
       "choosed",
@@ -5572,7 +5299,7 @@ export const QUESTION_BANK = {
     "exp": "choose → chose (불규칙)"
   },
   {
-    "id": 128,
+    "id": 107,
     "q": "You ______ milk this morning.",
     "opts": [
       "eating",
@@ -5585,20 +5312,7 @@ export const QUESTION_BANK = {
     "exp": "eat → ate (불규칙)"
   },
   {
-    "id": 129,
-    "q": "We ______ lunch last weekend.",
-    "opts": [
-      "putes",
-      "put",
-      "puting",
-      "putd",
-      "put"
-    ],
-    "ans": 4,
-    "exp": "put → put (불규칙)"
-  },
-  {
-    "id": 130,
+    "id": 108,
     "q": "I ______ baseball last night.",
     "opts": [
       "was lose",
@@ -5611,7 +5325,7 @@ export const QUESTION_BANK = {
     "exp": "lose → lost (불규칙)"
   },
   {
-    "id": 131,
+    "id": 109,
     "q": "We ______ to school this morning.",
     "opts": [
       "was send",
@@ -5624,7 +5338,7 @@ export const QUESTION_BANK = {
     "exp": "send → sent (불규칙)"
   },
   {
-    "id": 132,
+    "id": 110,
     "q": "I ______ a book this morning.",
     "opts": [
       "was hold",
@@ -5637,7 +5351,7 @@ export const QUESTION_BANK = {
     "exp": "hold → held (불규칙)"
   },
   {
-    "id": 133,
+    "id": 111,
     "q": "My mom ______ to the park yesterday.",
     "opts": [
       "did go",
@@ -5650,7 +5364,7 @@ export const QUESTION_BANK = {
     "exp": "go → went (불규칙)"
   },
   {
-    "id": 134,
+    "id": 112,
     "q": "My mom ______ my homework two days ago.",
     "opts": [
       "did sleep",
@@ -5663,7 +5377,7 @@ export const QUESTION_BANK = {
     "exp": "sleep → slept (불규칙)"
   },
   {
-    "id": 135,
+    "id": 113,
     "q": "My mom ______ to the park this morning.",
     "opts": [
       "falling",
@@ -5676,7 +5390,7 @@ export const QUESTION_BANK = {
     "exp": "fall → fell (불규칙)"
   },
   {
-    "id": 136,
+    "id": 114,
     "q": "Tom ______ English two days ago.",
     "opts": [
       "took",
@@ -5689,7 +5403,7 @@ export const QUESTION_BANK = {
     "exp": "take → took (불규칙)"
   },
   {
-    "id": 137,
+    "id": 115,
     "q": "The boys ______ the news this morning.",
     "opts": [
       "feeling",
@@ -5702,7 +5416,7 @@ export const QUESTION_BANK = {
     "exp": "feel → felt (불규칙)"
   },
   {
-    "id": 138,
+    "id": 116,
     "q": "She ______ to the park two days ago.",
     "opts": [
       "bringes",
@@ -5715,7 +5429,7 @@ export const QUESTION_BANK = {
     "exp": "bring → brought (불규칙)"
   },
   {
-    "id": 139,
+    "id": 117,
     "q": "The boys ______ to school last night.",
     "opts": [
       "sells",
@@ -5728,7 +5442,7 @@ export const QUESTION_BANK = {
     "exp": "sell → sold (불규칙)"
   },
   {
-    "id": 140,
+    "id": 118,
     "q": "The boys ______ an email this morning.",
     "opts": [
       "falled",
@@ -5741,7 +5455,7 @@ export const QUESTION_BANK = {
     "exp": "fall → fell (불규칙)"
   },
   {
-    "id": 141,
+    "id": 119,
     "q": "Did your friends ______ baseball yesterday?",
     "opts": [
       "planned",
@@ -5754,7 +5468,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 142,
+    "id": 120,
     "q": "Did your brother ______ a game yesterday?",
     "opts": [
       "listening",
@@ -5767,7 +5481,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 143,
+    "id": 121,
     "q": "Did your brother ______ baseball yesterday?",
     "opts": [
       "wears",
@@ -5780,7 +5494,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 144,
+    "id": 122,
     "q": "Did he ______ my homework yesterday?",
     "opts": [
       "walkes",
@@ -5793,20 +5507,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 145,
-    "q": "Did your brother ______ lunch yesterday?",
-    "opts": [
-      "cleaned",
-      "cleans",
-      "cleaned",
-      "cleanes",
-      "clean"
-    ],
-    "ans": 4,
-    "exp": "Did + 주어 + 동사원형 ~?"
-  },
-  {
-    "id": 146,
+    "id": 123,
     "q": "Did they ______ lunch yesterday?",
     "opts": [
       "comes",
@@ -5819,7 +5520,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 147,
+    "id": 124,
     "q": "Did your brother ______ to school yesterday?",
     "opts": [
       "arriveing",
@@ -5832,7 +5533,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 148,
+    "id": 125,
     "q": "Did your friends ______ lunch yesterday?",
     "opts": [
       "walking",
@@ -5845,7 +5546,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 149,
+    "id": 126,
     "q": "Did your friends ______ a letter yesterday?",
     "opts": [
       "playes",
@@ -5858,7 +5559,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 150,
+    "id": 127,
     "q": "Did you ______ TV yesterday?",
     "opts": [
       "sit",
@@ -5871,7 +5572,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 151,
+    "id": 128,
     "q": "Did he ______ dinner yesterday?",
     "opts": [
       "washed",
@@ -5884,7 +5585,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 152,
+    "id": 129,
     "q": "Did Tom ______ baseball yesterday?",
     "opts": [
       "cooking",
@@ -5897,7 +5598,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 153,
+    "id": 130,
     "q": "Did she ______ to the park yesterday?",
     "opts": [
       "sent",
@@ -5910,7 +5611,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 154,
+    "id": 131,
     "q": "Did you ______ a song yesterday?",
     "opts": [
       "breaking",
@@ -5923,7 +5624,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 155,
+    "id": 132,
     "q": "Did she ______ lunch yesterday?",
     "opts": [
       "wear",
@@ -5936,7 +5637,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 156,
+    "id": 133,
     "q": "Did they ______ a book yesterday?",
     "opts": [
       "choosees",
@@ -5949,7 +5650,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 157,
+    "id": 134,
     "q": "Did your friends ______ tea yesterday?",
     "opts": [
       "cook",
@@ -5962,7 +5663,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 158,
+    "id": 135,
     "q": "Did she ______ a song yesterday?",
     "opts": [
       "sent",
@@ -5975,7 +5676,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 159,
+    "id": 136,
     "q": "Did they ______ an email yesterday?",
     "opts": [
       "have",
@@ -5988,7 +5689,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 160,
+    "id": 137,
     "q": "Did your brother ______ TV yesterday?",
     "opts": [
       "loseed",
@@ -6001,7 +5702,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 161,
+    "id": 138,
     "q": "Did Tom ______ water yesterday?",
     "opts": [
       "say",
@@ -6014,7 +5715,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 162,
+    "id": 139,
     "q": "Did your friends ______ milk yesterday?",
     "opts": [
       "say",
@@ -6027,20 +5728,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 163,
-    "q": "Did he ______ dinner yesterday?",
-    "opts": [
-      "met",
-      "meetes",
-      "meets",
-      "meeted",
-      "meet"
-    ],
-    "ans": 4,
-    "exp": "Did + 주어 + 동사원형 ~?"
-  },
-  {
-    "id": 164,
+    "id": 140,
     "q": "Did they ______ tea yesterday?",
     "opts": [
       "openes",
@@ -6053,7 +5741,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 165,
+    "id": 141,
     "q": "Did they ______ a letter yesterday?",
     "opts": [
       "writees",
@@ -6066,7 +5754,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 166,
+    "id": 142,
     "q": "Did your friends ______ breakfast yesterday?",
     "opts": [
       "spoke",
@@ -6079,33 +5767,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 167,
-    "q": "Did your friends ______ to the park yesterday?",
-    "opts": [
-      "cleaned",
-      "cleaning",
-      "cleanes",
-      "cleaned",
-      "clean"
-    ],
-    "ans": 4,
-    "exp": "Did + 주어 + 동사원형 ~?"
-  },
-  {
-    "id": 168,
-    "q": "Did your friends ______ tea yesterday?",
-    "opts": [
-      "forgets",
-      "forget",
-      "forgeted",
-      "forgeting",
-      "forgetes"
-    ],
-    "ans": 1,
-    "exp": "Did + 주어 + 동사원형 ~?"
-  },
-  {
-    "id": 169,
+    "id": 143,
     "q": "Did she ______ a letter yesterday?",
     "opts": [
       "writeed",
@@ -6118,7 +5780,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 170,
+    "id": 144,
     "q": "Did you ______ the news yesterday?",
     "opts": [
       "came",
@@ -6131,7 +5793,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 171,
+    "id": 145,
     "q": "Did you ______ lunch yesterday?",
     "opts": [
       "sended",
@@ -6144,20 +5806,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 172,
-    "q": "Did she ______ my homework yesterday?",
-    "opts": [
-      "stayed",
-      "stays",
-      "stay",
-      "staying",
-      "stayed"
-    ],
-    "ans": 2,
-    "exp": "Did + 주어 + 동사원형 ~?"
-  },
-  {
-    "id": 173,
+    "id": 146,
     "q": "Did Tom ______ a game yesterday?",
     "opts": [
       "became",
@@ -6170,33 +5819,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 174,
-    "q": "Did she ______ soccer yesterday?",
-    "opts": [
-      "opened",
-      "opens",
-      "open",
-      "opened",
-      "opening"
-    ],
-    "ans": 2,
-    "exp": "Did + 주어 + 동사원형 ~?"
-  },
-  {
-    "id": 175,
-    "q": "Did you ______ a song yesterday?",
-    "opts": [
-      "meet",
-      "met",
-      "meets",
-      "meeted",
-      "meetes"
-    ],
-    "ans": 0,
-    "exp": "Did + 주어 + 동사원형 ~?"
-  },
-  {
-    "id": 176,
+    "id": 147,
     "q": "Did you ______ an email yesterday?",
     "opts": [
       "knew",
@@ -6209,20 +5832,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 177,
-    "q": "Did your friends ______ lunch yesterday?",
-    "opts": [
-      "drinks",
-      "drinking",
-      "drinkes",
-      "drank",
-      "drink"
-    ],
-    "ans": 4,
-    "exp": "Did + 주어 + 동사원형 ~?"
-  },
-  {
-    "id": 178,
+    "id": 148,
     "q": "Did he ______ lunch yesterday?",
     "opts": [
       "selled",
@@ -6235,7 +5845,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 179,
+    "id": 149,
     "q": "Did your friends ______ dinner yesterday?",
     "opts": [
       "stand",
@@ -6248,7 +5858,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 180,
+    "id": 150,
     "q": "Did she ______ dinner yesterday?",
     "opts": [
       "said",
@@ -6261,7 +5871,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 181,
+    "id": 151,
     "q": "Did she ______ to school yesterday?",
     "opts": [
       "buying",
@@ -6274,7 +5884,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 182,
+    "id": 152,
     "q": "Did they ______ breakfast yesterday?",
     "opts": [
       "choosees",
@@ -6287,7 +5897,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 183,
+    "id": 153,
     "q": "Did he ______ to school yesterday?",
     "opts": [
       "forgot",
@@ -6300,20 +5910,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 184,
-    "q": "Did your friends ______ breakfast yesterday?",
-    "opts": [
-      "stayed",
-      "stays",
-      "stayes",
-      "stay",
-      "stayed"
-    ],
-    "ans": 3,
-    "exp": "Did + 주어 + 동사원형 ~?"
-  },
-  {
-    "id": 185,
+    "id": 154,
     "q": "Did she ______ soccer yesterday?",
     "opts": [
       "likees",
@@ -6326,7 +5923,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 186,
+    "id": 155,
     "q": "Did your brother ______ a book yesterday?",
     "opts": [
       "loseed",
@@ -6339,7 +5936,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 187,
+    "id": 156,
     "q": "Did she ______ tea yesterday?",
     "opts": [
       "spending",
@@ -6352,20 +5949,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 188,
-    "q": "Did your friends ______ lunch yesterday?",
-    "opts": [
-      "cooked",
-      "cooks",
-      "cookes",
-      "cooking",
-      "cook"
-    ],
-    "ans": 4,
-    "exp": "Did + 주어 + 동사원형 ~?"
-  },
-  {
-    "id": 189,
+    "id": 157,
     "q": "Did Tom ______ a song yesterday?",
     "opts": [
       "do",
@@ -6378,7 +5962,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 190,
+    "id": 158,
     "q": "Did your brother ______ lunch yesterday?",
     "opts": [
       "cleaned",
@@ -6391,7 +5975,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 주어 + 동사원형 ~?"
   },
   {
-    "id": 191,
+    "id": 159,
     "q": "She didn't ______ the news yesterday.",
     "opts": [
       "had",
@@ -6404,7 +5988,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 192,
+    "id": 160,
     "q": "She didn't ______ to school yesterday.",
     "opts": [
       "ride",
@@ -6417,20 +6001,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 193,
-    "q": "They didn't ______ baseball yesterday.",
-    "opts": [
-      "reading",
-      "read",
-      "reades",
-      "read",
-      "readed"
-    ],
-    "ans": 1,
-    "exp": "didn't + 동사원형"
-  },
-  {
-    "id": 194,
+    "id": 161,
     "q": "We didn't ______ tea yesterday.",
     "opts": [
       "had",
@@ -6443,7 +6014,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 195,
+    "id": 162,
     "q": "Tom didn't ______ TV yesterday.",
     "opts": [
       "help",
@@ -6456,33 +6027,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 196,
-    "q": "They didn't ______ TV yesterday.",
-    "opts": [
-      "played",
-      "playing",
-      "plays",
-      "play",
-      "played"
-    ],
-    "ans": 3,
-    "exp": "didn't + 동사원형"
-  },
-  {
-    "id": 197,
-    "q": "My mom didn't ______ lunch yesterday.",
-    "opts": [
-      "helpes",
-      "helped",
-      "helped",
-      "helps",
-      "help"
-    ],
-    "ans": 4,
-    "exp": "didn't + 동사원형"
-  },
-  {
-    "id": 198,
+    "id": 163,
     "q": "You didn't ______ the news yesterday.",
     "opts": [
       "rode",
@@ -6495,7 +6040,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 199,
+    "id": 164,
     "q": "Tom didn't ______ lunch yesterday.",
     "opts": [
       "came",
@@ -6508,7 +6053,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 200,
+    "id": 165,
     "q": "My mom didn't ______ lunch yesterday.",
     "opts": [
       "haveed",
@@ -6521,7 +6066,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 201,
+    "id": 166,
     "q": "We didn't ______ water yesterday.",
     "opts": [
       "dance",
@@ -6534,7 +6079,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 202,
+    "id": 167,
     "q": "You didn't ______ to the park yesterday.",
     "opts": [
       "sended",
@@ -6547,7 +6092,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 203,
+    "id": 168,
     "q": "Tom didn't ______ my homework yesterday.",
     "opts": [
       "sleeped",
@@ -6560,7 +6105,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 204,
+    "id": 169,
     "q": "He didn't ______ TV yesterday.",
     "opts": [
       "watches",
@@ -6573,7 +6118,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 205,
+    "id": 170,
     "q": "They didn't ______ lunch yesterday.",
     "opts": [
       "find",
@@ -6586,7 +6131,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 206,
+    "id": 171,
     "q": "The boys didn't ______ a song yesterday.",
     "opts": [
       "eates",
@@ -6599,7 +6144,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 207,
+    "id": 172,
     "q": "They didn't ______ a book yesterday.",
     "opts": [
       "sited",
@@ -6612,20 +6157,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 208,
-    "q": "You didn't ______ breakfast yesterday.",
-    "opts": [
-      "readed",
-      "reads",
-      "reading",
-      "read",
-      "read"
-    ],
-    "ans": 3,
-    "exp": "didn't + 동사원형"
-  },
-  {
-    "id": 209,
+    "id": 173,
     "q": "He didn't ______ milk yesterday.",
     "opts": [
       "drinked",
@@ -6638,7 +6170,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 210,
+    "id": 174,
     "q": "They didn't ______ milk yesterday.",
     "opts": [
       "buyed",
@@ -6651,7 +6183,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 211,
+    "id": 175,
     "q": "The boys didn't ______ a letter yesterday.",
     "opts": [
       "ran",
@@ -6664,7 +6196,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 212,
+    "id": 176,
     "q": "My mom didn't ______ dinner yesterday.",
     "opts": [
       "drink",
@@ -6677,7 +6209,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 213,
+    "id": 177,
     "q": "The boys didn't ______ tea yesterday.",
     "opts": [
       "give",
@@ -6690,7 +6222,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 214,
+    "id": 178,
     "q": "Mary didn't ______ to the park yesterday.",
     "opts": [
       "forgeted",
@@ -6703,7 +6235,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 215,
+    "id": 179,
     "q": "The boys didn't ______ a movie yesterday.",
     "opts": [
       "read",
@@ -6716,7 +6248,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 216,
+    "id": 180,
     "q": "You didn't ______ a letter yesterday.",
     "opts": [
       "visites",
@@ -6729,7 +6261,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 217,
+    "id": 181,
     "q": "I didn't ______ breakfast yesterday.",
     "opts": [
       "dance",
@@ -6742,20 +6274,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 218,
-    "q": "The boys didn't ______ breakfast yesterday.",
-    "opts": [
-      "play",
-      "plays",
-      "played",
-      "played",
-      "playing"
-    ],
-    "ans": 0,
-    "exp": "didn't + 동사원형"
-  },
-  {
-    "id": 219,
+    "id": 182,
     "q": "He didn't ______ tea yesterday.",
     "opts": [
       "sat",
@@ -6768,7 +6287,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 220,
+    "id": 183,
     "q": "Mary didn't ______ an email yesterday.",
     "opts": [
       "likees",
@@ -6781,7 +6300,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 221,
+    "id": 184,
     "q": "We didn't ______ to school yesterday.",
     "opts": [
       "catch",
@@ -6794,7 +6313,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 222,
+    "id": 185,
     "q": "She didn't ______ soccer yesterday.",
     "opts": [
       "sleepes",
@@ -6807,33 +6326,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 223,
-    "q": "Tom didn't ______ TV yesterday.",
-    "opts": [
-      "walking",
-      "walks",
-      "walked",
-      "walk",
-      "walkes"
-    ],
-    "ans": 3,
-    "exp": "didn't + 동사원형"
-  },
-  {
-    "id": 224,
-    "q": "I didn't ______ to the park yesterday.",
-    "opts": [
-      "listened",
-      "listen",
-      "listened",
-      "listenes",
-      "listens"
-    ],
-    "ans": 1,
-    "exp": "didn't + 동사원형"
-  },
-  {
-    "id": 225,
+    "id": 186,
     "q": "He didn't ______ lunch yesterday.",
     "opts": [
       "spending",
@@ -6846,7 +6339,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 226,
+    "id": 187,
     "q": "We didn't ______ my homework yesterday.",
     "opts": [
       "spended",
@@ -6859,7 +6352,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 227,
+    "id": 188,
     "q": "My mom didn't ______ English yesterday.",
     "opts": [
       "closees",
@@ -6872,7 +6365,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 228,
+    "id": 189,
     "q": "Mary didn't ______ a movie yesterday.",
     "opts": [
       "ate",
@@ -6885,7 +6378,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 229,
+    "id": 190,
     "q": "Tom didn't ______ a letter yesterday.",
     "opts": [
       "gos",
@@ -6898,20 +6391,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 230,
-    "q": "He didn't ______ milk yesterday.",
-    "opts": [
-      "eated",
-      "eats",
-      "eat",
-      "eates",
-      "ate"
-    ],
-    "ans": 2,
-    "exp": "didn't + 동사원형"
-  },
-  {
-    "id": 231,
+    "id": 191,
     "q": "A: Did they win the game? B: No, ______.",
     "opts": [
       "they didn't",
@@ -6924,7 +6404,7 @@ export const QUESTION_BANK = {
     "exp": "No, they didn't."
   },
   {
-    "id": 232,
+    "id": 192,
     "q": "A: Did you see Tom? B: Yes, ______.",
     "opts": [
       "I did",
@@ -6937,20 +6417,7 @@ export const QUESTION_BANK = {
     "exp": "Yes, I did."
   },
   {
-    "id": 233,
-    "q": "A: Did they win the game? B: No, ______.",
-    "opts": [
-      "they didn't",
-      "they don't",
-      "they wasn't",
-      "they aren't",
-      "they weren't"
-    ],
-    "ans": 0,
-    "exp": "No, they didn't."
-  },
-  {
-    "id": 234,
+    "id": 193,
     "q": "A: Did he eat lunch? B: Yes, ______.",
     "opts": [
       "he did",
@@ -6963,7 +6430,7 @@ export const QUESTION_BANK = {
     "exp": "Yes, he did."
   },
   {
-    "id": 235,
+    "id": 194,
     "q": "A: Did she go to school? B: No, ______.",
     "opts": [
       "she didn't",
@@ -6976,33 +6443,7 @@ export const QUESTION_BANK = {
     "exp": "No, she didn't."
   },
   {
-    "id": 236,
-    "q": "A: Did she go to school? B: No, ______.",
-    "opts": [
-      "she didn't",
-      "she don't",
-      "she wasn't",
-      "she isn't",
-      "she doesn't"
-    ],
-    "ans": 0,
-    "exp": "No, she didn't."
-  },
-  {
-    "id": 237,
-    "q": "A: Did she go to school? B: No, ______.",
-    "opts": [
-      "she didn't",
-      "she don't",
-      "she wasn't",
-      "she isn't",
-      "she doesn't"
-    ],
-    "ans": 0,
-    "exp": "No, she didn't."
-  },
-  {
-    "id": 238,
+    "id": 195,
     "q": "A: Did you sleep well? B: Yes, ______.",
     "opts": [
       "I did",
@@ -7015,163 +6456,7 @@ export const QUESTION_BANK = {
     "exp": "Yes, I did."
   },
   {
-    "id": 239,
-    "q": "A: Did you see Tom? B: Yes, ______.",
-    "opts": [
-      "I did",
-      "I saw",
-      "I was",
-      "I have",
-      "I am"
-    ],
-    "ans": 0,
-    "exp": "Yes, I did."
-  },
-  {
-    "id": 240,
-    "q": "A: Did she go to school? B: No, ______.",
-    "opts": [
-      "she didn't",
-      "she don't",
-      "she wasn't",
-      "she isn't",
-      "she doesn't"
-    ],
-    "ans": 0,
-    "exp": "No, she didn't."
-  },
-  {
-    "id": 241,
-    "q": "A: Did he eat lunch? B: Yes, ______.",
-    "opts": [
-      "he did",
-      "he do",
-      "he ate",
-      "he was",
-      "he has"
-    ],
-    "ans": 0,
-    "exp": "Yes, he did."
-  },
-  {
-    "id": 242,
-    "q": "A: Did you see Tom? B: Yes, ______.",
-    "opts": [
-      "I did",
-      "I saw",
-      "I was",
-      "I have",
-      "I am"
-    ],
-    "ans": 0,
-    "exp": "Yes, I did."
-  },
-  {
-    "id": 243,
-    "q": "A: Did he eat lunch? B: Yes, ______.",
-    "opts": [
-      "he did",
-      "he do",
-      "he ate",
-      "he was",
-      "he has"
-    ],
-    "ans": 0,
-    "exp": "Yes, he did."
-  },
-  {
-    "id": 244,
-    "q": "A: Did you sleep well? B: Yes, ______.",
-    "opts": [
-      "I did",
-      "I do",
-      "I was",
-      "I am",
-      "I have"
-    ],
-    "ans": 0,
-    "exp": "Yes, I did."
-  },
-  {
-    "id": 245,
-    "q": "A: Did you sleep well? B: Yes, ______.",
-    "opts": [
-      "I did",
-      "I do",
-      "I was",
-      "I am",
-      "I have"
-    ],
-    "ans": 0,
-    "exp": "Yes, I did."
-  },
-  {
-    "id": 246,
-    "q": "A: Did she go to school? B: No, ______.",
-    "opts": [
-      "she didn't",
-      "she don't",
-      "she wasn't",
-      "she isn't",
-      "she doesn't"
-    ],
-    "ans": 0,
-    "exp": "No, she didn't."
-  },
-  {
-    "id": 247,
-    "q": "A: Did you sleep well? B: Yes, ______.",
-    "opts": [
-      "I did",
-      "I do",
-      "I was",
-      "I am",
-      "I have"
-    ],
-    "ans": 0,
-    "exp": "Yes, I did."
-  },
-  {
-    "id": 248,
-    "q": "A: Did they win the game? B: No, ______.",
-    "opts": [
-      "they didn't",
-      "they don't",
-      "they wasn't",
-      "they aren't",
-      "they weren't"
-    ],
-    "ans": 0,
-    "exp": "No, they didn't."
-  },
-  {
-    "id": 249,
-    "q": "A: Did you see Tom? B: Yes, ______.",
-    "opts": [
-      "I did",
-      "I saw",
-      "I was",
-      "I have",
-      "I am"
-    ],
-    "ans": 0,
-    "exp": "Yes, I did."
-  },
-  {
-    "id": 250,
-    "q": "A: Did he eat lunch? B: Yes, ______.",
-    "opts": [
-      "he did",
-      "he do",
-      "he ate",
-      "he was",
-      "he has"
-    ],
-    "ans": 0,
-    "exp": "Yes, he did."
-  },
-  {
-    "id": 251,
+    "id": 196,
     "q": "\"go\" 의 과거형은?",
     "opts": [
       "gos",
@@ -7184,7 +6469,7 @@ export const QUESTION_BANK = {
     "exp": "go → went"
   },
   {
-    "id": 252,
+    "id": 197,
     "q": "\"eat\" 의 과거형은?",
     "opts": [
       "eatd",
@@ -7197,7 +6482,7 @@ export const QUESTION_BANK = {
     "exp": "eat → ate"
   },
   {
-    "id": 253,
+    "id": 198,
     "q": "\"see\" 의 과거형은?",
     "opts": [
       "saw",
@@ -7210,7 +6495,7 @@ export const QUESTION_BANK = {
     "exp": "see → saw"
   },
   {
-    "id": 254,
+    "id": 199,
     "q": "\"come\" 의 과거형은?",
     "opts": [
       "comes",
@@ -7223,7 +6508,7 @@ export const QUESTION_BANK = {
     "exp": "come → came"
   },
   {
-    "id": 255,
+    "id": 200,
     "q": "\"do\" 의 과거형은?",
     "opts": [
       "did",
@@ -7236,7 +6521,7 @@ export const QUESTION_BANK = {
     "exp": "do → did"
   },
   {
-    "id": 256,
+    "id": 201,
     "q": "\"have\" 의 과거형은?",
     "opts": [
       "had",
@@ -7249,7 +6534,7 @@ export const QUESTION_BANK = {
     "exp": "have → had"
   },
   {
-    "id": 257,
+    "id": 202,
     "q": "\"give\" 의 과거형은?",
     "opts": [
       "gave",
@@ -7262,7 +6547,7 @@ export const QUESTION_BANK = {
     "exp": "give → gave"
   },
   {
-    "id": 258,
+    "id": 203,
     "q": "\"take\" 의 과거형은?",
     "opts": [
       "takes",
@@ -7275,7 +6560,7 @@ export const QUESTION_BANK = {
     "exp": "take → took"
   },
   {
-    "id": 259,
+    "id": 204,
     "q": "\"make\" 의 과거형은?",
     "opts": [
       "makes",
@@ -7288,7 +6573,7 @@ export const QUESTION_BANK = {
     "exp": "make → made"
   },
   {
-    "id": 260,
+    "id": 205,
     "q": "\"write\" 의 과거형은?",
     "opts": [
       "wrote",
@@ -7301,7 +6586,7 @@ export const QUESTION_BANK = {
     "exp": "write → wrote"
   },
   {
-    "id": 261,
+    "id": 206,
     "q": "\"speak\" 의 과거형은?",
     "opts": [
       "spoke",
@@ -7314,7 +6599,7 @@ export const QUESTION_BANK = {
     "exp": "speak → spoke"
   },
   {
-    "id": 262,
+    "id": 207,
     "q": "\"buy\" 의 과거형은?",
     "opts": [
       "buyd",
@@ -7327,7 +6612,7 @@ export const QUESTION_BANK = {
     "exp": "buy → bought"
   },
   {
-    "id": 263,
+    "id": 208,
     "q": "\"think\" 의 과거형은?",
     "opts": [
       "thinks",
@@ -7340,7 +6625,7 @@ export const QUESTION_BANK = {
     "exp": "think → thought"
   },
   {
-    "id": 264,
+    "id": 209,
     "q": "\"study\" 의 과거형은?",
     "opts": [
       "studys",
@@ -7353,7 +6638,7 @@ export const QUESTION_BANK = {
     "exp": "study → studied"
   },
   {
-    "id": 265,
+    "id": 210,
     "q": "\"stop\" 의 과거형은?",
     "opts": [
       "stopped",
@@ -7366,33 +6651,7 @@ export const QUESTION_BANK = {
     "exp": "stop → stopped"
   },
   {
-    "id": 266,
-    "q": "\"play\" 의 과거형은?",
-    "opts": [
-      "played",
-      "played",
-      "plays",
-      "playd",
-      "playes"
-    ],
-    "ans": 0,
-    "exp": "play → played"
-  },
-  {
-    "id": 267,
-    "q": "\"watch\" 의 과거형은?",
-    "opts": [
-      "watches",
-      "watched",
-      "watched",
-      "watchs",
-      "watchd"
-    ],
-    "ans": 1,
-    "exp": "watch → watched"
-  },
-  {
-    "id": 268,
+    "id": 211,
     "q": "\"sleep\" 의 과거형은?",
     "opts": [
       "slept",
@@ -7405,7 +6664,7 @@ export const QUESTION_BANK = {
     "exp": "sleep → slept"
   },
   {
-    "id": 269,
+    "id": 212,
     "q": "\"run\" 의 과거형은?",
     "opts": [
       "ran",
@@ -7418,7 +6677,7 @@ export const QUESTION_BANK = {
     "exp": "run → ran"
   },
   {
-    "id": 270,
+    "id": 213,
     "q": "\"swim\" 의 과거형은?",
     "opts": [
       "swimed",
@@ -7431,7 +6690,7 @@ export const QUESTION_BANK = {
     "exp": "swim → swam"
   },
   {
-    "id": 271,
+    "id": 214,
     "q": "\"sing\" 의 과거형은?",
     "opts": [
       "sang",
@@ -7444,7 +6703,7 @@ export const QUESTION_BANK = {
     "exp": "sing → sang"
   },
   {
-    "id": 272,
+    "id": 215,
     "q": "\"read\" 의 과거형은?",
     "opts": [
       "read",
@@ -7457,7 +6716,7 @@ export const QUESTION_BANK = {
     "exp": "read → read"
   },
   {
-    "id": 273,
+    "id": 216,
     "q": "\"meet\" 의 과거형은?",
     "opts": [
       "meets",
@@ -7470,7 +6729,7 @@ export const QUESTION_BANK = {
     "exp": "meet → met"
   },
   {
-    "id": 274,
+    "id": 217,
     "q": "\"find\" 의 과거형은?",
     "opts": [
       "finds",
@@ -7483,7 +6742,7 @@ export const QUESTION_BANK = {
     "exp": "find → found"
   },
   {
-    "id": 275,
+    "id": 218,
     "q": "\"tell\" 의 과거형은?",
     "opts": [
       "told",
@@ -7496,7 +6755,7 @@ export const QUESTION_BANK = {
     "exp": "tell → told"
   },
   {
-    "id": 276,
+    "id": 219,
     "q": "밑줄 친 부분을 과거형으로 바꾸시오: \"I see a bird.\"",
     "opts": [
       "saw",
@@ -7509,7 +6768,7 @@ export const QUESTION_BANK = {
     "exp": "see → saw"
   },
   {
-    "id": 277,
+    "id": 220,
     "q": "다음 중 동사의 과거형이 잘못된 것은?",
     "opts": [
       "eat-ate",
@@ -7522,20 +6781,7 @@ export const QUESTION_BANK = {
     "exp": "do → did"
   },
   {
-    "id": 278,
-    "q": "다음 중 동사의 과거형이 잘못된 것은?",
-    "opts": [
-      "eat-ate",
-      "go-went",
-      "see-saw",
-      "do-doed",
-      "have-had"
-    ],
-    "ans": 3,
-    "exp": "do → did"
-  },
-  {
-    "id": 279,
+    "id": 221,
     "q": "다음 중 올바른 문장은?",
     "opts": [
       "I goed to school.",
@@ -7548,7 +6794,7 @@ export const QUESTION_BANK = {
     "exp": "go → went"
   },
   {
-    "id": 280,
+    "id": 222,
     "q": "다음 중 어색한 문장은?",
     "opts": [
       "I watched TV last night.",
@@ -7561,33 +6807,7 @@ export const QUESTION_BANK = {
     "exp": "eated → ate"
   },
   {
-    "id": 281,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "I seed a movie.",
-      "She buyed a book.",
-      "He took a bus.",
-      "We doed our best.",
-      "They gived me a gift."
-    ],
-    "ans": 2,
-    "exp": "take → took"
-  },
-  {
-    "id": 282,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "I watched TV last night.",
-      "He went home early.",
-      "She did her homework.",
-      "They eated pizza.",
-      "We met our teacher."
-    ],
-    "ans": 3,
-    "exp": "eated → ate"
-  },
-  {
-    "id": 283,
+    "id": 223,
     "q": "다음 중 동사의 과거형이 같은 형태인 것은?",
     "opts": [
       "eat-ate",
@@ -7600,59 +6820,7 @@ export const QUESTION_BANK = {
     "exp": "put-put-put"
   },
   {
-    "id": 284,
-    "q": "다음 중 동사의 과거형이 잘못된 것은?",
-    "opts": [
-      "play-played",
-      "study-studied",
-      "stop-stopped",
-      "run-runned",
-      "dance-danced"
-    ],
-    "ans": 3,
-    "exp": "run → ran"
-  },
-  {
-    "id": 285,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "I goed to school.",
-      "He eated lunch.",
-      "She went home.",
-      "They runned fast.",
-      "We swimmed yesterday."
-    ],
-    "ans": 2,
-    "exp": "go → went"
-  },
-  {
-    "id": 286,
-    "q": "다음 중 동사의 과거형이 같은 형태인 것은?",
-    "opts": [
-      "eat-ate",
-      "put-put",
-      "go-went",
-      "see-saw",
-      "take-took"
-    ],
-    "ans": 1,
-    "exp": "put-put-put"
-  },
-  {
-    "id": 287,
-    "q": "다음 중 동사의 과거형이 잘못된 것은?",
-    "opts": [
-      "eat-ate",
-      "go-went",
-      "see-saw",
-      "do-doed",
-      "have-had"
-    ],
-    "ans": 3,
-    "exp": "do → did"
-  },
-  {
-    "id": 288,
+    "id": 224,
     "q": "밑줄 친 부분을 과거형으로 바꾸시오: \"She goes to school.\"",
     "opts": [
       "went",
@@ -7665,33 +6833,7 @@ export const QUESTION_BANK = {
     "exp": "goes → went"
   },
   {
-    "id": 289,
-    "q": "다음 중 동사의 과거형이 잘못된 것은?",
-    "opts": [
-      "play-played",
-      "study-studied",
-      "stop-stopped",
-      "run-runned",
-      "dance-danced"
-    ],
-    "ans": 3,
-    "exp": "run → ran"
-  },
-  {
-    "id": 290,
-    "q": "다음 중 동사의 과거형이 같은 형태인 것은?",
-    "opts": [
-      "eat-ate",
-      "put-put",
-      "go-went",
-      "see-saw",
-      "take-took"
-    ],
-    "ans": 1,
-    "exp": "put-put-put"
-  },
-  {
-    "id": 291,
+    "id": 225,
     "q": "When _____ you arrive?",
     "opts": [
       "did",
@@ -7704,33 +6846,7 @@ export const QUESTION_BANK = {
     "exp": "When did + 주어 + 동사원형"
   },
   {
-    "id": 292,
-    "q": "When _____ you arrive?",
-    "opts": [
-      "did",
-      "do",
-      "was",
-      "were",
-      "have"
-    ],
-    "ans": 0,
-    "exp": "When did + 주어 + 동사원형"
-  },
-  {
-    "id": 293,
-    "q": "When _____ you arrive?",
-    "opts": [
-      "did",
-      "do",
-      "was",
-      "were",
-      "have"
-    ],
-    "ans": 0,
-    "exp": "When did + 주어 + 동사원형"
-  },
-  {
-    "id": 294,
+    "id": 226,
     "q": "She didn't _____ breakfast this morning.",
     "opts": [
       "ate",
@@ -7743,7 +6859,7 @@ export const QUESTION_BANK = {
     "exp": "didn't + 동사원형"
   },
   {
-    "id": 295,
+    "id": 227,
     "q": "Did you _____ your homework last night?",
     "opts": [
       "do",
@@ -7756,7 +6872,7 @@ export const QUESTION_BANK = {
     "exp": "Did + 동사원형"
   },
   {
-    "id": 296,
+    "id": 228,
     "q": "I _____ to the park and _____ soccer yesterday.",
     "opts": [
       "went/played",
@@ -7769,46 +6885,7 @@ export const QUESTION_BANK = {
     "exp": "went/played"
   },
   {
-    "id": 297,
-    "q": "She didn't _____ breakfast this morning.",
-    "opts": [
-      "ate",
-      "eat",
-      "eaten",
-      "eats",
-      "eating"
-    ],
-    "ans": 1,
-    "exp": "didn't + 동사원형"
-  },
-  {
-    "id": 298,
-    "q": "When _____ you arrive?",
-    "opts": [
-      "did",
-      "do",
-      "was",
-      "were",
-      "have"
-    ],
-    "ans": 0,
-    "exp": "When did + 주어 + 동사원형"
-  },
-  {
-    "id": 299,
-    "q": "Did you _____ your homework last night?",
-    "opts": [
-      "do",
-      "did",
-      "done",
-      "does",
-      "doing"
-    ],
-    "ans": 0,
-    "exp": "Did + 동사원형"
-  },
-  {
-    "id": 300,
+    "id": 229,
     "q": "He _____ tired because he _____ all day.",
     "opts": [
       "was/worked",
@@ -7819,6 +6896,929 @@ export const QUESTION_BANK = {
     ],
     "ans": 0,
     "exp": "과거 시제 일치"
+  },
+  {
+    "id": 230,
+    "q": "Mary ______ the door a moment ago.",
+    "opts": [
+      "openned",
+      "opened",
+      "opening",
+      "opens",
+      "open"
+    ],
+    "ans": 1,
+    "exp": "open → opened (과거형)"
+  },
+  {
+    "id": 231,
+    "q": "Tom ______ to Jeju in 2019.",
+    "opts": [
+      "flying",
+      "flyed",
+      "flys",
+      "flew",
+      "fly"
+    ],
+    "ans": 3,
+    "exp": "fly → flew (과거형)"
+  },
+  {
+    "id": 232,
+    "q": "The students ______ here in 2019.",
+    "opts": [
+      "come",
+      "comes",
+      "came",
+      "comeing",
+      "comed"
+    ],
+    "ans": 2,
+    "exp": "come → came (과거형)"
+  },
+  {
+    "id": 233,
+    "q": "The boy ______ the rent last weekend.",
+    "opts": [
+      "pay",
+      "paying",
+      "pays",
+      "paid",
+      "payed"
+    ],
+    "ans": 3,
+    "exp": "pay → paid (과거형)"
+  },
+  {
+    "id": 234,
+    "q": "Jinho ______ the box a moment ago.",
+    "opts": [
+      "opens",
+      "opened",
+      "opening",
+      "open",
+      "openned"
+    ],
+    "ans": 1,
+    "exp": "open → opened (과거형)"
+  },
+  {
+    "id": 235,
+    "q": "The girl ______ with friends in 2019.",
+    "opts": [
+      "playing",
+      "played",
+      "plaied",
+      "play",
+      "plays"
+    ],
+    "ans": 1,
+    "exp": "play → played (과거형)"
+  },
+  {
+    "id": 236,
+    "q": "My friend ______ a circle a moment ago.",
+    "opts": [
+      "draws",
+      "drawed",
+      "drawing",
+      "draw",
+      "drew"
+    ],
+    "ans": 4,
+    "exp": "draw → drew (과거형)"
+  },
+  {
+    "id": 237,
+    "q": "She ______ dinner last weekend.",
+    "opts": [
+      "maked",
+      "makes",
+      "made",
+      "makeing",
+      "make"
+    ],
+    "ans": 2,
+    "exp": "make → made (과거형)"
+  },
+  {
+    "id": 238,
+    "q": "We ______ the dishes last Sunday.",
+    "opts": [
+      "washing",
+      "wash",
+      "washd",
+      "washed",
+      "washs"
+    ],
+    "ans": 3,
+    "exp": "wash → washed (과거형)"
+  },
+  {
+    "id": 239,
+    "q": "The boy ______ famous two days ago.",
+    "opts": [
+      "become",
+      "becomed",
+      "becomes",
+      "becomeing",
+      "became"
+    ],
+    "ans": 4,
+    "exp": "become → became (과거형)"
+  },
+  {
+    "id": 240,
+    "q": "They ______ a promise last year.",
+    "opts": [
+      "keep",
+      "keeps",
+      "keeping",
+      "keeped",
+      "kept"
+    ],
+    "ans": 4,
+    "exp": "keep → kept (과거형)"
+  },
+  {
+    "id": 241,
+    "q": "You ______ a friend a moment ago.",
+    "opts": [
+      "meets",
+      "met",
+      "meeted",
+      "meeting",
+      "meet"
+    ],
+    "ans": 1,
+    "exp": "meet → met (과거형)"
+  },
+  {
+    "id": 242,
+    "q": "I ______ a puppy yesterday.",
+    "opts": [
+      "wants",
+      "want",
+      "wanting",
+      "wanted",
+      "wantted"
+    ],
+    "ans": 3,
+    "exp": "want → wanted (과거형)"
+  },
+  {
+    "id": 243,
+    "q": "Jinho ______ the ball last weekend.",
+    "opts": [
+      "hits",
+      "hiting",
+      "to hit",
+      "hit",
+      "hited"
+    ],
+    "ans": 3,
+    "exp": "hit → hit (과거형)"
+  },
+  {
+    "id": 244,
+    "q": "Sora ______ a glass last year.",
+    "opts": [
+      "broke",
+      "breaks",
+      "breaking",
+      "break",
+      "breaked"
+    ],
+    "ans": 0,
+    "exp": "break → broke (과거형)"
+  },
+  {
+    "id": 245,
+    "q": "My brother ______ a story this morning.",
+    "opts": [
+      "wrote",
+      "write",
+      "writes",
+      "writeing",
+      "writed"
+    ],
+    "ans": 0,
+    "exp": "write → wrote (과거형)"
+  },
+  {
+    "id": 246,
+    "q": "He ______ tired last night.",
+    "opts": [
+      "feeled",
+      "feel",
+      "feeling",
+      "felt",
+      "feels"
+    ],
+    "ans": 3,
+    "exp": "feel → felt (과거형)"
+  },
+  {
+    "id": 247,
+    "q": "Jinho ______ the gift in 2019.",
+    "opts": [
+      "open",
+      "opening",
+      "opens",
+      "openned",
+      "opened"
+    ],
+    "ans": 4,
+    "exp": "open → opened (과거형)"
+  },
+  {
+    "id": 248,
+    "q": "You ______ next to me two days ago.",
+    "opts": [
+      "siting",
+      "sitted",
+      "sits",
+      "sit",
+      "sat"
+    ],
+    "ans": 4,
+    "exp": "sit → sat (과거형)"
+  },
+  {
+    "id": 249,
+    "q": "He ______ at a bank yesterday.",
+    "opts": [
+      "worked",
+      "working",
+      "work",
+      "works",
+      "workt"
+    ],
+    "ans": 0,
+    "exp": "work → worked (과거형)"
+  },
+  {
+    "id": 250,
+    "q": "You ______ the story this morning.",
+    "opts": [
+      "begins",
+      "begin",
+      "beginned",
+      "began",
+      "begining"
+    ],
+    "ans": 3,
+    "exp": "begin → began (과거형)"
+  },
+  {
+    "id": 251,
+    "q": "Sora ______ the truth this morning.",
+    "opts": [
+      "tell",
+      "telled",
+      "told",
+      "telling",
+      "tells"
+    ],
+    "ans": 2,
+    "exp": "tell → told (과거형)"
+  },
+  {
+    "id": 252,
+    "q": "The students ______ the game last Sunday.",
+    "opts": [
+      "watch",
+      "watching",
+      "watchd",
+      "watched",
+      "watchs"
+    ],
+    "ans": 3,
+    "exp": "watch → watched (과거형)"
+  },
+  {
+    "id": 253,
+    "q": "We all ______ home two days ago.",
+    "opts": [
+      "staying",
+      "stay",
+      "stays",
+      "stayed",
+      "staid"
+    ],
+    "ans": 3,
+    "exp": "stay → stayed (과거형)"
+  },
+  {
+    "id": 254,
+    "q": "They ______ in the park an hour ago.",
+    "opts": [
+      "walking",
+      "walked",
+      "walk",
+      "walks",
+      "walkt"
+    ],
+    "ans": 1,
+    "exp": "walk → walked (과거형)"
+  },
+  {
+    "id": 255,
+    "q": "My brother ______ a kite this morning.",
+    "opts": [
+      "flew",
+      "fly",
+      "flys",
+      "flyed",
+      "flying"
+    ],
+    "ans": 0,
+    "exp": "fly → flew (과거형)"
+  },
+  {
+    "id": 256,
+    "q": "Mary ______ dinner last month.",
+    "opts": [
+      "cooked",
+      "cookt",
+      "cook",
+      "cooks",
+      "cooking"
+    ],
+    "ans": 0,
+    "exp": "cook → cooked (과거형)"
+  },
+  {
+    "id": 257,
+    "q": "The students ______ a friend yesterday.",
+    "opts": [
+      "brought",
+      "brings",
+      "bring",
+      "bringing",
+      "bringed"
+    ],
+    "ans": 0,
+    "exp": "bring → brought (과거형)"
+  },
+  {
+    "id": 258,
+    "q": "They ______ brightly last weekend.",
+    "opts": [
+      "smiles",
+      "smiled",
+      "smild",
+      "smile",
+      "smileing"
+    ],
+    "ans": 1,
+    "exp": "smile → smiled (과거형)"
+  },
+  {
+    "id": 259,
+    "q": "Tom ______ all day two days ago.",
+    "opts": [
+      "work",
+      "working",
+      "workt",
+      "works",
+      "worked"
+    ],
+    "ans": 4,
+    "exp": "work → worked (과거형)"
+  },
+  {
+    "id": 260,
+    "q": "Sora ______ a comic yesterday.",
+    "opts": [
+      "to read",
+      "reading",
+      "reads",
+      "readed",
+      "read"
+    ],
+    "ans": 4,
+    "exp": "read → read (과거형)"
+  },
+  {
+    "id": 261,
+    "q": "We ______ the story two days ago.",
+    "opts": [
+      "begins",
+      "begining",
+      "beginned",
+      "began",
+      "begin"
+    ],
+    "ans": 3,
+    "exp": "begin → began (과거형)"
+  },
+  {
+    "id": 262,
+    "q": "We all ______ in the park last month.",
+    "opts": [
+      "runing",
+      "runs",
+      "run",
+      "ran",
+      "runned"
+    ],
+    "ans": 3,
+    "exp": "run → ran (과거형)"
+  },
+  {
+    "id": 263,
+    "q": "My brother ______ milk last Sunday.",
+    "opts": [
+      "drinked",
+      "drank",
+      "drink",
+      "drinks",
+      "drinking"
+    ],
+    "ans": 1,
+    "exp": "drink → drank (과거형)"
+  },
+  {
+    "id": 264,
+    "q": "The boy ______ a toy last Sunday.",
+    "opts": [
+      "bought",
+      "buyed",
+      "buy",
+      "buying",
+      "buys"
+    ],
+    "ans": 0,
+    "exp": "buy → bought (과거형)"
+  },
+  {
+    "id": 265,
+    "q": "We ______ here last year.",
+    "opts": [
+      "live",
+      "livd",
+      "lived",
+      "lives",
+      "liveing"
+    ],
+    "ans": 2,
+    "exp": "live → lived (과거형)"
+  },
+  {
+    "id": 266,
+    "q": "Sora ______ last week.",
+    "opts": [
+      "stopped",
+      "stop",
+      "stoped",
+      "stops",
+      "stoping"
+    ],
+    "ans": 0,
+    "exp": "stop → stopped (과거형)"
+  },
+  {
+    "id": 267,
+    "q": "We ______ a uniform last week.",
+    "opts": [
+      "wearing",
+      "weared",
+      "wear",
+      "wears",
+      "wore"
+    ],
+    "ans": 4,
+    "exp": "wear → wore (과거형)"
+  },
+  {
+    "id": 268,
+    "q": "Jinho ______ the homework last night.",
+    "opts": [
+      "did",
+      "doing",
+      "dos",
+      "do",
+      "doed"
+    ],
+    "ans": 0,
+    "exp": "do → did (과거형)"
+  },
+  {
+    "id": 269,
+    "q": "Mary ______ the way last night.",
+    "opts": [
+      "knows",
+      "knowed",
+      "know",
+      "knew",
+      "knowing"
+    ],
+    "ans": 3,
+    "exp": "know → knew (과거형)"
+  },
+  {
+    "id": 270,
+    "q": "Jinho ______ out the window last week.",
+    "opts": [
+      "lookt",
+      "looked",
+      "looks",
+      "look",
+      "looking"
+    ],
+    "ans": 1,
+    "exp": "look → looked (과거형)"
+  },
+  {
+    "id": 271,
+    "q": "The girl ______ the books last night.",
+    "opts": [
+      "carrying",
+      "carryed",
+      "carried",
+      "carrys",
+      "carry"
+    ],
+    "ans": 2,
+    "exp": "carry → carried (과거형)"
+  },
+  {
+    "id": 272,
+    "q": "Tom ______ brightly last weekend.",
+    "opts": [
+      "smiles",
+      "smiled",
+      "smileing",
+      "smild",
+      "smile"
+    ],
+    "ans": 1,
+    "exp": "smile → smiled (과거형)"
+  },
+  {
+    "id": 273,
+    "q": "You ______ tired an hour ago.",
+    "opts": [
+      "look",
+      "looks",
+      "lookt",
+      "looked",
+      "looking"
+    ],
+    "ans": 3,
+    "exp": "look → looked (과거형)"
+  },
+  {
+    "id": 274,
+    "q": "They ______ a letter last year.",
+    "opts": [
+      "send",
+      "sent",
+      "sending",
+      "sended",
+      "sends"
+    ],
+    "ans": 1,
+    "exp": "send → sent (과거형)"
+  },
+  {
+    "id": 275,
+    "q": "My brother ______ the game yesterday.",
+    "opts": [
+      "lost",
+      "lose",
+      "loseing",
+      "loses",
+      "losed"
+    ],
+    "ans": 0,
+    "exp": "lose → lost (과거형)"
+  },
+  {
+    "id": 276,
+    "q": "Mary ______ high last night.",
+    "opts": [
+      "jump",
+      "jumpt",
+      "jumped",
+      "jumps",
+      "jumping"
+    ],
+    "ans": 2,
+    "exp": "jump → jumped (과거형)"
+  },
+  {
+    "id": 277,
+    "q": "We ______ a promise last month.",
+    "opts": [
+      "keeped",
+      "keeps",
+      "keeping",
+      "kept",
+      "keep"
+    ],
+    "ans": 3,
+    "exp": "keep → kept (과거형)"
+  },
+  {
+    "id": 278,
+    "q": "He ______ goodbye last night.",
+    "opts": [
+      "sayed",
+      "saying",
+      "says",
+      "said",
+      "say"
+    ],
+    "ans": 3,
+    "exp": "say → said (과거형)"
+  },
+  {
+    "id": 279,
+    "q": "We all ______ some milk an hour ago.",
+    "opts": [
+      "buyed",
+      "buy",
+      "buying",
+      "bought",
+      "buys"
+    ],
+    "ans": 3,
+    "exp": "buy → bought (과거형)"
+  },
+  {
+    "id": 280,
+    "q": "You ______ science last Sunday.",
+    "opts": [
+      "studyed",
+      "studys",
+      "study",
+      "studied",
+      "studying"
+    ],
+    "ans": 3,
+    "exp": "study → studied (과거형)"
+  },
+  {
+    "id": 281,
+    "q": "Jinho ______ a number an hour ago.",
+    "opts": [
+      "choosed",
+      "chose",
+      "chooses",
+      "chooseing",
+      "choose"
+    ],
+    "ans": 1,
+    "exp": "choose → chose (과거형)"
+  },
+  {
+    "id": 282,
+    "q": "My friend ______ the piano last month.",
+    "opts": [
+      "play",
+      "plays",
+      "playing",
+      "plaied",
+      "played"
+    ],
+    "ans": 4,
+    "exp": "play → played (과거형)"
+  },
+  {
+    "id": 283,
+    "q": "My friend ______ the stars an hour ago.",
+    "opts": [
+      "watched",
+      "watchs",
+      "watching",
+      "watchd",
+      "watch"
+    ],
+    "ans": 0,
+    "exp": "watch → watched (과거형)"
+  },
+  {
+    "id": 284,
+    "q": "She ______ the piano last Sunday.",
+    "opts": [
+      "play",
+      "playing",
+      "plaied",
+      "plays",
+      "played"
+    ],
+    "ans": 4,
+    "exp": "play → played (과거형)"
+  },
+  {
+    "id": 285,
+    "q": "The students ______ a book an hour ago.",
+    "opts": [
+      "gived",
+      "gave",
+      "giveing",
+      "give",
+      "gives"
+    ],
+    "ans": 1,
+    "exp": "give → gave (과거형)"
+  },
+  {
+    "id": 286,
+    "q": "Mary ______ a lot this morning.",
+    "opts": [
+      "talked",
+      "talk",
+      "talking",
+      "talks",
+      "talkt"
+    ],
+    "ans": 0,
+    "exp": "talk → talked (과거형)"
+  },
+  {
+    "id": 287,
+    "q": "My brother ______ some milk in 2019.",
+    "opts": [
+      "buyed",
+      "buying",
+      "bought",
+      "buys",
+      "buy"
+    ],
+    "ans": 2,
+    "exp": "buy → bought (과거형)"
+  },
+  {
+    "id": 288,
+    "q": "We ______ well a moment ago.",
+    "opts": [
+      "singing",
+      "sang",
+      "singed",
+      "sing",
+      "sings"
+    ],
+    "ans": 1,
+    "exp": "sing → sang (과거형)"
+  },
+  {
+    "id": 289,
+    "q": "Tom ______ everything a moment ago.",
+    "opts": [
+      "plans",
+      "planing",
+      "plan",
+      "planned",
+      "planed"
+    ],
+    "ans": 3,
+    "exp": "plan → planned (과거형)"
+  },
+  {
+    "id": 290,
+    "q": "She ______ a lot last year.",
+    "opts": [
+      "crying",
+      "cry",
+      "cried",
+      "cryed",
+      "crys"
+    ],
+    "ans": 2,
+    "exp": "cry → cried (과거형)"
+  },
+  {
+    "id": 291,
+    "q": "My friend ______ flowers last month.",
+    "opts": [
+      "grows",
+      "growing",
+      "grew",
+      "growed",
+      "grow"
+    ],
+    "ans": 2,
+    "exp": "grow → grew (과거형)"
+  },
+  {
+    "id": 292,
+    "q": "Jinho ______ math last year.",
+    "opts": [
+      "learnt",
+      "learned",
+      "learn",
+      "learns",
+      "learning"
+    ],
+    "ans": 1,
+    "exp": "learn → learned (과거형)"
+  },
+  {
+    "id": 293,
+    "q": "The boy ______ a moment ago.",
+    "opts": [
+      "cry",
+      "cryed",
+      "crys",
+      "cried",
+      "crying"
+    ],
+    "ans": 3,
+    "exp": "cry → cried (과거형)"
+  },
+  {
+    "id": 294,
+    "q": "I ______ a book a moment ago.",
+    "opts": [
+      "bringing",
+      "bring",
+      "brings",
+      "bringed",
+      "brought"
+    ],
+    "ans": 4,
+    "exp": "bring → brought (과거형)"
+  },
+  {
+    "id": 295,
+    "q": "My brother ______ in line yesterday.",
+    "opts": [
+      "standing",
+      "stood",
+      "standed",
+      "stands",
+      "stand"
+    ],
+    "ans": 1,
+    "exp": "stand → stood (과거형)"
+  },
+  {
+    "id": 296,
+    "q": "He ______ a movie last year.",
+    "opts": [
+      "watchs",
+      "watch",
+      "watching",
+      "watched",
+      "watchd"
+    ],
+    "ans": 3,
+    "exp": "watch → watched (과거형)"
+  },
+  {
+    "id": 297,
+    "q": "My brother ______ the answer this morning.",
+    "opts": [
+      "write",
+      "writes",
+      "wrote",
+      "writed",
+      "writeing"
+    ],
+    "ans": 2,
+    "exp": "write → wrote (과거형)"
+  },
+  {
+    "id": 298,
+    "q": "We all ______ to school last Sunday.",
+    "opts": [
+      "walkt",
+      "walks",
+      "walk",
+      "walked",
+      "walking"
+    ],
+    "ans": 3,
+    "exp": "walk → walked (과거형)"
+  },
+  {
+    "id": 299,
+    "q": "My friend ______ the truth a moment ago.",
+    "opts": [
+      "knowing",
+      "knew",
+      "know",
+      "knows",
+      "knowed"
+    ],
+    "ans": 1,
+    "exp": "know → knew (과거형)"
+  },
+  {
+    "id": 300,
+    "q": "The girl ______ the teacher last Sunday.",
+    "opts": [
+      "helps",
+      "helping",
+      "helpped",
+      "help",
+      "helped"
+    ],
+    "ans": 4,
+    "exp": "help → helped (과거형)"
   }
 ]
   },
@@ -7843,19 +7843,6 @@ export const QUESTION_BANK = {
   },
   {
     "id": 2,
-    "q": "My brother can ______.",
-    "opts": [
-      "cookes",
-      "cook",
-      "cooks",
-      "cooked",
-      "cooking"
-    ],
-    "ans": 1,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 3,
     "q": "We can ______.",
     "opts": [
       "to understand",
@@ -7868,7 +7855,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 4,
+    "id": 3,
     "q": "They can ______ trees.",
     "opts": [
       "to climb",
@@ -7881,7 +7868,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 5,
+    "id": 4,
     "q": "I can ______.",
     "opts": [
       "cooks",
@@ -7894,7 +7881,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 6,
+    "id": 5,
     "q": "My brother can ______ a car.",
     "opts": [
       "driveing",
@@ -7907,7 +7894,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 7,
+    "id": 6,
     "q": "You can ______ this problem.",
     "opts": [
       "solve",
@@ -7920,7 +7907,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 8,
+    "id": 7,
     "q": "You can ______ the piano.",
     "opts": [
       "playes",
@@ -7933,7 +7920,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 9,
+    "id": 8,
     "q": "Mary can ______.",
     "opts": [
       "runs",
@@ -7946,20 +7933,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 10,
-    "q": "Mary can ______.",
-    "opts": [
-      "to understand",
-      "understanded",
-      "understandes",
-      "understand",
-      "understanding"
-    ],
-    "ans": 3,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 11,
+    "id": 9,
     "q": "My friend can ______.",
     "opts": [
       "to cook",
@@ -7972,7 +7946,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 12,
+    "id": 10,
     "q": "My brother can ______ it.",
     "opts": [
       "do",
@@ -7985,20 +7959,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 13,
-    "q": "My brother can ______.",
-    "opts": [
-      "to run",
-      "run",
-      "runed",
-      "runes",
-      "runing"
-    ],
-    "ans": 1,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 14,
+    "id": 11,
     "q": "They can ______ this problem.",
     "opts": [
       "solveing",
@@ -8011,7 +7972,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 15,
+    "id": 12,
     "q": "The baby can ______ the question.",
     "opts": [
       "answer",
@@ -8024,20 +7985,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 16,
-    "q": "We can ______.",
-    "opts": [
-      "to come",
-      "comes",
-      "come",
-      "comeing",
-      "comeed"
-    ],
-    "ans": 2,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 17,
+    "id": 13,
     "q": "We can ______ it.",
     "opts": [
       "do",
@@ -8050,7 +7998,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 18,
+    "id": 14,
     "q": "The baby can ______ English.",
     "opts": [
       "speak",
@@ -8063,7 +8011,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 19,
+    "id": 15,
     "q": "We can ______ English.",
     "opts": [
       "speak",
@@ -8076,7 +8024,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 20,
+    "id": 16,
     "q": "The baby can ______ trees.",
     "opts": [
       "climbing",
@@ -8089,7 +8037,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 21,
+    "id": 17,
     "q": "They can ______.",
     "opts": [
       "writeing",
@@ -8102,7 +8050,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 22,
+    "id": 18,
     "q": "Tom can ______ the question.",
     "opts": [
       "answeres",
@@ -8115,7 +8063,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 23,
+    "id": 19,
     "q": "They can ______ the piano.",
     "opts": [
       "play",
@@ -8128,20 +8076,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 24,
-    "q": "You can ______ this problem.",
-    "opts": [
-      "to solve",
-      "solve",
-      "solves",
-      "solveed",
-      "solveing"
-    ],
-    "ans": 1,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 25,
+    "id": 20,
     "q": "The baby can ______.",
     "opts": [
       "see",
@@ -8154,7 +8089,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 26,
+    "id": 21,
     "q": "Students can ______.",
     "opts": [
       "reading",
@@ -8167,33 +8102,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 27,
-    "q": "You can ______ this problem.",
-    "opts": [
-      "to solve",
-      "solve",
-      "solves",
-      "solveing",
-      "solveed"
-    ],
-    "ans": 1,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 28,
-    "q": "They can ______.",
-    "opts": [
-      "going",
-      "gos",
-      "goes",
-      "go",
-      "to go"
-    ],
-    "ans": 3,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 29,
+    "id": 22,
     "q": "He can ______ you.",
     "opts": [
       "to help",
@@ -8206,20 +8115,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 30,
-    "q": "My brother can ______.",
-    "opts": [
-      "to dance",
-      "danceed",
-      "dances",
-      "dance",
-      "danceing"
-    ],
-    "ans": 3,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 31,
+    "id": 23,
     "q": "Tom can ______.",
     "opts": [
       "sing",
@@ -8232,7 +8128,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 32,
+    "id": 24,
     "q": "She can ______.",
     "opts": [
       "to write",
@@ -8245,7 +8141,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 33,
+    "id": 25,
     "q": "The baby can ______ high.",
     "opts": [
       "jump",
@@ -8258,7 +8154,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 34,
+    "id": 26,
     "q": "He can ______ it.",
     "opts": [
       "dos",
@@ -8271,46 +8167,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 35,
-    "q": "Tom can ______.",
-    "opts": [
-      "writes",
-      "writeing",
-      "to write",
-      "write",
-      "writeed"
-    ],
-    "ans": 3,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 36,
-    "q": "My friend can ______.",
-    "opts": [
-      "runing",
-      "runs",
-      "runed",
-      "runes",
-      "run"
-    ],
-    "ans": 4,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 37,
-    "q": "The baby can ______.",
-    "opts": [
-      "understanded",
-      "to understand",
-      "understanding",
-      "understand",
-      "understands"
-    ],
-    "ans": 3,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 38,
+    "id": 27,
     "q": "He can ______.",
     "opts": [
       "write",
@@ -8323,7 +8180,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 39,
+    "id": 28,
     "q": "I can ______ high.",
     "opts": [
       "to jump",
@@ -8336,33 +8193,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 40,
-    "q": "They can ______.",
-    "opts": [
-      "to write",
-      "writes",
-      "write",
-      "writees",
-      "writeing"
-    ],
-    "ans": 2,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 41,
-    "q": "We can ______.",
-    "opts": [
-      "seees",
-      "to see",
-      "see",
-      "seeed",
-      "seeing"
-    ],
-    "ans": 2,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 42,
+    "id": 29,
     "q": "My brother can ______ you.",
     "opts": [
       "helps",
@@ -8375,33 +8206,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 43,
-    "q": "They can ______.",
-    "opts": [
-      "to cook",
-      "cookes",
-      "cooked",
-      "cook",
-      "cooking"
-    ],
-    "ans": 3,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 44,
-    "q": "My brother can ______.",
-    "opts": [
-      "singed",
-      "sings",
-      "to sing",
-      "singing",
-      "sing"
-    ],
-    "ans": 4,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 45,
+    "id": 30,
     "q": "I can ______ the piano.",
     "opts": [
       "plays",
@@ -8414,20 +8219,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 46,
-    "q": "Students can ______.",
-    "opts": [
-      "go",
-      "gos",
-      "going",
-      "to go",
-      "goed"
-    ],
-    "ans": 0,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 47,
+    "id": 31,
     "q": "Students can ______ you.",
     "opts": [
       "help",
@@ -8440,20 +8232,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 48,
-    "q": "She can ______.",
-    "opts": [
-      "readed",
-      "to read",
-      "reads",
-      "read",
-      "reading"
-    ],
-    "ans": 3,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 49,
+    "id": 32,
     "q": "Students can ______ English.",
     "opts": [
       "speaking",
@@ -8466,7 +8245,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 50,
+    "id": 33,
     "q": "I can ______ it.",
     "opts": [
       "does",
@@ -8479,20 +8258,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 51,
-    "q": "The baby can ______ English.",
-    "opts": [
-      "speakes",
-      "speaked",
-      "speak",
-      "speaking",
-      "to speak"
-    ],
-    "ans": 2,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 52,
+    "id": 34,
     "q": "We can ______ a car.",
     "opts": [
       "drivees",
@@ -8505,33 +8271,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 53,
-    "q": "We can ______ it.",
-    "opts": [
-      "doed",
-      "doing",
-      "to do",
-      "do",
-      "does"
-    ],
-    "ans": 3,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 54,
-    "q": "The baby can ______.",
-    "opts": [
-      "writes",
-      "writees",
-      "to write",
-      "write",
-      "writeing"
-    ],
-    "ans": 3,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 55,
+    "id": 35,
     "q": "He can ______ this problem.",
     "opts": [
       "solves",
@@ -8544,7 +8284,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 56,
+    "id": 36,
     "q": "You can ______.",
     "opts": [
       "write",
@@ -8557,7 +8297,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 57,
+    "id": 37,
     "q": "You can ______ you.",
     "opts": [
       "help",
@@ -8570,20 +8310,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 58,
-    "q": "Tom can ______.",
-    "opts": [
-      "gos",
-      "to go",
-      "go",
-      "going",
-      "goes"
-    ],
-    "ans": 2,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 59,
+    "id": 38,
     "q": "She can ______ English.",
     "opts": [
       "to speak",
@@ -8596,20 +8323,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 60,
-    "q": "They can ______ trees.",
-    "opts": [
-      "climb",
-      "climbs",
-      "climbing",
-      "climbed",
-      "to climb"
-    ],
-    "ans": 0,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 61,
+    "id": 39,
     "q": "She ______ speak French well.",
     "opts": [
       "can't",
@@ -8622,7 +8336,7 @@ export const QUESTION_BANK = {
     "exp": "can't + 동사원형"
   },
   {
-    "id": 62,
+    "id": 40,
     "q": "I ______ swim. I never learned.",
     "opts": [
       "can't",
@@ -8635,7 +8349,7 @@ export const QUESTION_BANK = {
     "exp": "can't = cannot"
   },
   {
-    "id": 63,
+    "id": 41,
     "q": "\"cannot\" 을 줄여 쓴 형태는?",
     "opts": [
       "can't",
@@ -8648,7 +8362,7 @@ export const QUESTION_BANK = {
     "exp": "cannot = can't"
   },
   {
-    "id": 64,
+    "id": 42,
     "q": "\"can not\" 의 올바른 줄임말은?",
     "opts": [
       "can't",
@@ -8661,33 +8375,7 @@ export const QUESTION_BANK = {
     "exp": "can't"
   },
   {
-    "id": 65,
-    "q": "I ______ swim. I never learned.",
-    "opts": [
-      "can't",
-      "don't",
-      "not can",
-      "amn't can",
-      "isn't can"
-    ],
-    "ans": 0,
-    "exp": "can't = cannot"
-  },
-  {
-    "id": 66,
-    "q": "\"cannot\" 을 줄여 쓴 형태는?",
-    "opts": [
-      "can't",
-      "can'not",
-      "cant",
-      "ca'nt",
-      "cano't"
-    ],
-    "ans": 0,
-    "exp": "cannot = can't"
-  },
-  {
-    "id": 67,
+    "id": 43,
     "q": "He ______ come to the party.",
     "opts": [
       "can't",
@@ -8700,20 +8388,7 @@ export const QUESTION_BANK = {
     "exp": "can't"
   },
   {
-    "id": 68,
-    "q": "She ______ speak French well.",
-    "opts": [
-      "can't",
-      "don't",
-      "doesn't can",
-      "isn't can",
-      "not can"
-    ],
-    "ans": 0,
-    "exp": "can't + 동사원형"
-  },
-  {
-    "id": 69,
+    "id": 44,
     "q": "They ______ understand this problem.",
     "opts": [
       "can't",
@@ -8726,410 +8401,7 @@ export const QUESTION_BANK = {
     "exp": "can't"
   },
   {
-    "id": 70,
-    "q": "\"can not\" 의 올바른 줄임말은?",
-    "opts": [
-      "can't",
-      "ca'nt",
-      "cant",
-      "cano't",
-      "can'no"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 71,
-    "q": "He ______ come to the party.",
-    "opts": [
-      "can't",
-      "don't",
-      "doesn't",
-      "isn't",
-      "not"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 72,
-    "q": "\"cannot\" 을 줄여 쓴 형태는?",
-    "opts": [
-      "can't",
-      "can'not",
-      "cant",
-      "ca'nt",
-      "cano't"
-    ],
-    "ans": 0,
-    "exp": "cannot = can't"
-  },
-  {
-    "id": 73,
-    "q": "I ______ swim. I never learned.",
-    "opts": [
-      "can't",
-      "don't",
-      "not can",
-      "amn't can",
-      "isn't can"
-    ],
-    "ans": 0,
-    "exp": "can't = cannot"
-  },
-  {
-    "id": 74,
-    "q": "\"can not\" 의 올바른 줄임말은?",
-    "opts": [
-      "can't",
-      "ca'nt",
-      "cant",
-      "cano't",
-      "can'no"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 75,
-    "q": "He ______ come to the party.",
-    "opts": [
-      "can't",
-      "don't",
-      "doesn't",
-      "isn't",
-      "not"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 76,
-    "q": "They ______ understand this problem.",
-    "opts": [
-      "can't",
-      "don't",
-      "aren't",
-      "not can",
-      "cans't"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 77,
-    "q": "They ______ understand this problem.",
-    "opts": [
-      "can't",
-      "don't",
-      "aren't",
-      "not can",
-      "cans't"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 78,
-    "q": "She ______ speak French well.",
-    "opts": [
-      "can't",
-      "don't",
-      "doesn't can",
-      "isn't can",
-      "not can"
-    ],
-    "ans": 0,
-    "exp": "can't + 동사원형"
-  },
-  {
-    "id": 79,
-    "q": "She ______ speak French well.",
-    "opts": [
-      "can't",
-      "don't",
-      "doesn't can",
-      "isn't can",
-      "not can"
-    ],
-    "ans": 0,
-    "exp": "can't + 동사원형"
-  },
-  {
-    "id": 80,
-    "q": "They ______ understand this problem.",
-    "opts": [
-      "can't",
-      "don't",
-      "aren't",
-      "not can",
-      "cans't"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 81,
-    "q": "He ______ come to the party.",
-    "opts": [
-      "can't",
-      "don't",
-      "doesn't",
-      "isn't",
-      "not"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 82,
-    "q": "They ______ understand this problem.",
-    "opts": [
-      "can't",
-      "don't",
-      "aren't",
-      "not can",
-      "cans't"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 83,
-    "q": "He ______ come to the party.",
-    "opts": [
-      "can't",
-      "don't",
-      "doesn't",
-      "isn't",
-      "not"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 84,
-    "q": "I ______ swim. I never learned.",
-    "opts": [
-      "can't",
-      "don't",
-      "not can",
-      "amn't can",
-      "isn't can"
-    ],
-    "ans": 0,
-    "exp": "can't = cannot"
-  },
-  {
-    "id": 85,
-    "q": "\"cannot\" 을 줄여 쓴 형태는?",
-    "opts": [
-      "can't",
-      "can'not",
-      "cant",
-      "ca'nt",
-      "cano't"
-    ],
-    "ans": 0,
-    "exp": "cannot = can't"
-  },
-  {
-    "id": 86,
-    "q": "I ______ swim. I never learned.",
-    "opts": [
-      "can't",
-      "don't",
-      "not can",
-      "amn't can",
-      "isn't can"
-    ],
-    "ans": 0,
-    "exp": "can't = cannot"
-  },
-  {
-    "id": 87,
-    "q": "\"can not\" 의 올바른 줄임말은?",
-    "opts": [
-      "can't",
-      "ca'nt",
-      "cant",
-      "cano't",
-      "can'no"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 88,
-    "q": "\"cannot\" 을 줄여 쓴 형태는?",
-    "opts": [
-      "can't",
-      "can'not",
-      "cant",
-      "ca'nt",
-      "cano't"
-    ],
-    "ans": 0,
-    "exp": "cannot = can't"
-  },
-  {
-    "id": 89,
-    "q": "She ______ speak French well.",
-    "opts": [
-      "can't",
-      "don't",
-      "doesn't can",
-      "isn't can",
-      "not can"
-    ],
-    "ans": 0,
-    "exp": "can't + 동사원형"
-  },
-  {
-    "id": 90,
-    "q": "They ______ understand this problem.",
-    "opts": [
-      "can't",
-      "don't",
-      "aren't",
-      "not can",
-      "cans't"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 91,
-    "q": "They ______ understand this problem.",
-    "opts": [
-      "can't",
-      "don't",
-      "aren't",
-      "not can",
-      "cans't"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 92,
-    "q": "She ______ speak French well.",
-    "opts": [
-      "can't",
-      "don't",
-      "doesn't can",
-      "isn't can",
-      "not can"
-    ],
-    "ans": 0,
-    "exp": "can't + 동사원형"
-  },
-  {
-    "id": 93,
-    "q": "They ______ understand this problem.",
-    "opts": [
-      "can't",
-      "don't",
-      "aren't",
-      "not can",
-      "cans't"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 94,
-    "q": "I ______ swim. I never learned.",
-    "opts": [
-      "can't",
-      "don't",
-      "not can",
-      "amn't can",
-      "isn't can"
-    ],
-    "ans": 0,
-    "exp": "can't = cannot"
-  },
-  {
-    "id": 95,
-    "q": "\"can not\" 의 올바른 줄임말은?",
-    "opts": [
-      "can't",
-      "ca'nt",
-      "cant",
-      "cano't",
-      "can'no"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 96,
-    "q": "He ______ come to the party.",
-    "opts": [
-      "can't",
-      "don't",
-      "doesn't",
-      "isn't",
-      "not"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 97,
-    "q": "They ______ understand this problem.",
-    "opts": [
-      "can't",
-      "don't",
-      "aren't",
-      "not can",
-      "cans't"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 98,
-    "q": "She ______ speak French well.",
-    "opts": [
-      "can't",
-      "don't",
-      "doesn't can",
-      "isn't can",
-      "not can"
-    ],
-    "ans": 0,
-    "exp": "can't + 동사원형"
-  },
-  {
-    "id": 99,
-    "q": "He ______ come to the party.",
-    "opts": [
-      "can't",
-      "don't",
-      "doesn't",
-      "isn't",
-      "not"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 100,
-    "q": "\"cannot\" 을 줄여 쓴 형태는?",
-    "opts": [
-      "can't",
-      "can'not",
-      "cant",
-      "ca'nt",
-      "cano't"
-    ],
-    "ans": 0,
-    "exp": "cannot = can't"
-  },
-  {
-    "id": 101,
+    "id": 45,
     "q": "______ she understand?",
     "opts": [
       "Do",
@@ -9142,7 +8414,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 102,
+    "id": 46,
     "q": "______ they understand?",
     "opts": [
       "Do",
@@ -9155,7 +8427,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 103,
+    "id": 47,
     "q": "______ your brother come?",
     "opts": [
       "Do",
@@ -9168,7 +8440,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 104,
+    "id": 48,
     "q": "______ they solve this problem?",
     "opts": [
       "Do",
@@ -9181,7 +8453,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 105,
+    "id": 49,
     "q": "______ your brother solve this problem?",
     "opts": [
       "Do",
@@ -9194,7 +8466,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 106,
+    "id": 50,
     "q": "______ they swim?",
     "opts": [
       "Do",
@@ -9207,7 +8479,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 107,
+    "id": 51,
     "q": "______ he speak English?",
     "opts": [
       "Do",
@@ -9220,7 +8492,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 108,
+    "id": 52,
     "q": "______ she read?",
     "opts": [
       "Do",
@@ -9233,7 +8505,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 109,
+    "id": 53,
     "q": "______ Tom understand?",
     "opts": [
       "Do",
@@ -9246,7 +8518,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 110,
+    "id": 54,
     "q": "______ Tom play the piano?",
     "opts": [
       "Do",
@@ -9259,7 +8531,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 111,
+    "id": 55,
     "q": "______ she go?",
     "opts": [
       "Do",
@@ -9272,7 +8544,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 112,
+    "id": 56,
     "q": "______ your brother run?",
     "opts": [
       "Do",
@@ -9285,7 +8557,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 113,
+    "id": 57,
     "q": "______ they go?",
     "opts": [
       "Do",
@@ -9298,20 +8570,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 114,
-    "q": "______ Tom play the piano?",
-    "opts": [
-      "Do",
-      "Can",
-      "Are",
-      "Is",
-      "Have"
-    ],
-    "ans": 1,
-    "exp": "Can + 주어 + 동사원형 ~?"
-  },
-  {
-    "id": 115,
+    "id": 58,
     "q": "______ they drive a car?",
     "opts": [
       "Do",
@@ -9324,7 +8583,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 116,
+    "id": 59,
     "q": "______ they write?",
     "opts": [
       "Do",
@@ -9337,7 +8596,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 117,
+    "id": 60,
     "q": "______ you run?",
     "opts": [
       "Do",
@@ -9350,7 +8609,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 118,
+    "id": 61,
     "q": "______ they help you?",
     "opts": [
       "Do",
@@ -9363,7 +8622,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 119,
+    "id": 62,
     "q": "______ you climb trees?",
     "opts": [
       "Do",
@@ -9376,7 +8635,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 120,
+    "id": 63,
     "q": "______ your brother answer the question?",
     "opts": [
       "Do",
@@ -9389,7 +8648,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 121,
+    "id": 64,
     "q": "______ she drive a car?",
     "opts": [
       "Do",
@@ -9402,7 +8661,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 122,
+    "id": 65,
     "q": "______ you do it?",
     "opts": [
       "Do",
@@ -9415,7 +8674,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 123,
+    "id": 66,
     "q": "______ they speak English?",
     "opts": [
       "Do",
@@ -9428,7 +8687,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 124,
+    "id": 67,
     "q": "______ he climb trees?",
     "opts": [
       "Do",
@@ -9441,7 +8700,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 125,
+    "id": 68,
     "q": "______ they come?",
     "opts": [
       "Do",
@@ -9454,7 +8713,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 126,
+    "id": 69,
     "q": "______ your brother read?",
     "opts": [
       "Do",
@@ -9467,7 +8726,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 127,
+    "id": 70,
     "q": "______ Tom help you?",
     "opts": [
       "Do",
@@ -9480,20 +8739,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 128,
-    "q": "______ they understand?",
-    "opts": [
-      "Do",
-      "Can",
-      "Are",
-      "Is",
-      "Have"
-    ],
-    "ans": 1,
-    "exp": "Can + 주어 + 동사원형 ~?"
-  },
-  {
-    "id": 129,
+    "id": 71,
     "q": "______ he read?",
     "opts": [
       "Do",
@@ -9506,7 +8752,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 130,
+    "id": 72,
     "q": "______ she see?",
     "opts": [
       "Do",
@@ -9519,7 +8765,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 131,
+    "id": 73,
     "q": "______ you jump high?",
     "opts": [
       "Do",
@@ -9532,7 +8778,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 132,
+    "id": 74,
     "q": "______ he swim?",
     "opts": [
       "Do",
@@ -9545,7 +8791,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 133,
+    "id": 75,
     "q": "______ Tom see?",
     "opts": [
       "Do",
@@ -9558,20 +8804,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 134,
-    "q": "______ they come?",
-    "opts": [
-      "Do",
-      "Can",
-      "Are",
-      "Is",
-      "Have"
-    ],
-    "ans": 1,
-    "exp": "Can + 주어 + 동사원형 ~?"
-  },
-  {
-    "id": 135,
+    "id": 76,
     "q": "______ your brother play the piano?",
     "opts": [
       "Do",
@@ -9584,7 +8817,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 136,
+    "id": 77,
     "q": "______ Tom read?",
     "opts": [
       "Do",
@@ -9597,7 +8830,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 137,
+    "id": 78,
     "q": "______ you come?",
     "opts": [
       "Do",
@@ -9610,7 +8843,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 138,
+    "id": 79,
     "q": "______ Tom solve this problem?",
     "opts": [
       "Do",
@@ -9623,7 +8856,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 139,
+    "id": 80,
     "q": "______ he do it?",
     "opts": [
       "Do",
@@ -9636,7 +8869,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 140,
+    "id": 81,
     "q": "______ she speak English?",
     "opts": [
       "Do",
@@ -9649,7 +8882,7 @@ export const QUESTION_BANK = {
     "exp": "Can + 주어 + 동사원형 ~?"
   },
   {
-    "id": 141,
+    "id": 82,
     "q": "______ I open the window?",
     "opts": [
       "Am",
@@ -9662,7 +8895,7 @@ export const QUESTION_BANK = {
     "exp": "May I ~?"
   },
   {
-    "id": 142,
+    "id": 83,
     "q": "______ I leave now?",
     "opts": [
       "Am",
@@ -9675,7 +8908,7 @@ export const QUESTION_BANK = {
     "exp": "May I ~?"
   },
   {
-    "id": 143,
+    "id": 84,
     "q": "______ I borrow your pen?",
     "opts": [
       "Am",
@@ -9688,59 +8921,7 @@ export const QUESTION_BANK = {
     "exp": "허락: May I ~?"
   },
   {
-    "id": 144,
-    "q": "______ I leave now?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 145,
-    "q": "______ I open the window?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 146,
-    "q": "______ I borrow your pen?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "허락: May I ~?"
-  },
-  {
-    "id": 147,
-    "q": "______ I borrow your pen?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "허락: May I ~?"
-  },
-  {
-    "id": 148,
+    "id": 85,
     "q": "______ I sit here?",
     "opts": [
       "Am",
@@ -9753,33 +8934,7 @@ export const QUESTION_BANK = {
     "exp": "May I ~?"
   },
   {
-    "id": 149,
-    "q": "______ I sit here?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 150,
-    "q": "______ I leave now?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 151,
+    "id": 86,
     "q": "______ I ask you a question?",
     "opts": [
       "Am",
@@ -9792,46 +8947,7 @@ export const QUESTION_BANK = {
     "exp": "May I ~?"
   },
   {
-    "id": 152,
-    "q": "______ I sit here?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 153,
-    "q": "______ I open the window?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 154,
-    "q": "______ I leave now?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 155,
+    "id": 87,
     "q": "A: May I help you? B: Yes, ______.",
     "opts": [
       "you may",
@@ -9844,7 +8960,7 @@ export const QUESTION_BANK = {
     "exp": "Yes, you may."
   },
   {
-    "id": 156,
+    "id": 88,
     "q": "______ I come in?",
     "opts": [
       "Am",
@@ -9857,7 +8973,7 @@ export const QUESTION_BANK = {
     "exp": "May I ~? (허락 요청)"
   },
   {
-    "id": 157,
+    "id": 89,
     "q": "______ I use your phone?",
     "opts": [
       "Am",
@@ -9870,7 +8986,7 @@ export const QUESTION_BANK = {
     "exp": "May I ~?"
   },
   {
-    "id": 158,
+    "id": 90,
     "q": "A: May I come in? B: No, you ______.",
     "opts": [
       "may not",
@@ -9883,293 +8999,7 @@ export const QUESTION_BANK = {
     "exp": "No, you may not."
   },
   {
-    "id": 159,
-    "q": "______ I leave now?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 160,
-    "q": "______ I open the window?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 161,
-    "q": "______ I sit here?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 162,
-    "q": "A: May I help you? B: Yes, ______.",
-    "opts": [
-      "you may",
-      "you do",
-      "you can't",
-      "you are",
-      "you have"
-    ],
-    "ans": 0,
-    "exp": "Yes, you may."
-  },
-  {
-    "id": 163,
-    "q": "______ I use your phone?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 164,
-    "q": "______ I leave now?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 165,
-    "q": "______ I ask you a question?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 166,
-    "q": "______ I borrow your pen?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "허락: May I ~?"
-  },
-  {
-    "id": 167,
-    "q": "______ I use your phone?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 168,
-    "q": "______ I sit here?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 169,
-    "q": "______ I leave now?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 170,
-    "q": "______ I leave now?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 171,
-    "q": "______ I sit here?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 172,
-    "q": "______ I come in?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~? (허락 요청)"
-  },
-  {
-    "id": 173,
-    "q": "______ I use your phone?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 174,
-    "q": "______ I ask you a question?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 175,
-    "q": "______ I leave now?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 176,
-    "q": "______ I come in?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~? (허락 요청)"
-  },
-  {
-    "id": 177,
-    "q": "______ I borrow your pen?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "허락: May I ~?"
-  },
-  {
-    "id": 178,
-    "q": "______ I leave now?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 179,
-    "q": "______ I ask you a question?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 180,
-    "q": "______ I use your phone?",
-    "opts": [
-      "Am",
-      "Do",
-      "May",
-      "Will",
-      "Is"
-    ],
-    "ans": 2,
-    "exp": "May I ~?"
-  },
-  {
-    "id": 181,
+    "id": 91,
     "q": "She ______ be at home now.",
     "opts": [
       "can",
@@ -10182,7 +9012,7 @@ export const QUESTION_BANK = {
     "exp": "may (추측)"
   },
   {
-    "id": 182,
+    "id": 92,
     "q": "They ______ know the answer.",
     "opts": [
       "can",
@@ -10195,46 +9025,7 @@ export const QUESTION_BANK = {
     "exp": "may (추측)"
   },
   {
-    "id": 183,
-    "q": "She ______ be at home now.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 184,
-    "q": "She ______ be at home now.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 185,
-    "q": "She ______ be at home now.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 186,
+    "id": 93,
     "q": "The story ______ be true.",
     "opts": [
       "can",
@@ -10247,7 +9038,7 @@ export const QUESTION_BANK = {
     "exp": "may be (~일지도)"
   },
   {
-    "id": 187,
+    "id": 94,
     "q": "It ______ rain tomorrow. (~할지도 모른다)",
     "opts": [
       "can",
@@ -10260,306 +9051,7 @@ export const QUESTION_BANK = {
     "exp": "may + 동사원형 (추측)"
   },
   {
-    "id": 188,
-    "q": "They ______ know the answer.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "are",
-      "have"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 189,
-    "q": "It ______ rain tomorrow. (~할지도 모른다)",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may + 동사원형 (추측)"
-  },
-  {
-    "id": 190,
-    "q": "It ______ rain tomorrow. (~할지도 모른다)",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may + 동사원형 (추측)"
-  },
-  {
-    "id": 191,
-    "q": "She ______ be at home now.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 192,
-    "q": "The story ______ be true.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may be (~일지도)"
-  },
-  {
-    "id": 193,
-    "q": "He ______ come to the party.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (~할지도)"
-  },
-  {
-    "id": 194,
-    "q": "They ______ know the answer.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "are",
-      "have"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 195,
-    "q": "She ______ be at home now.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 196,
-    "q": "The story ______ be true.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may be (~일지도)"
-  },
-  {
-    "id": 197,
-    "q": "He ______ come to the party.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (~할지도)"
-  },
-  {
-    "id": 198,
-    "q": "It ______ rain tomorrow. (~할지도 모른다)",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may + 동사원형 (추측)"
-  },
-  {
-    "id": 199,
-    "q": "She ______ be at home now.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 200,
-    "q": "He ______ come to the party.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (~할지도)"
-  },
-  {
-    "id": 201,
-    "q": "She ______ be at home now.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 202,
-    "q": "He ______ come to the party.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (~할지도)"
-  },
-  {
-    "id": 203,
-    "q": "She ______ be at home now.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 204,
-    "q": "The story ______ be true.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may be (~일지도)"
-  },
-  {
-    "id": 205,
-    "q": "He ______ come to the party.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (~할지도)"
-  },
-  {
-    "id": 206,
-    "q": "They ______ know the answer.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "are",
-      "have"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 207,
-    "q": "The story ______ be true.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may be (~일지도)"
-  },
-  {
-    "id": 208,
-    "q": "He ______ come to the party.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (~할지도)"
-  },
-  {
-    "id": 209,
-    "q": "She ______ be at home now.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 210,
-    "q": "She ______ be at home now.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 211,
+    "id": 95,
     "q": "빈칸에 알맞은 것은? \"I ______ to swim very well.\"",
     "opts": [
       "can",
@@ -10572,7 +9064,7 @@ export const QUESTION_BANK = {
     "exp": "be able + to + 동사원형"
   },
   {
-    "id": 212,
+    "id": 96,
     "q": "\"They can run fast.\" 과 같은 의미는?",
     "opts": [
       "They are able to run fast.",
@@ -10585,7 +9077,7 @@ export const QUESTION_BANK = {
     "exp": "can = be able to"
   },
   {
-    "id": 213,
+    "id": 97,
     "q": "\"She can speak English.\" 과 같은 의미는?",
     "opts": [
       "She is able to speak English.",
@@ -10598,7 +9090,7 @@ export const QUESTION_BANK = {
     "exp": "can = be able to"
   },
   {
-    "id": 214,
+    "id": 98,
     "q": "\"I can swim.\" 과 같은 의미는?",
     "opts": [
       "I am able to swim.",
@@ -10611,111 +9103,7 @@ export const QUESTION_BANK = {
     "exp": "can = be able to"
   },
   {
-    "id": 215,
-    "q": "\"I can swim.\" 과 같은 의미는?",
-    "opts": [
-      "I am able to swim.",
-      "I am swim.",
-      "I do swim.",
-      "I have swim.",
-      "I will swim."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 216,
-    "q": "\"I can swim.\" 과 같은 의미는?",
-    "opts": [
-      "I am able to swim.",
-      "I am swim.",
-      "I do swim.",
-      "I have swim.",
-      "I will swim."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 217,
-    "q": "빈칸에 알맞은 것은? \"I ______ to swim very well.\"",
-    "opts": [
-      "can",
-      "am able",
-      "is able",
-      "do able",
-      "have able"
-    ],
-    "ans": 1,
-    "exp": "be able + to + 동사원형"
-  },
-  {
-    "id": 218,
-    "q": "빈칸에 알맞은 것은? \"I ______ to swim very well.\"",
-    "opts": [
-      "can",
-      "am able",
-      "is able",
-      "do able",
-      "have able"
-    ],
-    "ans": 1,
-    "exp": "be able + to + 동사원형"
-  },
-  {
-    "id": 219,
-    "q": "\"They can run fast.\" 과 같은 의미는?",
-    "opts": [
-      "They are able to run fast.",
-      "They is able to run.",
-      "They do run fast.",
-      "They have run fast.",
-      "They were run fast."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 220,
-    "q": "\"She can speak English.\" 과 같은 의미는?",
-    "opts": [
-      "She is able to speak English.",
-      "She is speak English.",
-      "She does speak English.",
-      "She has speak English.",
-      "She will speak English."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 221,
-    "q": "\"They can run fast.\" 과 같은 의미는?",
-    "opts": [
-      "They are able to run fast.",
-      "They is able to run.",
-      "They do run fast.",
-      "They have run fast.",
-      "They were run fast."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 222,
-    "q": "\"I can swim.\" 과 같은 의미는?",
-    "opts": [
-      "I am able to swim.",
-      "I am swim.",
-      "I do swim.",
-      "I have swim.",
-      "I will swim."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 223,
+    "id": 99,
     "q": "\"He can't come.\" 과 같은 의미는?",
     "opts": [
       "He isn't able to come.",
@@ -10728,228 +9116,7 @@ export const QUESTION_BANK = {
     "exp": "can't = be not able to"
   },
   {
-    "id": 224,
-    "q": "\"She can speak English.\" 과 같은 의미는?",
-    "opts": [
-      "She is able to speak English.",
-      "She is speak English.",
-      "She does speak English.",
-      "She has speak English.",
-      "She will speak English."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 225,
-    "q": "\"They can run fast.\" 과 같은 의미는?",
-    "opts": [
-      "They are able to run fast.",
-      "They is able to run.",
-      "They do run fast.",
-      "They have run fast.",
-      "They were run fast."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 226,
-    "q": "\"He can't come.\" 과 같은 의미는?",
-    "opts": [
-      "He isn't able to come.",
-      "He don't come.",
-      "He doesn't come.",
-      "He won't come.",
-      "He hasn't come."
-    ],
-    "ans": 0,
-    "exp": "can't = be not able to"
-  },
-  {
-    "id": 227,
-    "q": "\"They can run fast.\" 과 같은 의미는?",
-    "opts": [
-      "They are able to run fast.",
-      "They is able to run.",
-      "They do run fast.",
-      "They have run fast.",
-      "They were run fast."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 228,
-    "q": "\"They can run fast.\" 과 같은 의미는?",
-    "opts": [
-      "They are able to run fast.",
-      "They is able to run.",
-      "They do run fast.",
-      "They have run fast.",
-      "They were run fast."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 229,
-    "q": "\"They can run fast.\" 과 같은 의미는?",
-    "opts": [
-      "They are able to run fast.",
-      "They is able to run.",
-      "They do run fast.",
-      "They have run fast.",
-      "They were run fast."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 230,
-    "q": "빈칸에 알맞은 것은? \"I ______ to swim very well.\"",
-    "opts": [
-      "can",
-      "am able",
-      "is able",
-      "do able",
-      "have able"
-    ],
-    "ans": 1,
-    "exp": "be able + to + 동사원형"
-  },
-  {
-    "id": 231,
-    "q": "\"He can't come.\" 과 같은 의미는?",
-    "opts": [
-      "He isn't able to come.",
-      "He don't come.",
-      "He doesn't come.",
-      "He won't come.",
-      "He hasn't come."
-    ],
-    "ans": 0,
-    "exp": "can't = be not able to"
-  },
-  {
-    "id": 232,
-    "q": "\"She can speak English.\" 과 같은 의미는?",
-    "opts": [
-      "She is able to speak English.",
-      "She is speak English.",
-      "She does speak English.",
-      "She has speak English.",
-      "She will speak English."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 233,
-    "q": "\"She can speak English.\" 과 같은 의미는?",
-    "opts": [
-      "She is able to speak English.",
-      "She is speak English.",
-      "She does speak English.",
-      "She has speak English.",
-      "She will speak English."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 234,
-    "q": "\"They can run fast.\" 과 같은 의미는?",
-    "opts": [
-      "They are able to run fast.",
-      "They is able to run.",
-      "They do run fast.",
-      "They have run fast.",
-      "They were run fast."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 235,
-    "q": "\"He can't come.\" 과 같은 의미는?",
-    "opts": [
-      "He isn't able to come.",
-      "He don't come.",
-      "He doesn't come.",
-      "He won't come.",
-      "He hasn't come."
-    ],
-    "ans": 0,
-    "exp": "can't = be not able to"
-  },
-  {
-    "id": 236,
-    "q": "\"They can run fast.\" 과 같은 의미는?",
-    "opts": [
-      "They are able to run fast.",
-      "They is able to run.",
-      "They do run fast.",
-      "They have run fast.",
-      "They were run fast."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 237,
-    "q": "빈칸에 알맞은 것은? \"I ______ to swim very well.\"",
-    "opts": [
-      "can",
-      "am able",
-      "is able",
-      "do able",
-      "have able"
-    ],
-    "ans": 1,
-    "exp": "be able + to + 동사원형"
-  },
-  {
-    "id": 238,
-    "q": "\"They can run fast.\" 과 같은 의미는?",
-    "opts": [
-      "They are able to run fast.",
-      "They is able to run.",
-      "They do run fast.",
-      "They have run fast.",
-      "They were run fast."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 239,
-    "q": "\"She can speak English.\" 과 같은 의미는?",
-    "opts": [
-      "She is able to speak English.",
-      "She is speak English.",
-      "She does speak English.",
-      "She has speak English.",
-      "She will speak English."
-    ],
-    "ans": 0,
-    "exp": "can = be able to"
-  },
-  {
-    "id": 240,
-    "q": "빈칸에 알맞은 것은? \"I ______ to swim very well.\"",
-    "opts": [
-      "can",
-      "am able",
-      "is able",
-      "do able",
-      "have able"
-    ],
-    "ans": 1,
-    "exp": "be able + to + 동사원형"
-  },
-  {
-    "id": 241,
+    "id": 100,
     "q": "조동사의 부정형이 잘못된 것은?",
     "opts": [
       "can - can't",
@@ -10962,20 +9129,7 @@ export const QUESTION_BANK = {
     "exp": "can't가 올바른 형태"
   },
   {
-    "id": 242,
-    "q": "조동사의 부정형이 잘못된 것은?",
-    "opts": [
-      "can - can't",
-      "may - may not",
-      "cannot - can't",
-      "can - cans't",
-      "cannot - cant"
-    ],
-    "ans": 3,
-    "exp": "can't가 올바른 형태"
-  },
-  {
-    "id": 243,
+    "id": 101,
     "q": "다음 중 어색한 문장은?",
     "opts": [
       "She can dance.",
@@ -10988,33 +9142,7 @@ export const QUESTION_BANK = {
     "exp": "can sings → can sing"
   },
   {
-    "id": 244,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "Can you help me?",
-      "May I come in?",
-      "Does she can swim?",
-      "He can't dance.",
-      "They may be late."
-    ],
-    "ans": 2,
-    "exp": "Does she can → Can she"
-  },
-  {
-    "id": 245,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "I can play piano.",
-      "She mays go.",
-      "He can't swim.",
-      "They may know.",
-      "We can run."
-    ],
-    "ans": 1,
-    "exp": "mays → may (조동사는 -s 없음)"
-  },
-  {
-    "id": 246,
+    "id": 102,
     "q": "밑줄 친 부분이 옳은 문장은?",
     "opts": [
       "She <u>can swims</u>.",
@@ -11027,124 +9155,7 @@ export const QUESTION_BANK = {
     "exp": "can + 동사원형"
   },
   {
-    "id": 247,
-    "q": "밑줄 친 부분이 옳은 문장은?",
-    "opts": [
-      "She <u>can swims</u>.",
-      "He <u>cans swim</u>.",
-      "They <u>can swim</u>.",
-      "We <u>can to swim</u>.",
-      "I <u>can swimming</u>."
-    ],
-    "ans": 2,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 248,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "I can play piano.",
-      "She mays go.",
-      "He can't swim.",
-      "They may know.",
-      "We can run."
-    ],
-    "ans": 1,
-    "exp": "mays → may (조동사는 -s 없음)"
-  },
-  {
-    "id": 249,
-    "q": "조동사의 부정형이 잘못된 것은?",
-    "opts": [
-      "can - can't",
-      "may - may not",
-      "cannot - can't",
-      "can - cans't",
-      "cannot - cant"
-    ],
-    "ans": 3,
-    "exp": "can't가 올바른 형태"
-  },
-  {
-    "id": 250,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "She can dance.",
-      "He may come.",
-      "They can sings.",
-      "We can help.",
-      "You may sit."
-    ],
-    "ans": 2,
-    "exp": "can sings → can sing"
-  },
-  {
-    "id": 251,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "I can play piano.",
-      "She mays go.",
-      "He can't swim.",
-      "They may know.",
-      "We can run."
-    ],
-    "ans": 1,
-    "exp": "mays → may (조동사는 -s 없음)"
-  },
-  {
-    "id": 252,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "Can you help me?",
-      "May I come in?",
-      "Does she can swim?",
-      "He can't dance.",
-      "They may be late."
-    ],
-    "ans": 2,
-    "exp": "Does she can → Can she"
-  },
-  {
-    "id": 253,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "I can play piano.",
-      "She mays go.",
-      "He can't swim.",
-      "They may know.",
-      "We can run."
-    ],
-    "ans": 1,
-    "exp": "mays → may (조동사는 -s 없음)"
-  },
-  {
-    "id": 254,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "Can you help me?",
-      "May I come in?",
-      "Does she can swim?",
-      "He can't dance.",
-      "They may be late."
-    ],
-    "ans": 2,
-    "exp": "Does she can → Can she"
-  },
-  {
-    "id": 255,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "I can play piano.",
-      "She mays go.",
-      "He can't swim.",
-      "They may know.",
-      "We can run."
-    ],
-    "ans": 1,
-    "exp": "mays → may (조동사는 -s 없음)"
-  },
-  {
-    "id": 256,
+    "id": 103,
     "q": "다음 중 올바른 문장은?",
     "opts": [
       "May I to go?",
@@ -11157,189 +9168,7 @@ export const QUESTION_BANK = {
     "exp": "May + 주어 + 동사원형"
   },
   {
-    "id": 257,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "I can play piano.",
-      "She mays go.",
-      "He can't swim.",
-      "They may know.",
-      "We can run."
-    ],
-    "ans": 1,
-    "exp": "mays → may (조동사는 -s 없음)"
-  },
-  {
-    "id": 258,
-    "q": "조동사의 부정형이 잘못된 것은?",
-    "opts": [
-      "can - can't",
-      "may - may not",
-      "cannot - can't",
-      "can - cans't",
-      "cannot - cant"
-    ],
-    "ans": 3,
-    "exp": "can't가 올바른 형태"
-  },
-  {
-    "id": 259,
-    "q": "밑줄 친 부분이 옳은 문장은?",
-    "opts": [
-      "She <u>can swims</u>.",
-      "He <u>cans swim</u>.",
-      "They <u>can swim</u>.",
-      "We <u>can to swim</u>.",
-      "I <u>can swimming</u>."
-    ],
-    "ans": 2,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 260,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "May I to go?",
-      "May I go?",
-      "May I going?",
-      "May I goes?",
-      "May I went?"
-    ],
-    "ans": 1,
-    "exp": "May + 주어 + 동사원형"
-  },
-  {
-    "id": 261,
-    "q": "조동사의 부정형이 잘못된 것은?",
-    "opts": [
-      "can - can't",
-      "may - may not",
-      "cannot - can't",
-      "can - cans't",
-      "cannot - cant"
-    ],
-    "ans": 3,
-    "exp": "can't가 올바른 형태"
-  },
-  {
-    "id": 262,
-    "q": "밑줄 친 부분이 옳은 문장은?",
-    "opts": [
-      "She <u>can swims</u>.",
-      "He <u>cans swim</u>.",
-      "They <u>can swim</u>.",
-      "We <u>can to swim</u>.",
-      "I <u>can swimming</u>."
-    ],
-    "ans": 2,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 263,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "She can dance.",
-      "He may come.",
-      "They can sings.",
-      "We can help.",
-      "You may sit."
-    ],
-    "ans": 2,
-    "exp": "can sings → can sing"
-  },
-  {
-    "id": 264,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "Can you help me?",
-      "May I come in?",
-      "Does she can swim?",
-      "He can't dance.",
-      "They may be late."
-    ],
-    "ans": 2,
-    "exp": "Does she can → Can she"
-  },
-  {
-    "id": 265,
-    "q": "다음 중 올바른 문장은?",
-    "opts": [
-      "I can swims.",
-      "She cans swim.",
-      "He can swim.",
-      "They can to swim.",
-      "We can swimming."
-    ],
-    "ans": 2,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 266,
-    "q": "조동사의 부정형이 잘못된 것은?",
-    "opts": [
-      "can - can't",
-      "may - may not",
-      "cannot - can't",
-      "can - cans't",
-      "cannot - cant"
-    ],
-    "ans": 3,
-    "exp": "can't가 올바른 형태"
-  },
-  {
-    "id": 267,
-    "q": "밑줄 친 부분이 옳은 문장은?",
-    "opts": [
-      "She <u>can swims</u>.",
-      "He <u>cans swim</u>.",
-      "They <u>can swim</u>.",
-      "We <u>can to swim</u>.",
-      "I <u>can swimming</u>."
-    ],
-    "ans": 2,
-    "exp": "can + 동사원형"
-  },
-  {
-    "id": 268,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "She can dance.",
-      "He may come.",
-      "They can sings.",
-      "We can help.",
-      "You may sit."
-    ],
-    "ans": 2,
-    "exp": "can sings → can sing"
-  },
-  {
-    "id": 269,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "Can you help me?",
-      "May I come in?",
-      "Does she can swim?",
-      "He can't dance.",
-      "They may be late."
-    ],
-    "ans": 2,
-    "exp": "Does she can → Can she"
-  },
-  {
-    "id": 270,
-    "q": "다음 중 어색한 문장은?",
-    "opts": [
-      "She can dance.",
-      "He may come.",
-      "They can sings.",
-      "We can help.",
-      "You may sit."
-    ],
-    "ans": 2,
-    "exp": "can sings → can sing"
-  },
-  {
-    "id": 271,
+    "id": 104,
     "q": "A: ______ you swim? B: Yes, I can.",
     "opts": [
       "Do",
@@ -11352,7 +9181,7 @@ export const QUESTION_BANK = {
     "exp": "Can you ~?"
   },
   {
-    "id": 272,
+    "id": 105,
     "q": "A bird can fly, but a fish ______.",
     "opts": [
       "can't",
@@ -11365,7 +9194,7 @@ export const QUESTION_BANK = {
     "exp": "can't (대조)"
   },
   {
-    "id": 273,
+    "id": 106,
     "q": "It ______ snow tonight. Look at the sky!",
     "opts": [
       "can",
@@ -11378,7 +9207,7 @@ export const QUESTION_BANK = {
     "exp": "may (추측)"
   },
   {
-    "id": 274,
+    "id": 107,
     "q": "Cats ______ see in the dark.",
     "opts": [
       "can",
@@ -11391,20 +9220,7 @@ export const QUESTION_BANK = {
     "exp": "can (능력)"
   },
   {
-    "id": 275,
-    "q": "It ______ snow tonight. Look at the sky!",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 276,
+    "id": 108,
     "q": "I think she ______ be sick. She looks pale.",
     "opts": [
       "can",
@@ -11417,7 +9233,7 @@ export const QUESTION_BANK = {
     "exp": "may be (추측)"
   },
   {
-    "id": 277,
+    "id": 109,
     "q": "Tom is a good cook. He ______ make pizza very well.",
     "opts": [
       "can",
@@ -11430,46 +9246,7 @@ export const QUESTION_BANK = {
     "exp": "can (능력)"
   },
   {
-    "id": 278,
-    "q": "A bird can fly, but a fish ______.",
-    "opts": [
-      "can't",
-      "doesn't",
-      "isn't",
-      "won't",
-      "hasn't"
-    ],
-    "ans": 0,
-    "exp": "can't (대조)"
-  },
-  {
-    "id": 279,
-    "q": "A bird can fly, but a fish ______.",
-    "opts": [
-      "can't",
-      "doesn't",
-      "isn't",
-      "won't",
-      "hasn't"
-    ],
-    "ans": 0,
-    "exp": "can't (대조)"
-  },
-  {
-    "id": 280,
-    "q": "A bird can fly, but a fish ______.",
-    "opts": [
-      "can't",
-      "doesn't",
-      "isn't",
-      "won't",
-      "hasn't"
-    ],
-    "ans": 0,
-    "exp": "can't (대조)"
-  },
-  {
-    "id": 281,
+    "id": 110,
     "q": "A: ______ I help you? B: Yes, please.",
     "opts": [
       "Do",
@@ -11482,33 +9259,7 @@ export const QUESTION_BANK = {
     "exp": "Can/May I help you?"
   },
   {
-    "id": 282,
-    "q": "A: ______ you swim? B: Yes, I can.",
-    "opts": [
-      "Do",
-      "Can",
-      "Are",
-      "Is",
-      "Have"
-    ],
-    "ans": 1,
-    "exp": "Can you ~?"
-  },
-  {
-    "id": 283,
-    "q": "I think she ______ be sick. She looks pale.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may be (추측)"
-  },
-  {
-    "id": 284,
+    "id": 111,
     "q": "Babies ______ walk well.",
     "opts": [
       "can't",
@@ -11521,98 +9272,7 @@ export const QUESTION_BANK = {
     "exp": "can't"
   },
   {
-    "id": 285,
-    "q": "Tom is a good cook. He ______ make pizza very well.",
-    "opts": [
-      "can",
-      "do",
-      "is",
-      "has",
-      "was"
-    ],
-    "ans": 0,
-    "exp": "can (능력)"
-  },
-  {
-    "id": 286,
-    "q": "It ______ snow tonight. Look at the sky!",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 287,
-    "q": "A bird can fly, but a fish ______.",
-    "opts": [
-      "can't",
-      "doesn't",
-      "isn't",
-      "won't",
-      "hasn't"
-    ],
-    "ans": 0,
-    "exp": "can't (대조)"
-  },
-  {
-    "id": 288,
-    "q": "Babies ______ walk well.",
-    "opts": [
-      "can't",
-      "don't",
-      "aren't",
-      "isn't",
-      "haven't"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 289,
-    "q": "Babies ______ walk well.",
-    "opts": [
-      "can't",
-      "don't",
-      "aren't",
-      "isn't",
-      "haven't"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 290,
-    "q": "A bird can fly, but a fish ______.",
-    "opts": [
-      "can't",
-      "doesn't",
-      "isn't",
-      "won't",
-      "hasn't"
-    ],
-    "ans": 0,
-    "exp": "can't (대조)"
-  },
-  {
-    "id": 291,
-    "q": "Tom is a good cook. He ______ make pizza very well.",
-    "opts": [
-      "can",
-      "do",
-      "is",
-      "has",
-      "was"
-    ],
-    "ans": 0,
-    "exp": "can (능력)"
-  },
-  {
-    "id": 292,
+    "id": 112,
     "q": "You ______ swim here. It's dangerous.",
     "opts": [
       "may not",
@@ -11625,85 +9285,7 @@ export const QUESTION_BANK = {
     "exp": "may not (금지)"
   },
   {
-    "id": 293,
-    "q": "Babies ______ walk well.",
-    "opts": [
-      "can't",
-      "don't",
-      "aren't",
-      "isn't",
-      "haven't"
-    ],
-    "ans": 0,
-    "exp": "can't"
-  },
-  {
-    "id": 294,
-    "q": "A bird can fly, but a fish ______.",
-    "opts": [
-      "can't",
-      "doesn't",
-      "isn't",
-      "won't",
-      "hasn't"
-    ],
-    "ans": 0,
-    "exp": "can't (대조)"
-  },
-  {
-    "id": 295,
-    "q": "A: ______ you swim? B: Yes, I can.",
-    "opts": [
-      "Do",
-      "Can",
-      "Are",
-      "Is",
-      "Have"
-    ],
-    "ans": 1,
-    "exp": "Can you ~?"
-  },
-  {
-    "id": 296,
-    "q": "I think she ______ be sick. She looks pale.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may be (추측)"
-  },
-  {
-    "id": 297,
-    "q": "It ______ snow tonight. Look at the sky!",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "is",
-      "has"
-    ],
-    "ans": 1,
-    "exp": "may (추측)"
-  },
-  {
-    "id": 298,
-    "q": "Cats ______ see in the dark.",
-    "opts": [
-      "can",
-      "may",
-      "do",
-      "are",
-      "have"
-    ],
-    "ans": 0,
-    "exp": "can (능력)"
-  },
-  {
-    "id": 299,
+    "id": 113,
     "q": "You ______ go home now if you want.",
     "opts": [
       "can",
@@ -11716,17 +9298,2435 @@ export const QUESTION_BANK = {
     "exp": "can (허락)"
   },
   {
-    "id": 300,
-    "q": "A: ______ you swim? B: Yes, I can.",
+    "id": 114,
+    "q": "She can ______ now.",
+    "opts": [
+      "cooked",
+      "to cook",
+      "cook",
+      "cooks",
+      "cooking"
+    ],
+    "ans": 2,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 115,
+    "q": "______ I ______ skate? (허락을 구할 때)",
+    "opts": [
+      "Will",
+      "Do",
+      "May",
+      "Is",
+      "Are"
+    ],
+    "ans": 2,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 116,
+    "q": "My friend ______ paint a picture very well.",
+    "opts": [
+      "can",
+      "do",
+      "does",
+      "is",
+      "are"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 117,
+    "q": "They can ______ now.",
+    "opts": [
+      "readed",
+      "to read",
+      "read",
+      "reads",
+      "reading"
+    ],
+    "ans": 2,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 118,
+    "q": "______ I ______ ski? (허락을 구할 때)",
     "opts": [
       "Do",
-      "Can",
+      "May",
+      "Will",
       "Are",
-      "Is",
-      "Have"
+      "Is"
     ],
     "ans": 1,
-    "exp": "Can you ~?"
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 119,
+    "q": "A: Can you ride a bike? B: Yes, I ______.",
+    "opts": [
+      "will",
+      "can",
+      "am",
+      "is",
+      "do"
+    ],
+    "ans": 1,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 120,
+    "q": "______ I ______ drive a car? (허락을 구할 때)",
+    "opts": [
+      "Do",
+      "Will",
+      "Are",
+      "Is",
+      "May"
+    ],
+    "ans": 4,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 121,
+    "q": "They can ______ very well.",
+    "opts": [
+      "drawed",
+      "drawing",
+      "draw",
+      "to draw",
+      "draws"
+    ],
+    "ans": 2,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 122,
+    "q": "______ I ______ spell the word? (허락을 구할 때)",
+    "opts": [
+      "Is",
+      "Do",
+      "Will",
+      "May",
+      "Are"
+    ],
+    "ans": 3,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 123,
+    "q": "Tom can ______ now.",
+    "opts": [
+      "draw",
+      "drawed",
+      "drawing",
+      "draws",
+      "to draw"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 124,
+    "q": "They ______ play the piano very well.",
+    "opts": [
+      "can",
+      "are",
+      "do",
+      "does",
+      "is"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 125,
+    "q": "______ I ______ run fast? (허락을 구할 때)",
+    "opts": [
+      "Will",
+      "May",
+      "Is",
+      "Are",
+      "Do"
+    ],
+    "ans": 1,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 126,
+    "q": "She can ______ very well.",
+    "opts": [
+      "skates",
+      "to skate",
+      "skateed",
+      "skate",
+      "skateing"
+    ],
+    "ans": 3,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 127,
+    "q": "A: Can you speak English? B: Yes, I ______.",
+    "opts": [
+      "am",
+      "is",
+      "can",
+      "will",
+      "do"
+    ],
+    "ans": 2,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 128,
+    "q": "______ I ______ climb a tree? (허락을 구할 때)",
+    "opts": [
+      "Are",
+      "May",
+      "Will",
+      "Is",
+      "Do"
+    ],
+    "ans": 1,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 129,
+    "q": "Mary ______ draw very well.",
+    "opts": [
+      "do",
+      "can",
+      "are",
+      "is",
+      "does"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 130,
+    "q": "______ I ______ run? (허락을 구할 때)",
+    "opts": [
+      "May",
+      "Is",
+      "Will",
+      "Are",
+      "Do"
+    ],
+    "ans": 0,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 131,
+    "q": "A: Can you jump? B: Yes, I ______.",
+    "opts": [
+      "can",
+      "will",
+      "do",
+      "is",
+      "am"
+    ],
+    "ans": 0,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 132,
+    "q": "She can ______ today.",
+    "opts": [
+      "to paint",
+      "paints",
+      "painting",
+      "paint",
+      "painted"
+    ],
+    "ans": 3,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 133,
+    "q": "I can ______ here.",
+    "opts": [
+      "jumping",
+      "jumped",
+      "jump",
+      "jumps",
+      "to jump"
+    ],
+    "ans": 2,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 134,
+    "q": "The bird ______ sing very well.",
+    "opts": [
+      "do",
+      "does",
+      "can",
+      "are",
+      "is"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 135,
+    "q": "______ I ______ help you? (허락을 구할 때)",
+    "opts": [
+      "Is",
+      "Are",
+      "Will",
+      "Do",
+      "May"
+    ],
+    "ans": 4,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 136,
+    "q": "______ I ______ play the piano? (허락을 구할 때)",
+    "opts": [
+      "Are",
+      "Do",
+      "May",
+      "Is",
+      "Will"
+    ],
+    "ans": 2,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 137,
+    "q": "A: Can you paint a picture? B: Yes, I ______.",
+    "opts": [
+      "will",
+      "can",
+      "am",
+      "is",
+      "do"
+    ],
+    "ans": 1,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 138,
+    "q": "Jinho ______ sing very well.",
+    "opts": [
+      "can",
+      "are",
+      "is",
+      "does",
+      "do"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 139,
+    "q": "A: Can you write? B: Yes, I ______.",
+    "opts": [
+      "do",
+      "will",
+      "am",
+      "is",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 140,
+    "q": "A: Can you spell the word? B: Yes, I ______.",
+    "opts": [
+      "can",
+      "is",
+      "do",
+      "will",
+      "am"
+    ],
+    "ans": 0,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 141,
+    "q": "My friend ______ spell the word very well.",
+    "opts": [
+      "does",
+      "are",
+      "do",
+      "can",
+      "is"
+    ],
+    "ans": 3,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 142,
+    "q": "My brother can ______ today.",
+    "opts": [
+      "climbed",
+      "climbs",
+      "climbing",
+      "climb",
+      "to climb"
+    ],
+    "ans": 3,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 143,
+    "q": "A: Can you ski? B: Yes, I ______.",
+    "opts": [
+      "do",
+      "is",
+      "am",
+      "will",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 144,
+    "q": "I can ______ today.",
+    "opts": [
+      "read",
+      "to read",
+      "reads",
+      "readed",
+      "reading"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 145,
+    "q": "Tom ______ run very well.",
+    "opts": [
+      "does",
+      "are",
+      "can",
+      "do",
+      "is"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 146,
+    "q": "______ I ______ fly a kite? (허락을 구할 때)",
+    "opts": [
+      "May",
+      "Are",
+      "Do",
+      "Is",
+      "Will"
+    ],
+    "ans": 0,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 147,
+    "q": "A: Can you count to ten? B: Yes, I ______.",
+    "opts": [
+      "will",
+      "can",
+      "do",
+      "is",
+      "am"
+    ],
+    "ans": 1,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 148,
+    "q": "My sister can ______ well.",
+    "opts": [
+      "danceed",
+      "dances",
+      "to dance",
+      "dance",
+      "danceing"
+    ],
+    "ans": 3,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 149,
+    "q": "My brother ______ draw very well.",
+    "opts": [
+      "do",
+      "can",
+      "are",
+      "is",
+      "does"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 150,
+    "q": "My friend can ______ well.",
+    "opts": [
+      "cook",
+      "cooking",
+      "cooks",
+      "cooked",
+      "to cook"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 151,
+    "q": "My brother ______ climb a tree very well.",
+    "opts": [
+      "do",
+      "can",
+      "is",
+      "are",
+      "does"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 152,
+    "q": "______ I ______ jump high? (허락을 구할 때)",
+    "opts": [
+      "May",
+      "Are",
+      "Is",
+      "Will",
+      "Do"
+    ],
+    "ans": 0,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 153,
+    "q": "______ I ______ count to ten? (허락을 구할 때)",
+    "opts": [
+      "May",
+      "Will",
+      "Is",
+      "Are",
+      "Do"
+    ],
+    "ans": 0,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 154,
+    "q": "Jinho ______ read very well.",
+    "opts": [
+      "does",
+      "can",
+      "is",
+      "are",
+      "do"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 155,
+    "q": "She ______ drive a car very well.",
+    "opts": [
+      "do",
+      "does",
+      "is",
+      "can",
+      "are"
+    ],
+    "ans": 3,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 156,
+    "q": "She can ______ well.",
+    "opts": [
+      "spell",
+      "spelling",
+      "spells",
+      "to spell",
+      "spelled"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 157,
+    "q": "Jinho can ______ very well.",
+    "opts": [
+      "reads",
+      "read",
+      "to read",
+      "reading",
+      "readed"
+    ],
+    "ans": 1,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 158,
+    "q": "A: Can you help you? B: Yes, I ______.",
+    "opts": [
+      "will",
+      "am",
+      "can",
+      "is",
+      "do"
+    ],
+    "ans": 2,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 159,
+    "q": "He ______ drive a car very well.",
+    "opts": [
+      "does",
+      "can",
+      "is",
+      "are",
+      "do"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 160,
+    "q": "He can ______ here.",
+    "opts": [
+      "swimed",
+      "to swim",
+      "swiming",
+      "swim",
+      "swims"
+    ],
+    "ans": 3,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 161,
+    "q": "My friend ______ help you very well.",
+    "opts": [
+      "can",
+      "are",
+      "is",
+      "does",
+      "do"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 162,
+    "q": "A: Can you draw? B: Yes, I ______.",
+    "opts": [
+      "will",
+      "do",
+      "is",
+      "am",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 163,
+    "q": "He ______ swim very well.",
+    "opts": [
+      "does",
+      "are",
+      "do",
+      "is",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 164,
+    "q": "He ______ skate very well.",
+    "opts": [
+      "does",
+      "are",
+      "do",
+      "can",
+      "is"
+    ],
+    "ans": 3,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 165,
+    "q": "A: Can you jump high? B: Yes, I ______.",
+    "opts": [
+      "am",
+      "do",
+      "will",
+      "is",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 166,
+    "q": "My sister ______ play the piano very well.",
+    "opts": [
+      "do",
+      "does",
+      "is",
+      "can",
+      "are"
+    ],
+    "ans": 3,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 167,
+    "q": "Mary can ______ now.",
+    "opts": [
+      "climbs",
+      "to climb",
+      "climbing",
+      "climbed",
+      "climb"
+    ],
+    "ans": 4,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 168,
+    "q": "The bird can ______.",
+    "opts": [
+      "spell",
+      "to spell",
+      "spells",
+      "spelled",
+      "spelling"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 169,
+    "q": "______ I ______ write? (허락을 구할 때)",
+    "opts": [
+      "Do",
+      "Is",
+      "May",
+      "Are",
+      "Will"
+    ],
+    "ans": 2,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 170,
+    "q": "Jinho can ______ now.",
+    "opts": [
+      "to fly",
+      "flys",
+      "fly",
+      "flying",
+      "flyed"
+    ],
+    "ans": 2,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 171,
+    "q": "They can ______ well.",
+    "opts": [
+      "writeed",
+      "writes",
+      "writeing",
+      "to write",
+      "write"
+    ],
+    "ans": 4,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 172,
+    "q": "A: Can you read? B: Yes, I ______.",
+    "opts": [
+      "can",
+      "am",
+      "will",
+      "is",
+      "do"
+    ],
+    "ans": 0,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 173,
+    "q": "My friend can ______ very well.",
+    "opts": [
+      "helped",
+      "help",
+      "helping",
+      "helps",
+      "to help"
+    ],
+    "ans": 1,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 174,
+    "q": "He ______ climb a tree very well.",
+    "opts": [
+      "can",
+      "are",
+      "does",
+      "do",
+      "is"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 175,
+    "q": "My brother ______ help you very well.",
+    "opts": [
+      "are",
+      "does",
+      "is",
+      "do",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 176,
+    "q": "My friend can ______ now.",
+    "opts": [
+      "fixed",
+      "fix",
+      "fixing",
+      "to fix",
+      "fixs"
+    ],
+    "ans": 1,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 177,
+    "q": "A: Can you dance? B: Yes, I ______.",
+    "opts": [
+      "can",
+      "will",
+      "do",
+      "is",
+      "am"
+    ],
+    "ans": 0,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 178,
+    "q": "Jinho ______ run very well.",
+    "opts": [
+      "is",
+      "can",
+      "do",
+      "are",
+      "does"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 179,
+    "q": "Mary can ______ well.",
+    "opts": [
+      "flys",
+      "flying",
+      "to fly",
+      "fly",
+      "flyed"
+    ],
+    "ans": 3,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 180,
+    "q": "Mary can ______ very well.",
+    "opts": [
+      "counted",
+      "to count",
+      "counts",
+      "counting",
+      "count"
+    ],
+    "ans": 4,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 181,
+    "q": "You ______ jump high very well.",
+    "opts": [
+      "is",
+      "do",
+      "can",
+      "are",
+      "does"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 182,
+    "q": "A: Can you fix it? B: Yes, I ______.",
+    "opts": [
+      "will",
+      "am",
+      "can",
+      "do",
+      "is"
+    ],
+    "ans": 2,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 183,
+    "q": "You can ______ well.",
+    "opts": [
+      "climb",
+      "climbed",
+      "climbing",
+      "climbs",
+      "to climb"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 184,
+    "q": "They can ______ here.",
+    "opts": [
+      "fixs",
+      "fixed",
+      "fix",
+      "to fix",
+      "fixing"
+    ],
+    "ans": 2,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 185,
+    "q": "We can ______ today.",
+    "opts": [
+      "run",
+      "runs",
+      "to run",
+      "runing",
+      "runed"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 186,
+    "q": "Jinho ______ dance very well.",
+    "opts": [
+      "do",
+      "can",
+      "is",
+      "are",
+      "does"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 187,
+    "q": "He can ______ today.",
+    "opts": [
+      "swimed",
+      "swims",
+      "swim",
+      "to swim",
+      "swiming"
+    ],
+    "ans": 2,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 188,
+    "q": "They ______ ride a bike very well.",
+    "opts": [
+      "does",
+      "can",
+      "are",
+      "do",
+      "is"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 189,
+    "q": "My sister ______ draw very well.",
+    "opts": [
+      "are",
+      "can",
+      "do",
+      "is",
+      "does"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 190,
+    "q": "______ I ______ ride a bike? (허락을 구할 때)",
+    "opts": [
+      "May",
+      "Will",
+      "Is",
+      "Are",
+      "Do"
+    ],
+    "ans": 0,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 191,
+    "q": "Tom can ______ here.",
+    "opts": [
+      "counting",
+      "counted",
+      "counts",
+      "count",
+      "to count"
+    ],
+    "ans": 3,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 192,
+    "q": "We can ______ well.",
+    "opts": [
+      "spelling",
+      "spell",
+      "spells",
+      "spelled",
+      "to spell"
+    ],
+    "ans": 1,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 193,
+    "q": "We ______ count to ten very well.",
+    "opts": [
+      "are",
+      "do",
+      "is",
+      "does",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 194,
+    "q": "______ I ______ dance? (허락을 구할 때)",
+    "opts": [
+      "Will",
+      "Is",
+      "Are",
+      "May",
+      "Do"
+    ],
+    "ans": 3,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 195,
+    "q": "The bird can ______ here.",
+    "opts": [
+      "danceing",
+      "to dance",
+      "dance",
+      "dances",
+      "danceed"
+    ],
+    "ans": 2,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 196,
+    "q": "______ I ______ draw? (허락을 구할 때)",
+    "opts": [
+      "May",
+      "Are",
+      "Do",
+      "Will",
+      "Is"
+    ],
+    "ans": 0,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 197,
+    "q": "He can ______ now.",
+    "opts": [
+      "skateing",
+      "skate",
+      "skates",
+      "skateed",
+      "to skate"
+    ],
+    "ans": 1,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 198,
+    "q": "A: Can you play the piano? B: Yes, I ______.",
+    "opts": [
+      "is",
+      "am",
+      "can",
+      "do",
+      "will"
+    ],
+    "ans": 2,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 199,
+    "q": "They ______ swim very well.",
+    "opts": [
+      "is",
+      "do",
+      "are",
+      "does",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 200,
+    "q": "______ I ______ swim? (허락을 구할 때)",
+    "opts": [
+      "Is",
+      "Are",
+      "May",
+      "Will",
+      "Do"
+    ],
+    "ans": 2,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 201,
+    "q": "You ______ help you very well.",
+    "opts": [
+      "are",
+      "do",
+      "does",
+      "is",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 202,
+    "q": "We can ______ very well.",
+    "opts": [
+      "to drive",
+      "drives",
+      "drive",
+      "driveing",
+      "driveed"
+    ],
+    "ans": 2,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 203,
+    "q": "He ______ paint a picture very well.",
+    "opts": [
+      "do",
+      "are",
+      "does",
+      "can",
+      "is"
+    ],
+    "ans": 3,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 204,
+    "q": "A: Can you climb a tree? B: Yes, I ______.",
+    "opts": [
+      "am",
+      "will",
+      "can",
+      "is",
+      "do"
+    ],
+    "ans": 2,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 205,
+    "q": "Mary can ______ here.",
+    "opts": [
+      "drive",
+      "driveing",
+      "to drive",
+      "driveed",
+      "drives"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 206,
+    "q": "A: Can you sing? B: Yes, I ______.",
+    "opts": [
+      "do",
+      "will",
+      "is",
+      "am",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 207,
+    "q": "You can ______ here.",
+    "opts": [
+      "sing",
+      "singing",
+      "sings",
+      "singed",
+      "to sing"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 208,
+    "q": "______ I ______ jump? (허락을 구할 때)",
+    "opts": [
+      "Will",
+      "May",
+      "Is",
+      "Are",
+      "Do"
+    ],
+    "ans": 1,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 209,
+    "q": "Tom ______ ride a bike very well.",
+    "opts": [
+      "can",
+      "does",
+      "are",
+      "do",
+      "is"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 210,
+    "q": "My brother can ______ now.",
+    "opts": [
+      "to run",
+      "run",
+      "runs",
+      "runing",
+      "runed"
+    ],
+    "ans": 1,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 211,
+    "q": "I ______ help you very well.",
+    "opts": [
+      "does",
+      "do",
+      "can",
+      "are",
+      "is"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 212,
+    "q": "A: Can you run? B: Yes, I ______.",
+    "opts": [
+      "am",
+      "can",
+      "is",
+      "will",
+      "do"
+    ],
+    "ans": 1,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 213,
+    "q": "Sora can ______ now.",
+    "opts": [
+      "draw",
+      "draws",
+      "drawed",
+      "drawing",
+      "to draw"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 214,
+    "q": "They ______ run very well.",
+    "opts": [
+      "can",
+      "is",
+      "do",
+      "are",
+      "does"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 215,
+    "q": "He can ______ very well.",
+    "opts": [
+      "skateed",
+      "skate",
+      "skateing",
+      "to skate",
+      "skates"
+    ],
+    "ans": 1,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 216,
+    "q": "Sora can ______ here.",
+    "opts": [
+      "counts",
+      "counting",
+      "to count",
+      "count",
+      "counted"
+    ],
+    "ans": 3,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 217,
+    "q": "I can ______ well.",
+    "opts": [
+      "counting",
+      "count",
+      "to count",
+      "counts",
+      "counted"
+    ],
+    "ans": 1,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 218,
+    "q": "My brother ______ run very well.",
+    "opts": [
+      "is",
+      "can",
+      "are",
+      "do",
+      "does"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 219,
+    "q": "They can ______ today.",
+    "opts": [
+      "to sing",
+      "sings",
+      "singed",
+      "sing",
+      "singing"
+    ],
+    "ans": 3,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 220,
+    "q": "A: Can you drive a car? B: Yes, I ______.",
+    "opts": [
+      "is",
+      "do",
+      "am",
+      "will",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 221,
+    "q": "The bird can ______ now.",
+    "opts": [
+      "counting",
+      "counts",
+      "counted",
+      "to count",
+      "count"
+    ],
+    "ans": 4,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 222,
+    "q": "She ______ fly a kite very well.",
+    "opts": [
+      "do",
+      "can",
+      "is",
+      "does",
+      "are"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 223,
+    "q": "Jinho can ______ today.",
+    "opts": [
+      "dance",
+      "to dance",
+      "danceing",
+      "danceed",
+      "dances"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 224,
+    "q": "We ______ cook very well.",
+    "opts": [
+      "can",
+      "do",
+      "are",
+      "does",
+      "is"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 225,
+    "q": "A: Can you run fast? B: Yes, I ______.",
+    "opts": [
+      "will",
+      "is",
+      "can",
+      "do",
+      "am"
+    ],
+    "ans": 2,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 226,
+    "q": "______ I ______ read? (허락을 구할 때)",
+    "opts": [
+      "Will",
+      "May",
+      "Are",
+      "Is",
+      "Do"
+    ],
+    "ans": 1,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 227,
+    "q": "She ______ play the piano very well.",
+    "opts": [
+      "are",
+      "do",
+      "does",
+      "is",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 228,
+    "q": "You ______ run fast very well.",
+    "opts": [
+      "are",
+      "can",
+      "does",
+      "is",
+      "do"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 229,
+    "q": "Sora ______ swim very well.",
+    "opts": [
+      "are",
+      "is",
+      "does",
+      "can",
+      "do"
+    ],
+    "ans": 3,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 230,
+    "q": "The bird ______ ski very well.",
+    "opts": [
+      "are",
+      "is",
+      "do",
+      "does",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 231,
+    "q": "We ______ run fast very well.",
+    "opts": [
+      "are",
+      "does",
+      "do",
+      "can",
+      "is"
+    ],
+    "ans": 3,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 232,
+    "q": "The bird ______ help you very well.",
+    "opts": [
+      "can",
+      "do",
+      "is",
+      "are",
+      "does"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 233,
+    "q": "Sora ______ drive a car very well.",
+    "opts": [
+      "does",
+      "do",
+      "can",
+      "is",
+      "are"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 234,
+    "q": "Mary ______ speak English very well.",
+    "opts": [
+      "does",
+      "can",
+      "do",
+      "is",
+      "are"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 235,
+    "q": "We ______ drive a car very well.",
+    "opts": [
+      "does",
+      "can",
+      "is",
+      "do",
+      "are"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 236,
+    "q": "Jinho ______ speak English very well.",
+    "opts": [
+      "are",
+      "do",
+      "is",
+      "can",
+      "does"
+    ],
+    "ans": 3,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 237,
+    "q": "A: Can you swim? B: Yes, I ______.",
+    "opts": [
+      "am",
+      "do",
+      "is",
+      "can",
+      "will"
+    ],
+    "ans": 3,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 238,
+    "q": "Jinho ______ paint a picture very well.",
+    "opts": [
+      "do",
+      "can",
+      "are",
+      "does",
+      "is"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 239,
+    "q": "The bird ______ dance very well.",
+    "opts": [
+      "are",
+      "do",
+      "can",
+      "does",
+      "is"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 240,
+    "q": "My sister can ______ very well.",
+    "opts": [
+      "cook",
+      "cooking",
+      "to cook",
+      "cooks",
+      "cooked"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 241,
+    "q": "The bird ______ ride a bike very well.",
+    "opts": [
+      "do",
+      "are",
+      "is",
+      "does",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 242,
+    "q": "Sora can ______.",
+    "opts": [
+      "danceing",
+      "danceed",
+      "to dance",
+      "dances",
+      "dance"
+    ],
+    "ans": 4,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 243,
+    "q": "Jinho ______ jump very well.",
+    "opts": [
+      "can",
+      "does",
+      "do",
+      "is",
+      "are"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 244,
+    "q": "My brother can ______ very well.",
+    "opts": [
+      "helping",
+      "helped",
+      "helps",
+      "help",
+      "to help"
+    ],
+    "ans": 3,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 245,
+    "q": "They ______ read very well.",
+    "opts": [
+      "is",
+      "are",
+      "do",
+      "does",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 246,
+    "q": "She ______ skate very well.",
+    "opts": [
+      "can",
+      "is",
+      "does",
+      "do",
+      "are"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 247,
+    "q": "My sister ______ jump high very well.",
+    "opts": [
+      "are",
+      "is",
+      "can",
+      "do",
+      "does"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 248,
+    "q": "You ______ read very well.",
+    "opts": [
+      "does",
+      "can",
+      "is",
+      "do",
+      "are"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 249,
+    "q": "______ I ______ fix it? (허락을 구할 때)",
+    "opts": [
+      "Is",
+      "May",
+      "Do",
+      "Are",
+      "Will"
+    ],
+    "ans": 1,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 250,
+    "q": "Mary ______ skate very well.",
+    "opts": [
+      "do",
+      "can",
+      "is",
+      "are",
+      "does"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 251,
+    "q": "They ______ fly a kite very well.",
+    "opts": [
+      "do",
+      "does",
+      "can",
+      "are",
+      "is"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 252,
+    "q": "I ______ spell the word very well.",
+    "opts": [
+      "are",
+      "do",
+      "can",
+      "is",
+      "does"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 253,
+    "q": "The bird can ______ well.",
+    "opts": [
+      "runed",
+      "to run",
+      "runing",
+      "runs",
+      "run"
+    ],
+    "ans": 4,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 254,
+    "q": "Sora ______ dance very well.",
+    "opts": [
+      "are",
+      "is",
+      "can",
+      "does",
+      "do"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 255,
+    "q": "A: Can you cook? B: Yes, I ______.",
+    "opts": [
+      "do",
+      "will",
+      "am",
+      "can",
+      "is"
+    ],
+    "ans": 3,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 256,
+    "q": "Sora ______ spell the word very well.",
+    "opts": [
+      "is",
+      "can",
+      "do",
+      "does",
+      "are"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 257,
+    "q": "My friend can ______ here.",
+    "opts": [
+      "skateing",
+      "skates",
+      "to skate",
+      "skate",
+      "skateed"
+    ],
+    "ans": 3,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 258,
+    "q": "Sora can ______ today.",
+    "opts": [
+      "rideing",
+      "to ride",
+      "ride",
+      "rides",
+      "rideed"
+    ],
+    "ans": 2,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 259,
+    "q": "My friend ______ climb a tree very well.",
+    "opts": [
+      "can",
+      "do",
+      "does",
+      "is",
+      "are"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 260,
+    "q": "Sora can ______ very well.",
+    "opts": [
+      "flying",
+      "to fly",
+      "flyed",
+      "flys",
+      "fly"
+    ],
+    "ans": 4,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 261,
+    "q": "We ______ dance very well.",
+    "opts": [
+      "is",
+      "are",
+      "do",
+      "can",
+      "does"
+    ],
+    "ans": 3,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 262,
+    "q": "My friend ______ drive a car very well.",
+    "opts": [
+      "are",
+      "do",
+      "is",
+      "does",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 263,
+    "q": "My friend ______ jump very well.",
+    "opts": [
+      "does",
+      "do",
+      "are",
+      "is",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 264,
+    "q": "My sister can ______.",
+    "opts": [
+      "fly",
+      "flys",
+      "to fly",
+      "flying",
+      "flyed"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 265,
+    "q": "My brother ______ swim very well.",
+    "opts": [
+      "can",
+      "is",
+      "are",
+      "does",
+      "do"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 266,
+    "q": "The bird ______ play the piano very well.",
+    "opts": [
+      "are",
+      "is",
+      "does",
+      "do",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 267,
+    "q": "My sister ______ ski very well.",
+    "opts": [
+      "do",
+      "can",
+      "is",
+      "does",
+      "are"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 268,
+    "q": "My brother can ______ here.",
+    "opts": [
+      "to read",
+      "reading",
+      "reads",
+      "readed",
+      "read"
+    ],
+    "ans": 4,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 269,
+    "q": "We can ______ here.",
+    "opts": [
+      "cook",
+      "cooking",
+      "to cook",
+      "cooks",
+      "cooked"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 270,
+    "q": "Tom ______ fix it very well.",
+    "opts": [
+      "does",
+      "do",
+      "are",
+      "is",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 271,
+    "q": "Jinho can ______ well.",
+    "opts": [
+      "spell",
+      "spells",
+      "to spell",
+      "spelled",
+      "spelling"
+    ],
+    "ans": 0,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 272,
+    "q": "Mary ______ help you very well.",
+    "opts": [
+      "do",
+      "does",
+      "can",
+      "are",
+      "is"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 273,
+    "q": "My brother ______ paint a picture very well.",
+    "opts": [
+      "does",
+      "can",
+      "do",
+      "is",
+      "are"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 274,
+    "q": "Jinho ______ ski very well.",
+    "opts": [
+      "does",
+      "is",
+      "can",
+      "are",
+      "do"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 275,
+    "q": "They ______ paint a picture very well.",
+    "opts": [
+      "is",
+      "do",
+      "are",
+      "can",
+      "does"
+    ],
+    "ans": 3,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 276,
+    "q": "My brother ______ jump very well.",
+    "opts": [
+      "is",
+      "does",
+      "do",
+      "can",
+      "are"
+    ],
+    "ans": 3,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 277,
+    "q": "Sora ______ play the piano very well.",
+    "opts": [
+      "is",
+      "do",
+      "does",
+      "are",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 278,
+    "q": "She ______ count to ten very well.",
+    "opts": [
+      "are",
+      "is",
+      "can",
+      "do",
+      "does"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 279,
+    "q": "I ______ jump very well.",
+    "opts": [
+      "are",
+      "do",
+      "can",
+      "does",
+      "is"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 280,
+    "q": "My sister can ______ now.",
+    "opts": [
+      "helped",
+      "to help",
+      "helps",
+      "helping",
+      "help"
+    ],
+    "ans": 4,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 281,
+    "q": "He ______ read very well.",
+    "opts": [
+      "is",
+      "does",
+      "do",
+      "are",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 282,
+    "q": "We ______ jump very well.",
+    "opts": [
+      "do",
+      "can",
+      "is",
+      "does",
+      "are"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 283,
+    "q": "______ I ______ paint a picture? (허락을 구할 때)",
+    "opts": [
+      "May",
+      "Will",
+      "Do",
+      "Are",
+      "Is"
+    ],
+    "ans": 0,
+    "exp": "허락을 구함 → May I ~?"
+  },
+  {
+    "id": 284,
+    "q": "Tom can ______ today.",
+    "opts": [
+      "cooks",
+      "cooked",
+      "cooking",
+      "cook",
+      "to cook"
+    ],
+    "ans": 3,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 285,
+    "q": "I ______ read very well.",
+    "opts": [
+      "does",
+      "is",
+      "are",
+      "do",
+      "can"
+    ],
+    "ans": 4,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 286,
+    "q": "My friend ______ skate very well.",
+    "opts": [
+      "does",
+      "do",
+      "can",
+      "is",
+      "are"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 287,
+    "q": "You ______ cook very well.",
+    "opts": [
+      "can",
+      "are",
+      "do",
+      "is",
+      "does"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 288,
+    "q": "She ______ sing very well.",
+    "opts": [
+      "is",
+      "do",
+      "are",
+      "can",
+      "does"
+    ],
+    "ans": 3,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 289,
+    "q": "My friend can ______ today.",
+    "opts": [
+      "to drive",
+      "drives",
+      "drive",
+      "driveing",
+      "driveed"
+    ],
+    "ans": 2,
+    "exp": "can + 동사원형"
+  },
+  {
+    "id": 290,
+    "q": "My friend ______ sing very well.",
+    "opts": [
+      "do",
+      "are",
+      "can",
+      "does",
+      "is"
+    ],
+    "ans": 2,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 291,
+    "q": "My sister ______ help you very well.",
+    "opts": [
+      "does",
+      "are",
+      "is",
+      "can",
+      "do"
+    ],
+    "ans": 3,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 292,
+    "q": "I ______ swim very well.",
+    "opts": [
+      "does",
+      "can",
+      "are",
+      "is",
+      "do"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 293,
+    "q": "He ______ ride a bike very well.",
+    "opts": [
+      "does",
+      "can",
+      "is",
+      "are",
+      "do"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 294,
+    "q": "A: Can you skate? B: Yes, I ______.",
+    "opts": [
+      "am",
+      "will",
+      "is",
+      "can",
+      "do"
+    ],
+    "ans": 3,
+    "exp": "Can 의문문 → can으로 답"
+  },
+  {
+    "id": 295,
+    "q": "My brother ______ jump high very well.",
+    "opts": [
+      "does",
+      "can",
+      "is",
+      "are",
+      "do"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 296,
+    "q": "Tom ______ read very well.",
+    "opts": [
+      "can",
+      "do",
+      "does",
+      "are",
+      "is"
+    ],
+    "ans": 0,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 297,
+    "q": "My sister ______ cook very well.",
+    "opts": [
+      "do",
+      "can",
+      "does",
+      "is",
+      "are"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 298,
+    "q": "Jinho ______ fix it very well.",
+    "opts": [
+      "do",
+      "are",
+      "is",
+      "can",
+      "does"
+    ],
+    "ans": 3,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 299,
+    "q": "We ______ run very well.",
+    "opts": [
+      "does",
+      "can",
+      "do",
+      "is",
+      "are"
+    ],
+    "ans": 1,
+    "exp": "능력 → can"
+  },
+  {
+    "id": 300,
+    "q": "We can ______ now.",
+    "opts": [
+      "to run",
+      "runed",
+      "runing",
+      "run",
+      "runs"
+    ],
+    "ans": 3,
+    "exp": "can + 동사원형"
   }
 ]
   },

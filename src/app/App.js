@@ -25,7 +25,8 @@ import {
   StatsDashboard, StudentDetailModal,
   computeStudentStats, getLevel, LEVEL_INFO,
   WordHomeworkManager, WordHomeworkPrint, WordHomeworkBanner,
-  getActiveHomeworkWords, updateWordMastery
+  getActiveHomeworkWords, updateWordMastery,
+  CustomExamManager, CustomExamPrint, CustomExamBanner, CustomExamPlay
 } from "./features";
 import {
   MemoryCardGame, DailyChallenge, WrongNoteGame, AnagramGame,
@@ -1061,6 +1062,11 @@ function TeacherHome({ bank, exams, students, onNav }) {
     return hw?.words?.length > 0 && hw.words.every(w => w.mastered);
   }).length;
 
+  // 진행중인 맞춤 시험 통계
+  const activeExams = studentsArr.filter(s => s.customExam?.active);
+  const activeExamCount = activeExams.length;
+  const completedExamCount = activeExams.filter(s => s.customExam?.completed).length;
+
   return (
     <div>
       <div style={{
@@ -1109,22 +1115,24 @@ function TeacherHome({ bank, exams, students, onNav }) {
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ fontSize: 24 }}>📝</div>
             <div>
-              <div style={{ fontSize: 10, color: T.textMid, fontWeight: 700 }}>시험지</div>
-              <div style={{ fontSize: 20, fontWeight: 900, color: T.text }}>{exams.length}개</div>
-              <div style={{ fontSize: 9, color: T.orange, fontWeight: 700 }}>출제 가능</div>
+              <div style={{ fontSize: 10, color: T.textMid, fontWeight: 700 }}>진행중 시험</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: T.text }}>{activeExamCount}건</div>
+              <div style={{ fontSize: 9, color: T.orange, fontWeight: 700 }}>완료 {completedExamCount}건</div>
             </div>
           </div>
         </Card>
       </div>
 
-      {/* 자주 쓰는 작업 — 4가지 핵심 액션 */}
+      {/* 자주 쓰는 작업 — 핵심 액션 */}
       <div style={{ fontSize: 13, fontWeight: 800, color: T.textMid, marginBottom: 10, letterSpacing: 0.5 }}>⚡ 자주 쓰는 작업</div>
       <div className="grid-2" style={{ marginBottom: 16 }}>
         {[
           { id: "word-homework", icon: "📚", label: "단어 숙제 만들기", desc: "학년별 단어 추천 + 배정",  color: T.accent, bg: T.accentLight },
+          { id: "custom-exam",   icon: "📝", label: "맞춤 시험지 만들기", desc: "문제 골라서 시험 출제",    color: T.pink,   bg: T.pinkLight },
           { id: "manage",        icon: "👤", label: "학생 관리",        desc: "학생 등록 · 정보 수정",   color: T.green,  bg: T.greenLight },
           { id: "assign",        icon: "📬", label: "과제 배정",        desc: "문제집을 학생에게 배정",  color: T.orange, bg: T.orangeLight },
           { id: "students",      icon: "📈", label: "학생 통계 보기",   desc: "전체 학습 현황 분석",     color: T.purple, bg: T.purpleLight },
+          { id: "bank",          icon: "🗂️", label: "문제 은행",        desc: "문제 추가 · 편집",        color: T.accent, bg: T.accentLight },
         ].map(m => (
           <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 16 }}>
             <div style={{
@@ -1171,6 +1179,48 @@ function TeacherHome({ bank, exams, students, onNav }) {
             {activeHomeworks.length > 5 && (
               <div onClick={() => onNav("word-homework")} style={{ textAlign: "center", padding: "8px 0 2px", fontSize: 11, fontWeight: 700, color: T.accent, cursor: "pointer" }}>
                 전체 {activeHomeworks.length}건 보기 →
+              </div>
+            )}
+          </Card>
+        </>
+      )}
+
+      {/* 진행 중인 맞춤 시험 — 있을 때만 표시 */}
+      {activeExamCount > 0 && (
+        <>
+          <div style={{ fontSize: 13, fontWeight: 800, color: T.textMid, marginBottom: 10, letterSpacing: 0.5 }}>📝 진행 중인 시험</div>
+          <Card style={{ padding: 12, marginBottom: 12 }}>
+            {activeExams.slice(0, 5).map((s, i) => {
+              const ex = s.customExam;
+              const total = ex.questions?.length || 0;
+              const done = ex.completed;
+              const score = ex.score;
+              return (
+                <div key={s.name} onClick={() => onNav("custom-exam")}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    padding: "8px 4px", cursor: "pointer",
+                    borderBottom: i < Math.min(activeExams.length, 5) - 1 ? `1px solid ${T.border}` : "none"
+                  }}>
+                  <div style={{ fontSize: 22 }}>{s.avatar || "🙂"}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 800, color: T.text }}>{s.name}</div>
+                    <div style={{ fontSize: 10, color: T.textMid, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{ex.title}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 12, fontWeight: 900, color: done ? T.green : T.orange }}>
+                      {done ? `${score}/${total}` : `${total}문항`}
+                    </div>
+                    <div style={{ fontSize: 9, color: T.textDim, marginTop: 2 }}>
+                      {done ? "완료" : "대기 중"}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            {activeExams.length > 5 && (
+              <div onClick={() => onNav("custom-exam")} style={{ textAlign: "center", padding: "8px 0 2px", fontSize: 11, fontWeight: 700, color: T.pink, cursor: "pointer" }}>
+                전체 {activeExams.length}건 보기 →
               </div>
             )}
           </Card>
@@ -1748,6 +1798,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
     parent:       { title:"학부모 뷰어",       back: "more" },
     attendance:   { title:"출석 기록",         back: "more" },
     "word-homework": { title:"📚 단어 숙제 관리", back: "dashboard" },
+    "custom-exam":   { title:"📝 맞춤 시험지", back: "dashboard" },
     "student-report": { title:"학생 상세 리포트", back: "students" },
   };
 
@@ -1807,6 +1858,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
         {/* 신규 */}
         {screen === "attendance"      && <AttendanceManager students={students} attendance={attendance} setAttendance={setAttendance} />}
         {screen === "word-homework"   && <WordHomeworkManager students={students} setStudents={setStudents} onNav={onNav} />}
+        {screen === "custom-exam"     && <CustomExamManager students={students} setStudents={setStudents} bank={bank} onNav={onNav} />}
         {screen === "student-report"  && <StudentDetailReport student={reportStudent} onBack={() => onNav("students")} />}
         {/* 더보기 메뉴 */}
         {screen === "more" && (
@@ -1818,6 +1870,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
             <div style={{ fontSize: 11, fontWeight: 800, color: T.accent, marginBottom: 8, letterSpacing: 0.5 }}>📖 학습 자료</div>
             <div className="grid-2" style={{ marginBottom: 16 }}>
               {[
+                { id:"custom-exam",  icon:"📝", label:"맞춤 시험지",      desc:"학생별 문제 골라 출제" },
                 { id:"bank",         icon:"📚", label:"문제 은행",        desc:"문제 추가 / 편집" },
                 { id:"exam-builder", icon:"✏️", label:"시험지 만들기",    desc:"새 시험지 생성" },
                 { id:"exams",        icon:"📋", label:"시험지 목록",      desc:"만든 시험지 보기 / 인쇄" },
@@ -2483,6 +2536,7 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
   if (screen === "game-spell")    return <SpellingGame  name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
   if (screen === "game-speed")    return <SpeedQuiz     name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
   if (screen === "game-flash")    return <FlashCard     name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
+  if (screen === "custom-exam-play") return <CustomExamPlay student={me} name={name} setStudents={setStudents} onExit={() => setScreen("home")} />;
   if (screen === "game-sentence") return <SentenceGame  name={name} setStudents={setStudents} onExit={exitGame} />;
   // 신규 8개 게임
   if (screen === "game-memory")   return <MemoryCardGame name={name} setStudents={setStudents} onExit={exitGame} />;
@@ -2551,6 +2605,9 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
           setPendingGame({ id: "game-match", name: "단어 맞추기" });
           setScreen("game-match");
         }} />
+
+        {/* 맞춤 시험지 배너 — 진행 중인 시험이 있으면 표시 */}
+        <CustomExamBanner student={me} onStart={() => setScreen("custom-exam-play")} />
 
         {/* 배정된 과제 */}
         {(() => {

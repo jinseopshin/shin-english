@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx --no-install eslint src/app/games.js --no-eslintrc --parser-options=ecmaVersion:2022,sourceType:module,ecmaFeatures:{jsx:true} --rule '{}')",
+      "PowerShell(npm run *)",
+      "PowerShell(Get-Command *)"
+    ]
+  }
+}

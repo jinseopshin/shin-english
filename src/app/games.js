@@ -48,14 +48,14 @@ const ls = {
   },
   set: (key, val) => {
     if (!isBrowser) return;
-    try { ls.set(key, val); } catch {}
+    try { window.localStorage.setItem(key, JSON.stringify(val)); } catch {}
   },
   raw: (key) => {
     if (!isBrowser) return null;
-    try { return ls.raw(key); } catch { return null; }
+    try { return window.localStorage.getItem(key); } catch { return null; }
   },
 };
-const safeRAF = (cb) => isBrowser ? safeRAF(cb) : 0;
+const safeRAF = (cb) => isBrowser ? requestAnimationFrame(cb) : 0;
 const safeCAF = (id) => { if (isBrowser && id) cancelAnimationFrame(id); };
 
 const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
@@ -960,8 +960,25 @@ export function WordWorldRPG({ name, setStudents, onExit }) {
   const [shieldActive, setShieldActive] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [battleItems, setBattleItems] = useState([]);
+  const awardedRef = useRef(false);
 
   const persist=(s)=>{setSaveState(s);try{ls.set(saveKey, s);}catch{}};
+
+  // 배틀 종료 시 보상/저장 — 렌더 중이 아니라 effect에서 1회만 처리
+  const battleOver = screen==="battle" && questions.length>0 && (hp<=0 || round>=questions.length);
+  useEffect(()=>{
+    if(!battleOver || awardedRef.current) return;
+    awardedRef.current = true;
+    const cleared=round>=questions.length&&hp>0;
+    const stars=cleared?3:score>questions.length/2?1:0;
+    const pts=score*20+(cleared?50:0);
+    if(typeof setStudents==="function"){setStudents(prev=>{const s=prev[name]||{};return {...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"단어월드RPG",score,total:questions.length,points:pts,date:new Date().toISOString()}].slice(-50)}};});}
+    if(cleared){
+      const newSave={...save,clearedWorlds:[...new Set([...save.clearedWorlds,selectedWorld.id])],totalStars:save.totalStars+stars,questLog:[...save.questLog,{world:selectedWorld.name,score,clearedAt:new Date().toISOString()}]};
+      persist(newSave);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[battleOver]);
 
   const startBattle=(world)=>{
     const pool=getWordsByLevel(world.wordLevel);
@@ -975,6 +992,7 @@ export function WordWorldRPG({ name, setStudents, onExit }) {
     setRound(0); setScore(0); setPicked(null); setFeedback(null);
     setBattleItems(save.items.slice(0,2));
     setSelectedWorld(world);
+    awardedRef.current=false;
     setScreen("battle");
   };
 
@@ -1023,15 +1041,9 @@ export function WordWorldRPG({ name, setStudents, onExit }) {
 
   if(screen==="battle"&&questions.length>0){
     if(hp<=0||round>=questions.length){
-      // 배틀 종료
+      // 배틀 종료 (보상/저장은 위 useEffect에서 처리 — 렌더 중 setState 금지)
       const cleared=round>=questions.length&&hp>0;
       const stars=cleared?3:score>questions.length/2?1:0;
-      const pts=score*20+(cleared?50:0);
-      if(typeof setStudents==="function"){setStudents(prev=>{const s=prev[name]||{};return {...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"단어월드RPG",score,total:questions.length,points:pts,date:new Date().toISOString()}].slice(-50)}};});}
-      if(cleared){
-        const newSave={...save,clearedWorlds:[...new Set([...save.clearedWorlds,selectedWorld.id])],totalStars:save.totalStars+stars,questLog:[...save.questLog,{world:selectedWorld.name,score,clearedAt:new Date().toISOString()}]};
-        persist(newSave);
-      }
       return(
         <div style={{minHeight:"100vh",background:T.bg,padding:"40px 20px",textAlign:"center"}}>
           <div style={{fontSize:72,marginBottom:12}}>{cleared?"🏆":hp<=0?"💀":"🎯"}</div>

@@ -692,12 +692,11 @@ function ExamPrintView({ exam, onBack }) {
 // ══════════════════════════════════════════════════════════════════════════
 
 const TEACHER_NAV = [
-  { id: "dashboard", icon: "📊", label: "대시보드" },
-  { id: "manage",    icon: "👤", label: "학생관리" },
-  { id: "assign",    icon: "📬", label: "과제배정" },
-  { id: "students",  icon: "📈", label: "통계" },
-  { id: "bank",      icon: "📚", label: "문제은행" },
-  { id: "more",      icon: "✨", label: "더보기" },
+  { id: "dashboard",      icon: "🏠", label: "홈" },
+  { id: "word-homework",  icon: "📚", label: "단어숙제" },
+  { id: "manage",         icon: "👤", label: "학생관리" },
+  { id: "assign",         icon: "📬", label: "과제배정" },
+  { id: "more",           icon: "✨", label: "더보기" },
 ];
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1053,11 +1052,20 @@ function TeacherHome({ bank, exams, students, onNav }) {
     return last === new Date().toISOString().slice(0, 10);
   }).length;
 
+  // 진행중인 단어 숙제 통계
+  const studentsArr = Object.values(students || {});
+  const activeHomeworks = studentsArr.filter(s => s.wordHomework?.active);
+  const activeHwCount = activeHomeworks.length;
+  const completedHwCount = activeHomeworks.filter(s => {
+    const hw = s.wordHomework;
+    return hw?.words?.length > 0 && hw.words.every(w => w.mastered);
+  }).length;
+
   return (
     <div>
       <div style={{
         background: `linear-gradient(135deg, ${T.accent} 0%, ${T.purple} 100%)`,
-        borderRadius: 16, padding: "20px 18px", color: "white", marginBottom: 16,
+        borderRadius: 16, padding: "20px 18px", color: "white", marginBottom: 14,
         boxShadow: T.shadowLg
       }}>
         <div style={{ fontSize: 12, opacity: 0.9, marginBottom: 4 }}>안녕하세요 👋</div>
@@ -1065,46 +1073,109 @@ function TeacherHome({ bank, exams, students, onNav }) {
         <div style={{ fontSize: 11, opacity: 0.85, marginTop: 6 }}>오늘도 멋진 수업 화이팅!</div>
       </div>
 
-      <div className="grid-2" style={{ marginBottom: 16 }}>
-        <Card style={{ padding: 14 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ fontSize: 28 }}>👥</div>
+      {/* 오늘의 현황 — 3개 통계 카드 */}
+      <div className="stat-grid" style={{ marginBottom: 16 }}>
+        <Card style={{ padding: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ fontSize: 24 }}>👥</div>
             <div>
               <div style={{ fontSize: 10, color: T.textMid, fontWeight: 700 }}>전체 학생</div>
-              <div style={{ fontSize: 22, fontWeight: 900, color: T.text }}>{studentCount}명</div>
-              <div style={{ fontSize: 10, color: T.green, fontWeight: 700 }}>오늘 {todayActive}명 활동</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: T.text }}>{studentCount}명</div>
+              <div style={{ fontSize: 9, color: T.green, fontWeight: 700 }}>오늘 {todayActive}명 활동</div>
             </div>
           </div>
         </Card>
-        <Card style={{ padding: 14 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ fontSize: 28 }}>📚</div>
+        <Card style={{ padding: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ fontSize: 24 }}>📚</div>
             <div>
               <div style={{ fontSize: 10, color: T.textMid, fontWeight: 700 }}>문제 은행</div>
-              <div style={{ fontSize: 22, fontWeight: 900, color: T.text }}>{questionCount}문항</div>
-              <div style={{ fontSize: 10, color: T.accent, fontWeight: 700 }}>{Object.keys(bank).length}개 문제집</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: T.text }}>{questionCount}문항</div>
+              <div style={{ fontSize: 9, color: T.accent, fontWeight: 700 }}>{Object.keys(bank).length}개 문제집</div>
+            </div>
+          </div>
+        </Card>
+        <Card style={{ padding: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ fontSize: 24 }}>📖</div>
+            <div>
+              <div style={{ fontSize: 10, color: T.textMid, fontWeight: 700 }}>진행중 단어숙제</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: T.text }}>{activeHwCount}건</div>
+              <div style={{ fontSize: 9, color: T.purple, fontWeight: 700 }}>완료 {completedHwCount}건</div>
+            </div>
+          </div>
+        </Card>
+        <Card style={{ padding: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ fontSize: 24 }}>📝</div>
+            <div>
+              <div style={{ fontSize: 10, color: T.textMid, fontWeight: 700 }}>시험지</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: T.text }}>{exams.length}개</div>
+              <div style={{ fontSize: 9, color: T.orange, fontWeight: 700 }}>출제 가능</div>
             </div>
           </div>
         </Card>
       </div>
 
-      <div style={{ fontSize: 13, fontWeight: 800, color: T.textMid, marginBottom: 10, letterSpacing: 0.5 }}>빠른 실행</div>
-      <div className="grid-2">
+      {/* 자주 쓰는 작업 — 4가지 핵심 액션 */}
+      <div style={{ fontSize: 13, fontWeight: 800, color: T.textMid, marginBottom: 10, letterSpacing: 0.5 }}>⚡ 자주 쓰는 작업</div>
+      <div className="grid-2" style={{ marginBottom: 16 }}>
         {[
-          { id: "dashboard", icon: "📊", label: "학생 대시보드", color: T.accent, bg: T.accentLight },
-          { id: "students", icon: "👥", label: "학생 통계 보기", color: T.purple, bg: T.purpleLight },
-          { id: "exam-builder", icon: "✏️", label: "시험지 만들기", color: T.green, bg: T.greenLight },
-          { id: "bank", icon: "📚", label: "문제 추가", color: T.pink, bg: T.pinkLight },
+          { id: "word-homework", icon: "📚", label: "단어 숙제 만들기", desc: "학년별 단어 추천 + 배정",  color: T.accent, bg: T.accentLight },
+          { id: "manage",        icon: "👤", label: "학생 관리",        desc: "학생 등록 · 정보 수정",   color: T.green,  bg: T.greenLight },
+          { id: "assign",        icon: "📬", label: "과제 배정",        desc: "문제집을 학생에게 배정",  color: T.orange, bg: T.orangeLight },
+          { id: "students",      icon: "📈", label: "학생 통계 보기",   desc: "전체 학습 현황 분석",     color: T.purple, bg: T.purpleLight },
         ].map(m => (
-          <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 18, textAlign: "center" }}>
+          <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 16 }}>
             <div style={{
-              width: 50, height: 50, borderRadius: 14, background: m.bg, margin: "0 auto 8px",
+              width: 48, height: 48, borderRadius: 14, background: m.bg, marginBottom: 10,
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26
             }}>{m.icon}</div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>{m.label}</div>
+            <div style={{ fontSize: 14, fontWeight: 900, color: T.text, marginBottom: 3 }}>{m.label}</div>
+            <div style={{ fontSize: 10, color: T.textMid, lineHeight: 1.4 }}>{m.desc}</div>
           </Card>
         ))}
       </div>
+
+      {/* 진행 중인 단어 숙제 — 있을 때만 표시 */}
+      {activeHwCount > 0 && (
+        <>
+          <div style={{ fontSize: 13, fontWeight: 800, color: T.textMid, marginBottom: 10, letterSpacing: 0.5 }}>📖 진행 중인 단어 숙제</div>
+          <Card style={{ padding: 12, marginBottom: 12 }}>
+            {activeHomeworks.slice(0, 5).map((s, i) => {
+              const hw = s.wordHomework;
+              const total = hw.words?.length || 0;
+              const done = hw.words?.filter(w => w.mastered).length || 0;
+              const pct = total ? Math.round(done/total*100) : 0;
+              return (
+                <div key={s.name} onClick={() => onNav("word-homework")}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    padding: "8px 4px", cursor: "pointer",
+                    borderBottom: i < Math.min(activeHomeworks.length, 5) - 1 ? `1px solid ${T.border}` : "none"
+                  }}>
+                  <div style={{ fontSize: 22 }}>{s.avatar || "🙂"}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 800, color: T.text }}>{s.name}</div>
+                    <div style={{ fontSize: 10, color: T.textMid, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hw.title}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 12, fontWeight: 900, color: pct === 100 ? T.green : T.accent }}>{done}/{total}</div>
+                    <div style={{ width: 60, height: 4, background: T.border, borderRadius: 2, marginTop: 2, overflow: "hidden" }}>
+                      <div style={{ width: `${pct}%`, height: "100%", background: pct === 100 ? T.green : T.accent }} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            {activeHomeworks.length > 5 && (
+              <div onClick={() => onNav("word-homework")} style={{ textAlign: "center", padding: "8px 0 2px", fontSize: 11, fontWeight: 700, color: T.accent, cursor: "pointer" }}>
+                전체 {activeHomeworks.length}건 보기 →
+              </div>
+            )}
+          </Card>
+        </>
+      )}
     </div>
   );
 }
@@ -1676,7 +1747,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
     report:       { title:"월간 성적표",       back: "more" },
     parent:       { title:"학부모 뷰어",       back: "more" },
     attendance:   { title:"출석 기록",         back: "more" },
-    "word-homework": { title:"📚 단어 숙제 관리", back: "more" },
+    "word-homework": { title:"📚 단어 숙제 관리", back: "dashboard" },
     "student-report": { title:"학생 상세 리포트", back: "students" },
   };
 
@@ -1741,10 +1812,29 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
         {screen === "more" && (
           <div>
             <div style={{ fontSize: 16, fontWeight: 900, color: T.text, marginBottom: 4 }}>✨ 더 많은 기능</div>
-            <div style={{ fontSize: 11, color: T.textMid, marginBottom: 14 }}>신규 기능 모음</div>
+            <div style={{ fontSize: 11, color: T.textMid, marginBottom: 14 }}>학습 자료 · 통계 · 관리</div>
+
+            {/* 학습 자료 그룹 */}
+            <div style={{ fontSize: 11, fontWeight: 800, color: T.accent, marginBottom: 8, letterSpacing: 0.5 }}>📖 학습 자료</div>
+            <div className="grid-2" style={{ marginBottom: 16 }}>
+              {[
+                { id:"bank",         icon:"📚", label:"문제 은행",        desc:"문제 추가 / 편집" },
+                { id:"exam-builder", icon:"✏️", label:"시험지 만들기",    desc:"새 시험지 생성" },
+                { id:"exams",        icon:"📋", label:"시험지 목록",      desc:"만든 시험지 보기 / 인쇄" },
+                { id:"students",     icon:"📈", label:"학생 통계",        desc:"전체 학습 현황 분석" },
+              ].map(m => (
+                <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 14, textAlign: "center" }}>
+                  <div style={{ fontSize: 28, marginBottom: 8 }}>{m.icon}</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: T.text, marginBottom: 4 }}>{m.label}</div>
+                  <div style={{ fontSize: 10, color: T.textMid, lineHeight: 1.4 }}>{m.desc}</div>
+                </Card>
+              ))}
+            </div>
+
+            {/* 관리 & 운영 그룹 */}
+            <div style={{ fontSize: 11, fontWeight: 800, color: T.purple, marginBottom: 8, letterSpacing: 0.5 }}>🛠️ 관리 & 운영</div>
             <div className="grid-2">
               {[
-                { id:"word-homework", icon:"📚", label:"단어 숙제 만들기", desc:"학년별 단어 추천 + 학생 배정" },
                 { id:"groups",     icon:"👥", label:"반별 그룹 관리",  desc:"반 만들고 일괄 과제 배정" },
                 { id:"goals",      icon:"🎯", label:"목표 설정",        desc:"학생별 월간 목표 지정" },
                 { id:"notice",     icon:"💬", label:"공지 & 메시지",    desc:"학생 앱에 공지 띄우기" },

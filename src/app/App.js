@@ -2,6 +2,20 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { QUESTION_BANK } from "./questionData";
 import { WORD_LEVELS, ALL_WORDS, getWordsByLevel } from "./wordData";
+
+// 게임에서 사용할 단어 풀 결정:
+//  - levelId === "homework"이면 학생의 활성 단어 숙제(미마스터 단어) 사용
+//  - 그 외엔 기존처럼 levelId로 단어 가져오기
+function getGameWordPool(levelId, student) {
+  if (levelId === "homework") {
+    const hw = student?.wordHomework;
+    if (hw?.active && hw.words?.length) {
+      const notMastered = hw.words.filter(w => !w.mastered);
+      return notMastered.length > 0 ? notMastered : hw.words; // 다 마스터하면 복습용으로 전체
+    }
+  }
+  return getWordsByLevel(levelId);
+}
 import {
   GroupManager, BadgeDisplay, BadgeCelebration, getEarnedBadges,
   NoticeManager, NoticeBanner, GoalManager, StudentGoalWidget,
@@ -9,7 +23,9 @@ import {
   ScheduleManager, ScheduleBanner,
   StudentDetailReport, AttendanceManager,
   StatsDashboard, StudentDetailModal,
-  computeStudentStats, getLevel, LEVEL_INFO
+  computeStudentStats, getLevel, LEVEL_INFO,
+  WordHomeworkManager, WordHomeworkPrint, WordHomeworkBanner,
+  getActiveHomeworkWords, updateWordMastery
 } from "./features";
 import {
   MemoryCardGame, DailyChallenge, WrongNoteGame, AnagramGame,
@@ -1616,6 +1632,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
     report:       { title:"월간 성적표",       back: "more" },
     parent:       { title:"학부모 뷰어",       back: "more" },
     attendance:   { title:"출석 기록",         back: "more" },
+    "word-homework": { title:"📚 단어 숙제 관리", back: "more" },
     "student-report": { title:"학생 상세 리포트", back: "students" },
   };
 
@@ -1674,6 +1691,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
         {screen === "parent"     && <ParentViewer students={students} />}
         {/* 신규 */}
         {screen === "attendance"      && <AttendanceManager students={students} attendance={attendance} setAttendance={setAttendance} />}
+        {screen === "word-homework"   && <WordHomeworkManager students={students} setStudents={setStudents} onNav={onNav} />}
         {screen === "student-report"  && <StudentDetailReport student={reportStudent} onBack={() => onNav("students")} />}
         {/* 더보기 메뉴 */}
         {screen === "more" && (
@@ -1682,6 +1700,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
             <div style={{ fontSize: 11, color: T.textMid, marginBottom: 14 }}>신규 기능 모음</div>
             <div className="grid-2">
               {[
+                { id:"word-homework", icon:"📚", label:"단어 숙제 만들기", desc:"학년별 단어 추천 + 학생 배정" },
                 { id:"groups",     icon:"👥", label:"반별 그룹 관리",  desc:"반 만들고 일괄 과제 배정" },
                 { id:"goals",      icon:"🎯", label:"목표 설정",        desc:"학생별 월간 목표 지정" },
                 { id:"notice",     icon:"💬", label:"공지 & 메시지",    desc:"학생 앱에 공지 띄우기" },
@@ -1730,7 +1749,7 @@ const MATCH_MODES = [
   { id: "mixed", label: "랜덤 섞기",   desc: "두 방향이 랜덤으로 섞여요", icon: "🔀",      question: "mixed", answer: "mixed" },
 ];
 
-function WordMatchGame({ name, setStudents, onExit, levelId = "all" }) {
+function WordMatchGame({ name, setStudents, student, onExit, levelId = "all" }) {
   const [mode, setMode] = useState(null); // null = 방향 선택 화면
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
@@ -1739,7 +1758,7 @@ function WordMatchGame({ name, setStudents, onExit, levelId = "all" }) {
 
   const questions = useMemo(() => {
     if (!mode) return [];
-    const pool = getWordsByLevel(levelId);
+    const pool = getGameWordPool(levelId, student);
     const picked = shuffle(pool).slice(0, 10);
     return picked.map(w => {
       // 이 문제의 방향 결정
@@ -1755,7 +1774,7 @@ function WordMatchGame({ name, setStudents, onExit, levelId = "all" }) {
         opts, ansIdx: opts.findIndex(o => o.en === w.en)
       };
     });
-  }, [mode, levelId]);
+  }, [mode, levelId, student?.wordHomework]);
 
   // ── 방향 선택 화면 ──
   if (!mode) {
@@ -1831,9 +1850,11 @@ function WordMatchGame({ name, setStudents, onExit, levelId = "all" }) {
       setScore(score + 1);
       setFeedback("correct");
       setWrongWord(null);
+      if (levelId === "homework") updateWordMastery(setStudents, name, q.en, true);
     } else {
       setFeedback("wrong");
       setWrongWord(q); // 틀렸을 때 정답 표시용
+      if (levelId === "homework") updateWordMastery(setStudents, name, q.en, false);
     }
     setTimeout(() => { setFeedback(null); setWrongWord(null); setRound(round + 1); }, 1000);
   };
@@ -1944,13 +1965,13 @@ function WordMatchGame({ name, setStudents, onExit, levelId = "all" }) {
 }
 
 // ── 게임 2: 스펠링 ────────────────────────────────────────────────────────
-function SpellingGame({ name, setStudents, onExit, levelId = "all" }) {
+function SpellingGame({ name, setStudents, student, onExit, levelId = "all" }) {
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState(null);
 
-  const questions = useMemo(() => shuffle(getWordsByLevel(levelId)).slice(0, 8), [levelId]);
+  const questions = useMemo(() => shuffle(getGameWordPool(levelId, student)).slice(0, 8), [levelId, student?.wordHomework]);
 
   if (round >= questions.length) {
     saveStudentRecord(setStudents, name, {
@@ -1975,9 +1996,11 @@ function SpellingGame({ name, setStudents, onExit, levelId = "all" }) {
 
   const submit = () => {
     if (feedback) return;
-    if (input.trim().toLowerCase() === q.en.toLowerCase()) {
+    const isCorrect = input.trim().toLowerCase() === q.en.toLowerCase();
+    if (isCorrect) {
       setScore(score + 1); setFeedback("correct");
     } else setFeedback("wrong");
+    if (levelId === "homework") updateWordMastery(setStudents, name, q.en, isCorrect);
     setTimeout(() => { setFeedback(null); setInput(""); setRound(round + 1); }, 1200);
   };
 
@@ -2009,7 +2032,7 @@ function SpellingGame({ name, setStudents, onExit, levelId = "all" }) {
 }
 
 // ── 게임 3: 스피드 퀴즈 (10초 + 방향 선택) ───────────────────────────────
-function SpeedQuiz({ name, setStudents, onExit, levelId = "all" }) {
+function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" }) {
   const [mode, setMode] = useState(null); // null = 방향 선택
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
@@ -2017,7 +2040,7 @@ function SpeedQuiz({ name, setStudents, onExit, levelId = "all" }) {
 
   const questions = useMemo(() => {
     if (!mode) return [];
-    const pool = getWordsByLevel(levelId);
+    const pool = getGameWordPool(levelId, student);
     const picked = shuffle(pool).slice(0, 10);
     return picked.map(w => {
       const dir = mode === "mixed" ? (Math.random() < 0.5 ? "ko2en" : "en2ko") : mode;
@@ -2027,7 +2050,7 @@ function SpeedQuiz({ name, setStudents, onExit, levelId = "all" }) {
       const opts = shuffle([w, ...wrongs]);
       return { ...w, dir, qField, aField, opts, ansIdx: opts.findIndex(o => o.en === w.en) };
     });
-  }, [mode, levelId]);
+  }, [mode, levelId, student?.wordHomework]);
 
   useEffect(() => {
     if (!mode || round >= questions.length) return;
@@ -2102,7 +2125,9 @@ function SpeedQuiz({ name, setStudents, onExit, levelId = "all" }) {
   const isKo2En = q.dir === "ko2en";
 
   const pick = (idx) => {
-    if (idx === q.ansIdx) setScore(score + 1);
+    const isCorrect = idx === q.ansIdx;
+    if (isCorrect) setScore(score + 1);
+    if (levelId === "homework") updateWordMastery(setStudents, name, q.en, isCorrect);
     setRound(round + 1);
   };
 
@@ -2163,10 +2188,10 @@ function SpeedQuiz({ name, setStudents, onExit, levelId = "all" }) {
 }
 
 // ── 게임 4: 플래시카드 (발음 기능 포함) ───────────────────────────────────
-function FlashCard({ name, setStudents, onExit, levelId = "all" }) {
+function FlashCard({ name, setStudents, student, onExit, levelId = "all" }) {
   const [idx, setIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
-  const cards = useMemo(() => shuffle(getWordsByLevel(levelId)).slice(0, 10), [levelId]);
+  const cards = useMemo(() => shuffle(getGameWordPool(levelId, student)).slice(0, 10), [levelId, student?.wordHomework]);
   const [studied, setStudied] = useState(0);
 
   // 카드가 바뀌면 자동으로 발음 재생
@@ -2319,11 +2344,11 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
     }
   }, []);
 
-  if (screen === "level-select" && pendingGame) return <LevelSelect gameInfo={pendingGame} onSelect={onLevelSelected} onCancel={exitGame} />;
-  if (screen === "game-match")    return <WordMatchGame name={name} setStudents={setStudents} onExit={exitGame} levelId={selectedLevel} />;
-  if (screen === "game-spell")    return <SpellingGame  name={name} setStudents={setStudents} onExit={exitGame} levelId={selectedLevel} />;
-  if (screen === "game-speed")    return <SpeedQuiz     name={name} setStudents={setStudents} onExit={exitGame} levelId={selectedLevel} />;
-  if (screen === "game-flash")    return <FlashCard     name={name} setStudents={setStudents} onExit={exitGame} levelId={selectedLevel} />;
+  if (screen === "level-select" && pendingGame) return <LevelSelect gameInfo={pendingGame} onSelect={onLevelSelected} onCancel={exitGame} student={me} />;
+  if (screen === "game-match")    return <WordMatchGame name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
+  if (screen === "game-spell")    return <SpellingGame  name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
+  if (screen === "game-speed")    return <SpeedQuiz     name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
+  if (screen === "game-flash")    return <FlashCard     name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
   if (screen === "game-sentence") return <SentenceGame  name={name} setStudents={setStudents} onExit={exitGame} />;
   // 신규 8개 게임
   if (screen === "game-memory")   return <MemoryCardGame name={name} setStudents={setStudents} onExit={exitGame} />;
@@ -2386,6 +2411,13 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
       <ScheduleBanner schedules={schedules} />
 
       <div className="app-container">
+        {/* 단어 숙제 배너 — 진행 중인 숙제가 있으면 최상단에 표시 */}
+        <WordHomeworkBanner student={me} onStart={() => {
+          setSelectedLevel("homework");
+          setPendingGame({ id: "game-match", name: "단어 맞추기" });
+          setScreen("game-match");
+        }} />
+
         {/* 배정된 과제 */}
         {(() => {
           const myAssigns = (typeof window !== "undefined"

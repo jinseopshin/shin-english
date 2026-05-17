@@ -6,6 +6,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   AreaChart, Area
 } from "recharts";
+import { WORD_LEVELS, WORD_CATEGORIES, ALL_WORDS, getWordsForGrade } from "./wordData";
 
 // ══════════════════════════════════════════════════════════════════════════
 //   Angela's English Academy - features.js
@@ -2074,3 +2075,429 @@ export function StatsDashboard({ students, onSelectStudent }) {
 // ══════════════════════════════════════════════════════════════════════════
 //   문제은행 / 출제 / 시험지
 // ══════════════════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════════════════
+//   📚 단어 숙제 시스템 (Word Homework)
+//   - WordHomeworkManager: 선생님이 학년별로 단어 추천받고 학생에게 배정
+//   - WordHomeworkPrint:   학생용 단어장 인쇄 (A4)
+//   - WordHomeworkBanner:  학생 홈에 표시되는 진행중 숙제 배너
+// ══════════════════════════════════════════════════════════════════════════
+
+// ── 학년 정보 (단어 추천용 — kinder/elem1/elem2/elem3/middle) ──
+const HW_LEVELS = [
+  { id: "kinder", label: "유치원", icon: "🌱", desc: "5~6세 기초" },
+  { id: "elem1",  label: "초1-2",  icon: "🌿", desc: "쉬운 단어" },
+  { id: "elem2",  label: "초3-4",  icon: "🍀", desc: "기본 단어" },
+  { id: "elem3",  label: "초5-6",  icon: "🌱", desc: "심화 단어" },
+  { id: "middle", label: "중학교", icon: "🌳", desc: "중학 수준" },
+];
+
+// ── 학생 학년(grade) → 추천 levelId 매핑 ──
+function gradeToLevelId(grade) {
+  if (!grade) return "elem1";
+  if (grade.includes("유치")) return "kinder";
+  if (grade === "초등1" || grade === "초등2") return "elem1";
+  if (grade === "초등3" || grade === "초등4") return "elem2";
+  if (grade === "초등5" || grade === "초등6") return "elem3";
+  if (grade.startsWith("중")) return "middle";
+  return "elem1";
+}
+
+// ════════════════════════════════════════════════════════════════════
+//   1) 선생님: 단어 숙제 관리자
+// ════════════════════════════════════════════════════════════════════
+export function WordHomeworkManager({ students, setStudents, onNav }) {
+  const studentList = Object.values(students || {});
+  const [step, setStep] = useState("list"); // list | create | print
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [levelId, setLevelId] = useState("elem1");
+  const [catFilter, setCatFilter] = useState("all");
+  const [picked, setPicked] = useState({}); // { en: true }
+  const [title, setTitle] = useState("");
+
+  // 학생 선택 시 학년에 맞는 추천 레벨 자동 세팅
+  const pickStudent = (s) => {
+    setSelectedStudent(s.name);
+    setLevelId(gradeToLevelId(s.grade));
+    setPicked({});
+    setTitle(`${s.name} 단어숙제 ${new Date().toISOString().slice(5,10)}`);
+    setStep("create");
+  };
+
+  const candidateWords = useMemo(() => {
+    const all = getWordsForGrade(levelId);
+    return catFilter === "all" ? all : all.filter(w => w.cat === catFilter);
+  }, [levelId, catFilter]);
+
+  const pickedCount = Object.values(picked).filter(Boolean).length;
+  const togglePick = (en) => setPicked(p => ({ ...p, [en]: !p[en] }));
+  const pickAll = () => {
+    const next = { ...picked };
+    candidateWords.forEach(w => { next[w.en] = true; });
+    setPicked(next);
+  };
+  const clearPick = () => setPicked({});
+
+  // 단어 숙제 저장 (학생에게 배정)
+  const saveHomework = () => {
+    if (!selectedStudent) return;
+    if (pickedCount === 0) { alert("최소 1개 이상의 단어를 선택해주세요"); return; }
+    const stu = students[selectedStudent];
+    if (stu?.wordHomework?.active) {
+      if (!confirm(`${selectedStudent} 학생에게 이미 진행 중인 숙제가 있습니다. 덮어쓸까요?`)) return;
+    }
+    const pickedWords = candidateWords.filter(w => picked[w.en]);
+    const homework = {
+      id: "hw_" + Date.now().toString(36),
+      title: title || `${selectedStudent} 단어숙제`,
+      createdAt: new Date().toISOString(),
+      levelId,
+      words: pickedWords.map(w => ({ en: w.en, ko: w.ko, cat: w.cat, mastered: false, correct: 0, wrong: 0 })),
+      active: true,
+    };
+    setStudents(prev => ({
+      ...prev,
+      [selectedStudent]: { ...prev[selectedStudent], wordHomework: homework }
+    }));
+    alert(`${selectedStudent} 학생에게 ${pickedWords.length}개 단어 숙제를 배정했어요!`);
+    setStep("list");
+    setSelectedStudent(null);
+    setPicked({});
+  };
+
+  // 숙제 취소
+  const cancelHomework = (studentName) => {
+    if (!confirm(`${studentName} 학생의 진행중인 단어 숙제를 취소할까요?`)) return;
+    setStudents(prev => {
+      const s = prev[studentName];
+      if (!s?.wordHomework) return prev;
+      return { ...prev, [studentName]: { ...s, wordHomework: { ...s.wordHomework, active: false, canceledAt: new Date().toISOString() } } };
+    });
+  };
+
+  // ── 화면 1: 학생 목록 ──
+  if (step === "list") {
+    return (
+      <div>
+        <div style={{ fontSize: 18, fontWeight: 900, color: T.text, marginBottom: 4 }}>📚 단어 숙제 만들기</div>
+        <div style={{ fontSize: 12, color: T.textMid, marginBottom: 16 }}>
+          학생을 선택하면 학년에 맞는 단어를 추천해드려요. 원하는 단어를 골라 숙제로 배정하세요.
+        </div>
+
+        {studentList.length === 0 ? (
+          <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: 30, textAlign: "center" }}>
+            <div style={{ fontSize: 40, marginBottom: 10 }}>👶</div>
+            <div style={{ fontSize: 13, color: T.textMid }}>먼저 [학생 관리]에서 학생을 등록해주세요.</div>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gap: 10 }}>
+            {studentList.map(s => {
+              const hw = s.wordHomework;
+              const active = hw?.active;
+              const total = hw?.words?.length || 0;
+              const done = hw?.words?.filter(w => w.mastered).length || 0;
+              return (
+                <div key={s.name} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: 14 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: active ? 10 : 0 }}>
+                    <div style={{ fontSize: 26 }}>{s.avatar || "🙂"}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, fontWeight: 900, color: T.text }}>{s.name}</div>
+                      <div style={{ fontSize: 11, color: T.textMid }}>{s.grade || "학년 미지정"}</div>
+                    </div>
+                    {!active && (
+                      <button onClick={() => pickStudent(s)} style={{
+                        background: T.accent, color: "white", border: "none", borderRadius: 10,
+                        padding: "8px 14px", fontSize: 12, fontWeight: 800, cursor: "pointer"
+                      }}>+ 숙제 만들기</button>
+                    )}
+                  </div>
+                  {active && (
+                    <div style={{ background: T.greenLight, borderRadius: 10, padding: 10, fontSize: 11 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                        <div style={{ fontWeight: 800, color: T.text }}>📖 진행중: {hw.title}</div>
+                        <div style={{ fontWeight: 800, color: T.green }}>{done}/{total}</div>
+                      </div>
+                      <div style={{ height: 6, background: "rgba(0,0,0,0.06)", borderRadius: 4, overflow: "hidden", marginBottom: 8 }}>
+                        <div style={{ width: `${total ? (done/total*100) : 0}%`, height: "100%", background: T.green }} />
+                      </div>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button onClick={() => { setSelectedStudent(s.name); setStep("print"); }}
+                          style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: "6px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: T.text }}>
+                          🖨️ 단어장 인쇄
+                        </button>
+                        <button onClick={() => cancelHomework(s.name)}
+                          style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: "6px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: T.red }}>
+                          숙제 취소
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── 화면 2: 단어 선택 ──
+  if (step === "create") {
+    const stu = students[selectedStudent];
+    const categories = ["all", ...Array.from(new Set(getWordsForGrade(levelId).map(w => w.cat)))];
+
+    return (
+      <div>
+        <button onClick={() => setStep("list")} style={{
+          background: "none", border: "none", color: T.accent, fontSize: 12, fontWeight: 700,
+          padding: "4px 0", marginBottom: 10, cursor: "pointer"
+        }}>← 학생 목록으로</button>
+
+        <div style={{ background: T.accentLight, borderRadius: 14, padding: 14, marginBottom: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ fontSize: 30 }}>{stu?.avatar || "🙂"}</div>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 900, color: T.text }}>{selectedStudent}</div>
+              <div style={{ fontSize: 11, color: T.textMid }}>{stu?.grade} · 추천: {HW_LEVELS.find(l => l.id === levelId)?.label}</div>
+            </div>
+          </div>
+        </div>
+
+        <input value={title} onChange={e => setTitle(e.target.value)} placeholder="숙제 이름 (예: 동물 단어 외우기)"
+          style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: `1px solid ${T.border}`,
+            fontSize: 13, marginBottom: 12, background: T.card, color: T.text }} />
+
+        {/* 학년 선택 */}
+        <div style={{ fontSize: 12, fontWeight: 800, color: T.textMid, marginBottom: 6 }}>📚 학년 수준</div>
+        <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
+          {HW_LEVELS.map(l => (
+            <button key={l.id} onClick={() => { setLevelId(l.id); setPicked({}); }}
+              style={{
+                background: levelId === l.id ? T.accent : T.card,
+                color: levelId === l.id ? "white" : T.text,
+                border: `1px solid ${levelId === l.id ? T.accent : T.border}`,
+                borderRadius: 10, padding: "8px 10px", fontSize: 11, fontWeight: 800, cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 4
+              }}>
+              <span>{l.icon}</span><span>{l.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* 카테고리 필터 */}
+        <div style={{ fontSize: 12, fontWeight: 800, color: T.textMid, marginBottom: 6 }}>🏷️ 카테고리</div>
+        <div style={{ display: "flex", gap: 5, marginBottom: 14, flexWrap: "wrap" }}>
+          {categories.map(c => (
+            <button key={c} onClick={() => setCatFilter(c)}
+              style={{
+                background: catFilter === c ? T.purple : T.card,
+                color: catFilter === c ? "white" : T.text,
+                border: `1px solid ${catFilter === c ? T.purple : T.border}`,
+                borderRadius: 8, padding: "5px 9px", fontSize: 11, fontWeight: 700, cursor: "pointer"
+              }}>
+              {c === "all" ? "전체" : `${WORD_CATEGORIES[c]?.icon || ""} ${c}`}
+            </button>
+          ))}
+        </div>
+
+        {/* 선택 컨트롤 */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, padding: "8px 0", borderTop: `1px solid ${T.border}`, borderBottom: `1px solid ${T.border}` }}>
+          <div style={{ fontSize: 12, color: T.textMid }}>
+            <span style={{ fontWeight: 900, color: T.accent, fontSize: 14 }}>{pickedCount}</span>
+            <span> / {candidateWords.length}개 선택</span>
+          </div>
+          <div style={{ display: "flex", gap: 6 }}>
+            <button onClick={pickAll} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: "4px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: T.text }}>전체</button>
+            <button onClick={clearPick} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: "4px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", color: T.textMid }}>해제</button>
+          </div>
+        </div>
+
+        {/* 단어 그리드 */}
+        <div style={{ maxHeight: 400, overflowY: "auto", marginBottom: 14, padding: 2 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 6 }}>
+            {candidateWords.map(w => {
+              const isPicked = !!picked[w.en];
+              return (
+                <button key={w.en} onClick={() => togglePick(w.en)}
+                  style={{
+                    background: isPicked ? T.accentLight : T.card,
+                    border: `2px solid ${isPicked ? T.accent : T.border}`,
+                    borderRadius: 10, padding: "8px 10px", cursor: "pointer", textAlign: "left",
+                    transition: "all 0.1s"
+                  }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>{w.en}</div>
+                    {isPicked && <span style={{ fontSize: 14 }}>✓</span>}
+                  </div>
+                  <div style={{ fontSize: 11, color: T.textMid, marginTop: 2 }}>{w.ko}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <button onClick={saveHomework} disabled={pickedCount === 0}
+          style={{
+            width: "100%", background: pickedCount === 0 ? T.border : T.green, color: "white",
+            border: "none", borderRadius: 12, padding: "14px 16px",
+            fontSize: 15, fontWeight: 900, cursor: pickedCount === 0 ? "not-allowed" : "pointer"
+          }}>
+          📬 {selectedStudent}에게 {pickedCount}개 단어 숙제로 배정하기
+        </button>
+      </div>
+    );
+  }
+
+  // ── 화면 3: 인쇄 ──
+  if (step === "print") {
+    return <WordHomeworkPrint student={students[selectedStudent]} onBack={() => setStep("list")} />;
+  }
+
+  return null;
+}
+
+// ════════════════════════════════════════════════════════════════════
+//   2) 단어장 인쇄 컴포넌트 (A4 형식)
+// ════════════════════════════════════════════════════════════════════
+export function WordHomeworkPrint({ student, onBack }) {
+  const hw = student?.wordHomework;
+  if (!hw || !hw.words) {
+    return (
+      <div style={{ padding: 30, textAlign: "center", color: T.textMid }}>
+        진행중인 단어 숙제가 없어요.
+        <div style={{ marginTop: 16 }}>
+          <button onClick={onBack} style={{ background: T.accent, color: "white", border: "none", borderRadius: 10, padding: "8px 16px", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>← 돌아가기</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="no-print" style={{ marginBottom: 14, display: "flex", gap: 8 }}>
+        <button onClick={onBack} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: "8px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: T.text }}>← 돌아가기</button>
+        <button onClick={() => window.print()} style={{ flex: 1, background: T.accent, color: "white", border: "none", borderRadius: 10, padding: "10px 16px", fontSize: 13, fontWeight: 900, cursor: "pointer" }}>
+          🖨️ 단어장 인쇄하기
+        </button>
+      </div>
+
+      <div className="exam-print-body" style={{ background: "white", padding: "24px 22px", borderRadius: 8, boxShadow: T.shadow, color: "#222" }}>
+        {/* 헤더 */}
+        <div style={{ textAlign: "center", borderBottom: "2px solid #333", paddingBottom: 10, marginBottom: 16 }}>
+          <div style={{ fontSize: 22, fontWeight: 900, marginBottom: 4 }}>📚 {hw.title}</div>
+          <div style={{ fontSize: 11, color: "#666" }}>
+            이름: <span style={{ borderBottom: "1px solid #999", padding: "0 30px" }}>{student.name}</span>
+            <span style={{ margin: "0 14px" }}>·</span>
+            날짜: <span style={{ borderBottom: "1px solid #999", padding: "0 40px" }}>{hw.createdAt?.slice(0, 10)}</span>
+          </div>
+        </div>
+
+        {/* 단어 목록 - 단어장 형식 */}
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+          <thead>
+            <tr style={{ borderBottom: "2px solid #333" }}>
+              <th style={{ padding: "8px 4px", width: 40, textAlign: "center" }}>#</th>
+              <th style={{ padding: "8px 6px", textAlign: "left" }}>English</th>
+              <th style={{ padding: "8px 6px", textAlign: "left" }}>한글 뜻</th>
+              <th style={{ padding: "8px 6px", width: 70, textAlign: "center" }}>분류</th>
+              <th style={{ padding: "8px 4px", width: 60, textAlign: "center" }}>체크</th>
+            </tr>
+          </thead>
+          <tbody>
+            {hw.words.map((w, i) => (
+              <tr key={w.en} style={{ borderBottom: "1px solid #ddd" }}>
+                <td style={{ padding: "6px 4px", textAlign: "center", color: "#888" }}>{i + 1}</td>
+                <td style={{ padding: "6px 6px", fontWeight: 700 }}>{w.en}</td>
+                <td style={{ padding: "6px 6px" }}>{w.ko}</td>
+                <td style={{ padding: "6px 6px", textAlign: "center", fontSize: 11, color: "#666" }}>{w.cat}</td>
+                <td style={{ padding: "6px 4px", textAlign: "center" }}>
+                  <span style={{ display: "inline-block", width: 18, height: 18, border: "1.5px solid #888", borderRadius: 3 }}></span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div style={{ marginTop: 18, fontSize: 11, color: "#888", textAlign: "right" }}>
+          Angela's English Academy · 단어장
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════
+//   3) 학생 홈 화면: 진행중 단어 숙제 배너
+// ════════════════════════════════════════════════════════════════════
+export function WordHomeworkBanner({ student, onStart }) {
+  const hw = student?.wordHomework;
+  if (!hw?.active || !hw.words?.length) return null;
+
+  const total = hw.words.length;
+  const done = hw.words.filter(w => w.mastered).length;
+  const progress = total ? Math.round(done / total * 100) : 0;
+  const allDone = done === total;
+
+  return (
+    <div style={{
+      background: allDone
+        ? `linear-gradient(135deg, ${T.green} 0%, ${T.accent} 100%)`
+        : `linear-gradient(135deg, ${T.accent} 0%, ${T.purple} 100%)`,
+      borderRadius: 14, padding: 14, marginBottom: 14, color: "white",
+      boxShadow: T.shadow
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+        <div style={{ fontSize: 30 }}>{allDone ? "🎉" : "📚"}</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 11, opacity: 0.9 }}>{allDone ? "단어 숙제 완료!" : "선생님이 내준 단어 숙제"}</div>
+          <div style={{ fontSize: 15, fontWeight: 900 }}>{hw.title}</div>
+        </div>
+        <div style={{ background: "rgba(255,255,255,0.25)", borderRadius: 10, padding: "6px 10px", textAlign: "center" }}>
+          <div style={{ fontSize: 16, fontWeight: 900 }}>{done}/{total}</div>
+          <div style={{ fontSize: 9, opacity: 0.9 }}>마스터</div>
+        </div>
+      </div>
+      <div style={{ height: 8, background: "rgba(255,255,255,0.25)", borderRadius: 4, overflow: "hidden", marginBottom: 10 }}>
+        <div style={{ width: `${progress}%`, height: "100%", background: "white", transition: "width 0.4s" }} />
+      </div>
+      <button onClick={onStart} style={{
+        width: "100%", background: "white", color: T.accent,
+        border: "none", borderRadius: 10, padding: "10px 14px",
+        fontSize: 13, fontWeight: 900, cursor: "pointer"
+      }}>
+        {allDone ? "🏆 한번 더 도전하기" : "▶️ 숙제 단어로 게임 시작"}
+      </button>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════
+//   4) 단어 마스터 진도 업데이트 헬퍼
+//   게임에서 정답/오답 시 호출 — 3번 연속 맞추면 마스터로 처리
+// ════════════════════════════════════════════════════════════════════
+export function updateWordMastery(setStudents, studentName, wordEn, isCorrect) {
+  setStudents(prev => {
+    const s = prev[studentName];
+    if (!s?.wordHomework?.active) return prev;
+    const words = s.wordHomework.words.map(w => {
+      if (w.en !== wordEn) return w;
+      if (isCorrect) {
+        const correct = (w.correct || 0) + 1;
+        // 3번 누적 정답 시 마스터
+        return { ...w, correct, mastered: correct >= 3 };
+      } else {
+        return { ...w, wrong: (w.wrong || 0) + 1, correct: 0 }; // 틀리면 카운터 리셋
+      }
+    });
+    return { ...prev, [studentName]: { ...s, wordHomework: { ...s.wordHomework, words } } };
+  });
+}
+
+// 활성 숙제의 미마스터 단어들만 반환 (학생 게임용)
+export function getActiveHomeworkWords(student) {
+  const hw = student?.wordHomework;
+  if (!hw?.active || !hw.words?.length) return null;
+  const notMastered = hw.words.filter(w => !w.mastered);
+  // 마스터되지 않은 단어가 있으면 그것만, 모두 마스터했으면 전체 단어 복습
+  return notMastered.length > 0 ? notMastered : hw.words;
+}

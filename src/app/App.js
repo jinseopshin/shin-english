@@ -2325,10 +2325,9 @@ function WordMatchGame({ name, setStudents, student, onExit, levelId = "all" }) 
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState(null);
   const [wrongWord, setWrongWord] = useState(null);
-
   const [isFav, setIsFav] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
-  
+
   const questions = useMemo(() => {
     if (!mode) return [];
     const pool = getGameWordPool(levelId, student);
@@ -2338,8 +2337,8 @@ function WordMatchGame({ name, setStudents, student, onExit, levelId = "all" }) 
       const dir = mode.id === "mixed"
         ? (Math.random() < 0.5 ? "ko2en" : "en2ko")
         : mode.id;
-      const qField = dir === "ko2en" ? "ko" : "en"; // 문제로 보여줄 것
-      const aField = dir === "ko2en" ? "en" : "ko"; // 정답 보기에 표시할 것
+      const qField = dir === "ko2en" ? "ko" : "en";
+      const aField = dir === "ko2en" ? "en" : "ko";
       const wrongs = shuffle(pool.filter(x => x.en !== w.en)).slice(0, 3);
       const opts = shuffle([w, ...wrongs]);
       return {
@@ -2348,6 +2347,32 @@ function WordMatchGame({ name, setStudents, student, onExit, levelId = "all" }) 
       };
     });
   }, [mode, levelId, student?.wordHomework]);
+
+  // ⭐ 단어장 등록 여부 — 문제가 바뀔 때마다 자동 체크 (early return 위에 있어야 함!)
+  useEffect(() => {
+    const q = questions[round];
+    if (!q) { setIsFav(false); return; }
+    let cancelled = false;
+    isInWordbook(name, q.en).then(result => {
+      if (!cancelled) setIsFav(result);
+    });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [round, questions]);
+
+  const toggleFav = async () => {
+    const q = questions[round];
+    if (favLoading || !q) return;
+    setFavLoading(true);
+    if (isFav) {
+      await removeFromWordbook(name, q.en);
+      setIsFav(false);
+    } else {
+      await addToWordbook(name, q);
+      setIsFav(true);
+    }
+    setFavLoading(false);
+  };
 
   // ── 방향 선택 화면 ──
   if (!mode) {
@@ -2416,29 +2441,6 @@ function WordMatchGame({ name, setStudents, student, onExit, levelId = "all" }) 
   }
 
   const q = questions[round];
-// 문제 바뀔 때마다 단어장 등록 여부 확인
-  useEffect(() => {
-    if (!q) return;
-    let cancelled = false;
-    isInWordbook(name, q.en).then(result => {
-      if (!cancelled) setIsFav(result);
-    });
-    return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [round]);
-
-  const toggleFav = async () => {
-    if (favLoading || !q) return;
-    setFavLoading(true);
-    if (isFav) {
-      await removeFromWordbook(name, q.en);
-      setIsFav(false);
-    } else {
-      await addToWordbook(name, q);
-      setIsFav(true);
-    }
-    setFavLoading(false);
-  };
 
   const pick = (idx) => {
     if (feedback) return;
@@ -2449,7 +2451,7 @@ function WordMatchGame({ name, setStudents, student, onExit, levelId = "all" }) 
       if (levelId === "homework") updateWordMastery(setStudents, name, q.en, true);
     } else {
       setFeedback("wrong");
-      setWrongWord(q); // 틀렸을 때 정답 표시용
+      setWrongWord(q);
       if (levelId === "homework") updateWordMastery(setStudents, name, q.en, false);
     }
     setTimeout(() => { setFeedback(null); setWrongWord(null); setRound(round + 1); }, 1000);
@@ -2475,7 +2477,7 @@ function WordMatchGame({ name, setStudents, student, onExit, levelId = "all" }) 
         <Tag color="yellow">⭐ {score}</Tag>
       </div>
 
-{/* ⭐ 단어장 토글 (상단 우측) */}
+      {/* ⭐ 단어장 토글 (상단 우측) */}
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}>
         <button onClick={toggleFav} disabled={favLoading} style={{
           padding: "5px 10px", borderRadius: 8,
@@ -2486,8 +2488,9 @@ function WordMatchGame({ name, setStudents, student, onExit, levelId = "all" }) 
         }}>
           {isFav ? "⭐ 단어장" : "☆ 단어장 추가"}
         </button>
-      </div>      
-{/* 진도바 */}
+      </div>
+
+      {/* 진도바 */}
       <div style={{ height: 5, background: T.border, borderRadius: 3, marginBottom: 16, overflow: "hidden" }}>
         <div style={{
           height: "100%", borderRadius: 3, transition: "width 0.3s",
@@ -2537,7 +2540,7 @@ function WordMatchGame({ name, setStudents, student, onExit, levelId = "all" }) 
           const isCorrect = idx === q.ansIdx;
           let bg = T.card, color = T.text, borderColor = T.border;
           if (feedback === "correct" && isCorrect) { bg = T.green; color = "white"; borderColor = T.green; }
-          else if (feedback === "wrong" && isCorrect) { bg = T.green; color = "white"; borderColor = T.green; } // 정답 강조
+          else if (feedback === "wrong" && isCorrect) { bg = T.green; color = "white"; borderColor = T.green; }
           else if (feedback === "wrong" && !isCorrect) { bg = T.card; color = T.textDim; }
           return (
             <button key={idx} onClick={() => pick(idx)} disabled={!!feedback} style={{

@@ -37,6 +37,7 @@ import { AIQuestionGenerator } from "./aiQuestions";
 import { supabase, isSupabaseReady, testConnection, getAdapter } from "./supabaseClient";
 import { SupabaseMigration } from "./SupabaseMigration";
 import { MyWordbook } from "./MyWordbook";
+import { addToWordbook, removeFromWordbook, isInWordbook } from "./studentWords";
 
 // ── 음성 합성 (발음 기능) ─────────────────────────────────────────────────
 function speak(text) {
@@ -2325,6 +2326,9 @@ function WordMatchGame({ name, setStudents, student, onExit, levelId = "all" }) 
   const [feedback, setFeedback] = useState(null);
   const [wrongWord, setWrongWord] = useState(null);
 
+  const [isFav, setIsFav] = useState(false);
+  const [favLoading, setFavLoading] = useState(false);
+  
   const questions = useMemo(() => {
     if (!mode) return [];
     const pool = getGameWordPool(levelId, student);
@@ -2412,6 +2416,29 @@ function WordMatchGame({ name, setStudents, student, onExit, levelId = "all" }) 
   }
 
   const q = questions[round];
+// 문제 바뀔 때마다 단어장 등록 여부 확인
+  useEffect(() => {
+    if (!q) return;
+    let cancelled = false;
+    isInWordbook(name, q.en).then(result => {
+      if (!cancelled) setIsFav(result);
+    });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [round]);
+
+  const toggleFav = async () => {
+    if (favLoading || !q) return;
+    setFavLoading(true);
+    if (isFav) {
+      await removeFromWordbook(name, q.en);
+      setIsFav(false);
+    } else {
+      await addToWordbook(name, q);
+      setIsFav(true);
+    }
+    setFavLoading(false);
+  };
 
   const pick = (idx) => {
     if (feedback) return;
@@ -2448,7 +2475,19 @@ function WordMatchGame({ name, setStudents, student, onExit, levelId = "all" }) 
         <Tag color="yellow">⭐ {score}</Tag>
       </div>
 
-      {/* 진도바 */}
+{/* ⭐ 단어장 토글 (상단 우측) */}
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}>
+        <button onClick={toggleFav} disabled={favLoading} style={{
+          padding: "5px 10px", borderRadius: 8,
+          background: isFav ? "#fef3c7" : "white",
+          color: isFav ? "#f59e0b" : T.textMid,
+          border: `1.5px solid ${isFav ? "#f59e0b" : T.border}`,
+          fontSize: 11, fontWeight: 800, cursor: favLoading ? "wait" : "pointer",
+        }}>
+          {isFav ? "⭐ 단어장" : "☆ 단어장 추가"}
+        </button>
+      </div>      
+{/* 진도바 */}
       <div style={{ height: 5, background: T.border, borderRadius: 3, marginBottom: 16, overflow: "hidden" }}>
         <div style={{
           height: "100%", borderRadius: 3, transition: "width 0.3s",
@@ -2761,6 +2800,8 @@ function FlashCard({ name, setStudents, student, onExit, levelId = "all" }) {
   const [idx, setIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const cards = useMemo(() => shuffle(getGameWordPool(levelId, student)).slice(0, 10), [levelId, student?.wordHomework]);
+  const [isFav, setIsFav] = useState(false);
+  const [favLoading, setFavLoading] = useState(false);
   const [studied, setStudied] = useState(0);
 
   // 카드가 바뀌면 자동으로 발음 재생
@@ -2768,6 +2809,31 @@ function FlashCard({ name, setStudents, student, onExit, levelId = "all" }) {
     if (cards[idx]) speak(cards[idx].en);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx]);
+
+  // 카드 바뀔 때마다 단어장 등록 여부 확인
+  useEffect(() => {
+    if (!cards[idx]) return;
+    let cancelled = false;
+    isInWordbook(name, cards[idx].en).then(result => {
+      if (!cancelled) setIsFav(result);
+    });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx]);
+
+  // ⭐ 토글
+  const toggleFav = async () => {
+    if (favLoading || !cards[idx]) return;
+    setFavLoading(true);
+    if (isFav) {
+      await removeFromWordbook(name, cards[idx].en);
+      setIsFav(false);
+    } else {
+      await addToWordbook(name, cards[idx]);
+      setIsFav(true);
+    }
+    setFavLoading(false);
+  };
 
   const next = () => {
     if (idx < cards.length - 1) { setIdx(idx + 1); setFlipped(false); setStudied(studied + 1); }
@@ -2806,7 +2872,16 @@ function FlashCard({ name, setStudents, student, onExit, levelId = "all" }) {
           {flipped ? c.en : c.ko} <span style={{ opacity: 0.5 }}>· {c.cat}</span>
         </div>
       </div>
-
+{/* ⭐ 단어장 토글 */}
+      <button onClick={(e) => { e.stopPropagation(); toggleFav(); }} disabled={favLoading} style={{
+        width: "100%", marginBottom: 8, padding: "10px",
+        background: isFav ? "#fef3c7" : "white",
+        color: isFav ? "#f59e0b" : T.textMid,
+        border: `2px solid ${isFav ? "#f59e0b" : T.border}`,
+        borderRadius: 12, fontSize: 13, fontWeight: 800, cursor: favLoading ? "wait" : "pointer",
+      }}>
+        {isFav ? "⭐ 내 단어장에 있어요" : "☆ 내 단어장에 추가"}
+      </button>
       {/* 발음 버튼 */}
       <Btn v="secondary" size="lg" onClick={(e) => { e.stopPropagation(); speak(c.en); }} style={{ width: "100%", marginBottom: 12 }}>
         🔊 발음 듣기

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { QUESTION_BANK } from "./questionData";
 import { WORD_LEVELS, ALL_WORDS, getWordsByLevel } from "./wordData";
 
@@ -34,7 +34,7 @@ import {
   PictureWordGame, WordMatchLines, WordSearchGame, DictationGame
 } from "./games";
 import { AIQuestionGenerator } from "./aiQuestions";
-import { SupabaseMigration } from "./SupabaseMigration";
+import { supabase, isSupabaseReady, testConnection, getAdapter } from "./supabaseClient";
 
 // ── 음성 합성 (발음 기능) ─────────────────────────────────────────────────
 function speak(text) {
@@ -143,7 +143,6 @@ function useStorage(key, initial) {
           const data = await adapter.fetch();
           if (!cancelled && data !== undefined && data !== null) {
             setVal(data);
-            // localStorage에도 캐시 (오프라인 폴백)
             try { window.localStorage.setItem(key, JSON.stringify(data)); } catch {}
             setHydrated(true);
             return;
@@ -164,12 +163,10 @@ function useStorage(key, initial) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
-  // 값 변경 시: localStorage 즉시 저장 + Supabase는 디바운스(500ms)로 저장
+  // 값 변경 시: localStorage 즉시 저장 + Supabase는 500ms 디바운스
   useEffect(() => {
     if (!hydrated) return;
-    // localStorage 즉시 저장 (백업)
     try { window.localStorage.setItem(key, JSON.stringify(val)); } catch {}
-    // Supabase 디바운스 저장 (연속 변경을 1회로 묶음)
     const adapter = getAdapter(key);
     if (adapter && isSupabaseReady()) {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);

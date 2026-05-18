@@ -4,8 +4,13 @@ import { ALL_WORDS, getWordsByLevel } from "./wordData";
 
 // ══════════════════════════════════════════════════════════════════════════
 //   Angela's English Academy — games.js
-//   8개 신규 게임: 메모리카드 / 데일리챌린지 / 단어월드RPG /
-//                  오답노트 / 애너그램 / 타이핑레이스 / 릴레이 / 스무고개
+//   12개 게임: 메모리카드 / 데일리챌린지 / 오답노트 / 애너그램 /
+//              타이핑레이스 / 단어릴레이 / 스무고개 / 단어월드RPG /
+//              그림단어 / 단어연결 / 단어찾기퍼즐 / 받아쓰기
+//
+//   ⚠️ 모든 게임의 결과 화면에서 setStudents 호출은 useEffect 안에서
+//      awardedRef.current 로 단 한 번만 실행되도록 패턴 통일.
+//      (렌더 중 setState 호출 → React error #185 무한루프 방지)
 // ══════════════════════════════════════════════════════════════════════════
 
 // 영어 발음 재생 헬퍼
@@ -61,6 +66,34 @@ const safeCAF = (id) => { if (isBrowser && id) cancelAnimationFrame(id); };
 const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
 const uid = () => Math.random().toString(36).slice(2, 9);
 
+// ── 공통: 학생 기록 저장 헬퍼 ──────────────────────────────────────────
+// 모든 게임에서 동일하게 사용하기 위한 헬퍼.
+// 결과 화면 렌더링 중이 아니라 useEffect 안에서만 호출되어야 함.
+function saveGameRecord(setStudents, name, gameType, score, total, points) {
+  if (typeof setStudents !== "function") return;
+  setStudents(prev => {
+    const s = prev[name] || {};
+    return {
+      ...prev,
+      [name]: {
+        ...s,
+        points: (s.points || 0) + points,
+        records: [
+          ...(s.records || []),
+          {
+            type: "game",
+            gameType,
+            score,
+            total,
+            points,
+            date: new Date().toISOString()
+          }
+        ].slice(-50)
+      }
+    };
+  });
+}
+
 function Btn({ children, onClick, v="primary", size="md", style={}, disabled }) {
   const vs = {
     primary:{bg:T.accent,color:"white"}, secondary:{bg:T.accentLight,color:T.accent},
@@ -110,6 +143,7 @@ export function MemoryCardGame({ name, setStudents, onExit }) {
   const [startTime, setStartTime] = useState(null);
   const [elapsed, setElapsed] = useState(0);
   const timerRef = useRef(null);
+  const awardedRef = useRef(false);
 
   // 타이머
   useEffect(() => {
@@ -118,6 +152,15 @@ export function MemoryCardGame({ name, setStudents, onExit }) {
       return () => clearInterval(timerRef.current);
     }
   }, [startTime, done]);
+
+  // ✅ 게임 완료 시 점수 저장 (한 번만)
+  useEffect(() => {
+    if (!done || awardedRef.current) return;
+    awardedRef.current = true;
+    const bonus = Math.max(0, 200 - elapsed);
+    const pts = matched.size * 10 + bonus;
+    saveGameRecord(setStudents, name, "메모리카드", matched.size, matched.size, pts);
+  }, [done, elapsed, matched.size, name, setStudents]);
 
   const initGame = useCallback((n) => {
     const pool = shuffle(ALL_WORDS).slice(0, n);
@@ -128,6 +171,7 @@ export function MemoryCardGame({ name, setStudents, onExit }) {
     setCards(deck); setFlipped([]); setMatched(new Set());
     setMoves(0); setDone(false); setElapsed(0);
     setStartTime(Date.now());
+    awardedRef.current = false;
   }, []);
 
   const flip = useCallback((idx) => {
@@ -144,18 +188,10 @@ export function MemoryCardGame({ name, setStudents, onExit }) {
         if (nm.size === cards.length / 2) {
           clearInterval(timerRef.current);
           setDone(true);
-          const bonus = Math.max(0, 200 - elapsed);
-          if (typeof setStudents==="function") {
-            setStudents(prev => {
-              const s = prev[name]||{};
-              const pts = nm.size * 10 + bonus;
-              return {...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"메모리카드",score:nm.size,total:nm.size,points:pts,date:new Date().toISOString()}].slice(-50)}};
-            });
-          }
         }
       } else setTimeout(() => setFlipped([]), 900);
     }
-  }, [flipped, matched, cards, elapsed, name, setStudents]);
+  }, [flipped, matched, cards]);
 
   // 난이도 선택
   if (!size) return (
@@ -240,6 +276,7 @@ export function DailyChallenge({ name, setStudents, onExit }) {
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState(null);
   const [phase, setPhase] = useState("quiz"); // quiz | result
+  const awardedRef = useRef(false);
 
   // 오늘 날짜 시드로 고정 단어 5개 (매일 같은 단어)
   const dailyWords = useMemo(() => {
@@ -252,6 +289,16 @@ export function DailyChallenge({ name, setStudents, onExit }) {
       return {...w,opts,ansIdx:opts.findIndex(o=>o.en===w.en)};
     });
   },[today]);
+
+  // ✅ 결과 화면 진입 시 점수 저장 + localStorage 기록 (한 번만)
+  useEffect(() => {
+    if (phase !== "result" || awardedRef.current) return;
+    awardedRef.current = true;
+    const bonus = score === 5 ? 50 : 0;
+    const pts = score * 15 + bonus;
+    saveGameRecord(setStudents, name, "데일리챌린지", score, 5, pts);
+    ls.set(storageKey, { score, completedAt: new Date().toISOString() });
+  }, [phase, score, name, setStudents, storageKey]);
 
   // 이미 오늘 완료했으면
   if (status) {
@@ -273,13 +320,6 @@ export function DailyChallenge({ name, setStudents, onExit }) {
   if (phase==="result") {
     const bonus = score===5?50:0;
     const pts = score*15+bonus;
-    if (typeof setStudents==="function") {
-      setStudents(prev=>{
-        const s=prev[name]||{};
-        return {...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"데일리챌린지",score,total:5,points:pts,date:new Date().toISOString()}].slice(-50)}};
-      });
-    }
-    ls.set(storageKey, {score, completedAt:new Date().toISOString()});
     return (
       <div style={{minHeight:"100vh",background:T.bg,padding:"48px 20px",textAlign:"center"}}>
         <div style={{fontSize:72,marginBottom:12}}>{score===5?"🏆":score>=3?"🎉":"💪"}</div>
@@ -389,6 +429,7 @@ export function WrongNoteGame({ name, students, setStudents, onExit }) {
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState(null);
   const [done, setDone] = useState(false);
+  const awardedRef = useRef(false);
 
   // 오답 단어 추출 (과거 기록에서 틀린 것들)
   const wrongWords = useMemo(()=>{
@@ -410,6 +451,16 @@ export function WrongNoteGame({ name, students, setStudents, onExit }) {
     } catch { return []; }
   },[name]);
 
+  const gameOver = done || round >= wrongWords.length;
+
+  // ✅ 게임 종료 시 점수 저장 (한 번만)
+  useEffect(() => {
+    if (wrongWords.length === 0 || !gameOver || awardedRef.current) return;
+    awardedRef.current = true;
+    const pts = score * 12;
+    saveGameRecord(setStudents, name, "오답노트", score, wrongWords.length, pts);
+  }, [gameOver, wrongWords.length, score, name, setStudents]);
+
   if (wrongWords.length===0) return (
     <div style={{minHeight:"100vh",background:T.bg,padding:"60px 20px",textAlign:"center"}}>
       <div style={{fontSize:64,marginBottom:12}}>🎉</div>
@@ -419,12 +470,8 @@ export function WrongNoteGame({ name, students, setStudents, onExit }) {
     </div>
   );
 
-  if (done || round>=wrongWords.length) {
-    const pts=score*12;
-    if(typeof setStudents==="function"){
-      setStudents(prev=>{const s=prev[name]||{};return {...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"오답노트",score,total:wrongWords.length,points:pts,date:new Date().toISOString()}].slice(-50)}};});
-    }
-    return <ResultScreen score={score} total={wrongWords.length} title="오답 노트 복습 완료!" onExit={onExit} onRetry={()=>{setRound(0);setScore(0);setDone(false);setPicked(null);}} />;
+  if (gameOver) {
+    return <ResultScreen score={score} total={wrongWords.length} title="오답 노트 복습 완료!" onExit={onExit} onRetry={()=>{setRound(0);setScore(0);setDone(false);setPicked(null);awardedRef.current=false;}} />;
   }
 
   const q = wrongWords[round];
@@ -496,6 +543,7 @@ export function AnagramGame({ name, setStudents, onExit }) {
   const [answer, setAnswer] = useState([]);
   const [feedback, setFeedback] = useState(null);
   const [done, setDone] = useState(false);
+  const awardedRef = useRef(false);
 
   const questions = useMemo(()=>shuffle(ALL_WORDS.filter(w=>w.en.length>=3&&w.en.length<=8&&!w.en.includes(" "))).slice(0,10),[]);
 
@@ -508,10 +556,18 @@ export function AnagramGame({ name, setStudents, onExit }) {
     }
   },[round,questions]);
 
-  if(done||round>=questions.length){
-    const pts=score*15;
-    if(typeof setStudents==="function"){setStudents(prev=>{const s=prev[name]||{};return {...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"애너그램",score,total:questions.length,points:pts,date:new Date().toISOString()}].slice(-50)}};});}
-    return <ResultScreen score={score} total={questions.length} title="애너그램 완료!" onExit={onExit} onRetry={()=>{setRound(0);setScore(0);setDone(false);}} />;
+  const gameOver = done || round >= questions.length;
+
+  // ✅ 게임 종료 시 점수 저장 (한 번만)
+  useEffect(() => {
+    if (!gameOver || awardedRef.current) return;
+    awardedRef.current = true;
+    const pts = score * 15;
+    saveGameRecord(setStudents, name, "애너그램", score, questions.length, pts);
+  }, [gameOver, score, questions.length, name, setStudents]);
+
+  if (gameOver) {
+    return <ResultScreen score={score} total={questions.length} title="애너그램 완료!" onExit={onExit} onRetry={()=>{setRound(0);setScore(0);setDone(false);awardedRef.current=false;}} />;
   }
 
   const q=questions[round];
@@ -605,6 +661,7 @@ export function TypingRace({ name, setStudents, onExit }) {
   const inputRef = useRef(null);
   const frameRef = useRef(null);
   const lastSpawn = useRef(0);
+  const awardedRef = useRef(false);
   const BOARD_H = 320;
 
   const wordPool = useMemo(()=>shuffle(ALL_WORDS.filter(w=>!w.en.includes(" "))).map(w=>w.en),[]);
@@ -650,6 +707,14 @@ export function TypingRace({ name, setStudents, onExit }) {
   // 레벨업
   useEffect(()=>{if(score>0&&score%5===0&&level<5)setLevel(l=>l+1);},[score]);
 
+  // ✅ 게임 종료 시 점수 저장 (한 번만)
+  useEffect(() => {
+    if (!done || awardedRef.current) return;
+    awardedRef.current = true;
+    const pts = score * 8;
+    saveGameRecord(setStudents, name, "타이핑레이스", score, score, pts);
+  }, [done, score, name, setStudents]);
+
   const tryType=(e)=>{
     const val=e.target.value.trim().toLowerCase();
     setInput(e.target.value);
@@ -666,9 +731,7 @@ export function TypingRace({ name, setStudents, onExit }) {
   };
 
   if(done){
-    const pts=score*8;
-    if(typeof setStudents==="function"){setStudents(prev=>{const s=prev[name]||{};return {...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"타이핑레이스",score,total:score,points:pts,date:new Date().toISOString()}].slice(-50)}};});}
-    return <ResultScreen score={score} total={score} title={`Lv.${level} 도달! · 단어 ${score}개 격파!`} onExit={onExit} onRetry={()=>{setScore(0);setLives(3);setFalling([]);setDone(false);setLevel(1);setStarted(false);}} />;
+    return <ResultScreen score={score} total={score} title={`Lv.${level} 도달! · 단어 ${score}개 격파!`} onExit={onExit} onRetry={()=>{setScore(0);setLives(3);setFalling([]);setDone(false);setLevel(1);setStarted(false);awardedRef.current=false;}} />;
   }
 
   if(!started) return (
@@ -723,6 +786,7 @@ export function WordRelay({ name, setStudents, onExit }) {
   const [picked, setPicked] = useState(null);
   const [done, setDone] = useState(false);
   const [comboFlash, setComboFlash] = useState(false);
+  const awardedRef = useRef(false);
 
   // 릴레이: 앞 단어의 마지막 글자로 시작하는 다음 단어 맞추기
   const chain = useMemo(()=>{
@@ -740,11 +804,19 @@ export function WordRelay({ name, setStudents, onExit }) {
     });
   },[]);
 
-  if(done||round>=chain.length){
-    const bonus=maxCombo>=5?50:maxCombo>=3?20:0;
-    const pts=score*10+bonus;
-    if(typeof setStudents==="function"){setStudents(prev=>{const s=prev[name]||{};return {...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"단어릴레이",score,total:chain.length,points:pts,date:new Date().toISOString()}].slice(-50)}};});}
-    return <ResultScreen score={score} total={chain.length} bonus={bonus} title={`최고 콤보 ${maxCombo}! 릴레이 완료!`} onExit={onExit} onRetry={()=>{setRound(0);setScore(0);setCombo(0);setMaxCombo(0);setDone(false);setPicked(null);}} />;
+  const gameOver = done || round >= chain.length;
+  const bonus = maxCombo>=5?50:maxCombo>=3?20:0;
+
+  // ✅ 게임 종료 시 점수 저장 (한 번만)
+  useEffect(() => {
+    if (!gameOver || awardedRef.current) return;
+    awardedRef.current = true;
+    const pts = score * 10 + bonus;
+    saveGameRecord(setStudents, name, "단어릴레이", score, chain.length, pts);
+  }, [gameOver, score, bonus, chain.length, name, setStudents]);
+
+  if (gameOver) {
+    return <ResultScreen score={score} total={chain.length} bonus={bonus} title={`최고 콤보 ${maxCombo}! 릴레이 완료!`} onExit={onExit} onRetry={()=>{setRound(0);setScore(0);setCombo(0);setMaxCombo(0);setDone(false);setPicked(null);awardedRef.current=false;}} />;
   }
 
   const q=chain[round];
@@ -842,6 +914,7 @@ export function WordTwenty({ name, setStudents, onExit }) {
   const [hintIdx, setHintIdx] = useState(0);
   const [picked, setPicked] = useState(null);
   const [done, setDone] = useState(false);
+  const awardedRef = useRef(false);
 
   const generateHints = (w)=>[
     `카테고리: ${w.cat}`,
@@ -859,10 +932,18 @@ export function WordTwenty({ name, setStudents, onExit }) {
     return {...w,opts,ansIdx:opts.findIndex(o=>o.en===w.en),hints:generateHints(w)};
   }),[]);
 
-  if(done||round>=questions.length){
-    const pts=score*15;
-    if(typeof setStudents==="function"){setStudents(prev=>{const s=prev[name]||{};return {...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"단어스무고개",score,total:questions.length,points:pts,date:new Date().toISOString()}].slice(-50)}};});}
-    return <ResultScreen score={score} total={questions.length} title="스무고개 완료!" onExit={onExit} onRetry={()=>{setRound(0);setScore(0);setHintIdx(0);setPicked(null);setDone(false);}} />;
+  const gameOver = done || round >= questions.length;
+
+  // ✅ 게임 종료 시 점수 저장 (한 번만)
+  useEffect(() => {
+    if (!gameOver || awardedRef.current) return;
+    awardedRef.current = true;
+    const pts = score * 15;
+    saveGameRecord(setStudents, name, "단어스무고개", score, questions.length, pts);
+  }, [gameOver, score, questions.length, name, setStudents]);
+
+  if (gameOver) {
+    return <ResultScreen score={score} total={questions.length} title="스무고개 완료!" onExit={onExit} onRetry={()=>{setRound(0);setScore(0);setHintIdx(0);setPicked(null);setDone(false);awardedRef.current=false;}} />;
   }
 
   const q=questions[round];
@@ -972,7 +1053,7 @@ export function WordWorldRPG({ name, setStudents, onExit }) {
     const cleared=round>=questions.length&&hp>0;
     const stars=cleared?3:score>questions.length/2?1:0;
     const pts=score*20+(cleared?50:0);
-    if(typeof setStudents==="function"){setStudents(prev=>{const s=prev[name]||{};return {...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"단어월드RPG",score,total:questions.length,points:pts,date:new Date().toISOString()}].slice(-50)}};});}
+    saveGameRecord(setStudents, name, "단어월드RPG", score, questions.length, pts);
     if(cleared){
       const newSave={...save,clearedWorlds:[...new Set([...save.clearedWorlds,selectedWorld.id])],totalStars:save.totalStars+stars,questLog:[...save.questLog,{world:selectedWorld.name,score,clearedAt:new Date().toISOString()}]};
       persist(newSave);
@@ -1218,6 +1299,7 @@ export function PictureWordGame({ name, setStudents, onExit }) {
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState(null);
   const [mode, setMode] = useState(null); // null=선택 | "en" | "ko"
+  const awardedRef = useRef(false);
 
   const questions = useMemo(() => {
     const pool = shuffle(EMOJI_WORDS).slice(0, 10);
@@ -1227,6 +1309,16 @@ export function PictureWordGame({ name, setStudents, onExit }) {
       return { ...w, opts };
     });
   }, []);
+
+  const gameOver = mode !== null && round >= questions.length;
+
+  // ✅ 게임 종료 시 점수 저장 (한 번만)
+  useEffect(() => {
+    if (!gameOver || awardedRef.current) return;
+    awardedRef.current = true;
+    const pts = score * 10;
+    saveGameRecord(setStudents, name, "그림단어", score, questions.length, pts);
+  }, [gameOver, score, questions.length, name, setStudents]);
 
   if (!mode) return (
     <div style={{minHeight:"100vh",background:T.bg,padding:16}}>
@@ -1253,14 +1345,8 @@ export function PictureWordGame({ name, setStudents, onExit }) {
     </div>
   );
 
-  if (round >= questions.length) {
+  if (gameOver) {
     const pts = score * 10;
-    if (typeof setStudents === "function") {
-      setStudents(prev => {
-        const s = prev[name] || {};
-        return { ...prev, [name]: { ...s, points:(s.points||0)+pts, records:[...(s.records||[]), {type:"game",gameType:"그림단어",score,total:questions.length,points:pts,date:new Date().toISOString()}].slice(-50) }};
-      });
-    }
     return (
       <div style={{minHeight:"100vh",background:T.bg,padding:"60px 20px",textAlign:"center"}}>
         <div style={{fontSize:64,marginBottom:14}}>{score>=8?"🎉":score>=5?"👏":"💪"}</div>
@@ -1269,7 +1355,7 @@ export function PictureWordGame({ name, setStudents, onExit }) {
           <div style={{fontSize:32}}>⭐</div><div style={{fontSize:16,fontWeight:900,color:T.text}}>+{pts} 포인트</div>
         </Card>
         <div style={{display:"flex",gap:10,maxWidth:280,margin:"0 auto"}}>
-          <Btn v="secondary" size="lg" onClick={()=>{setRound(0);setScore(0);setPicked(null);setMode(null);}} style={{flex:1}}>🔄 다시</Btn>
+          <Btn v="secondary" size="lg" onClick={()=>{setRound(0);setScore(0);setPicked(null);setMode(null);awardedRef.current=false;}} style={{flex:1}}>🔄 다시</Btn>
           <Btn v="primary" size="lg" onClick={onExit} style={{flex:1}}>홈으로</Btn>
         </div>
       </div>
@@ -1352,6 +1438,7 @@ export function WordMatchLines({ name, setStudents, onExit }) {
   const [matched, setMatched] = useState({});    // {leftIdx: rightIdx}
   const [wrong, setWrong] = useState(null);      // 틀린 쌍 표시용
   const [done, setDone] = useState(false);
+  const awardedRef = useRef(false);
 
   const ROUNDS = 3;
   const PER = 6;
@@ -1363,6 +1450,15 @@ export function WordMatchLines({ name, setStudents, onExit }) {
       return { left: words, right: shuffle([...words]) };
     });
   }, []);
+
+  // ✅ 게임 종료 시 점수 저장 (한 번만)
+  useEffect(() => {
+    if (!done || awardedRef.current) return;
+    awardedRef.current = true;
+    const total = ROUNDS * PER;
+    const pts = score * 10;
+    saveGameRecord(setStudents, name, "단어연결", score, total, pts);
+  }, [done, score, name, setStudents]);
 
   const cur = sets[round];
   const allMatched = Object.keys(matched).length === PER;
@@ -1390,9 +1486,6 @@ export function WordMatchLines({ name, setStudents, onExit }) {
   if (done) {
     const total = ROUNDS * PER;
     const pts = score * 10;
-    if (typeof setStudents==="function") {
-      setStudents(prev => { const s=prev[name]||{}; return {...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"단어연결",score,total,points:pts,date:new Date().toISOString()}].slice(-50)}}; });
-    }
     return (
       <div style={{minHeight:"100vh",background:T.bg,padding:"60px 20px",textAlign:"center"}}>
         <div style={{fontSize:64,marginBottom:14}}>{score>=total*.8?"🎉":score>=total*.5?"👏":"💪"}</div>
@@ -1522,6 +1615,7 @@ export function WordSearchGame({ name, setStudents, onExit }) {
   const [done, setDone] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const timerRef = useRef(null);
+  const awardedRef = useRef(false);
 
   useEffect(()=>{
     timerRef.current = setInterval(()=>setElapsed(e=>e+1),1000);
@@ -1534,6 +1628,14 @@ export function WordSearchGame({ name, setStudents, onExit }) {
       setDone(true);
     }
   },[found,placed]);
+
+  // ✅ 게임 종료 시 점수 저장 (한 번만)
+  useEffect(() => {
+    if (!done || awardedRef.current) return;
+    awardedRef.current = true;
+    const pts = found.length * 15;
+    saveGameRecord(setStudents, name, "단어찾기퍼즐", found.length, placed.length, pts);
+  }, [done, found.length, placed.length, name, setStudents]);
 
   // 현재 선택 중인 셀들 계산
   const getSelected = () => {
@@ -1570,30 +1672,6 @@ export function WordSearchGame({ name, setStudents, onExit }) {
 
   const selected = getSelected();
   const CELL = 30;
-
-  // 점수 저장은 렌더링 중이 아니라 effect에서 한 번만
-  const awardedRef = useRef(false);
-  useEffect(() => {
-    if (!done || awardedRef.current) return;
-    awardedRef.current = true;
-    const pts = found.length * 15;
-    if (typeof setStudents === "function") {
-      setStudents(prev => {
-        const s = prev[name] || {};
-        return {
-          ...prev,
-          [name]: {
-            ...s,
-            points: (s.points || 0) + pts,
-            records: [
-              ...(s.records || []),
-              { type: "game", gameType: "단어찾기퍼즐", score: found.length, total: placed.length, points: pts, date: new Date().toISOString() }
-            ].slice(-50)
-          }
-        };
-      });
-    }
-  }, [done]);
 
   if (done) {
     const pts = found.length * 15;
@@ -1691,6 +1769,7 @@ export function DictationGame({ name, setStudents, onExit }) {
   const [feedback, setFeedback] = useState(null);
   const [played, setPlayed] = useState(false);
   const inputRef = useRef(null);
+  const awardedRef = useRef(false);
 
   const SENTENCES = [
     "I am a student.","She is my friend.","They are happy.",
@@ -1705,6 +1784,16 @@ export function DictationGame({ name, setStudents, onExit }) {
     if (mode==="word") return shuffle(ALL_WORDS.filter(w=>!w.en.includes(" "))).slice(0,10);
     return shuffle(SENTENCES).slice(0,8).map(s=>({en:s,ko:"문장 받아쓰기"}));
   },[mode]);
+
+  const gameOver = mode !== null && round >= questions.length;
+
+  // ✅ 게임 종료 시 점수 저장 (한 번만)
+  useEffect(() => {
+    if (!gameOver || awardedRef.current) return;
+    awardedRef.current = true;
+    const pts = score * 12;
+    saveGameRecord(setStudents, name, "받아쓰기", score, questions.length, pts);
+  }, [gameOver, score, questions.length, name, setStudents]);
 
   const speakQ = () => {
     if (!questions[round]) return;
@@ -1755,12 +1844,9 @@ export function DictationGame({ name, setStudents, onExit }) {
     </div>
   );
 
-  if (round>=questions.length) {
+  if (gameOver) {
     const total=questions.length;
     const pts=score*12;
-    if (typeof setStudents==="function") {
-      setStudents(prev=>{const s=prev[name]||{};return{...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"받아쓰기",score,total,points:pts,date:new Date().toISOString()}].slice(-50)}};});
-    }
     return (
       <div style={{minHeight:"100vh",background:T.bg,padding:"60px 20px",textAlign:"center"}}>
         <div style={{fontSize:64,marginBottom:14}}>{score>=total*.8?"🎉":score>=total*.5?"👏":"💪"}</div>
@@ -1769,7 +1855,7 @@ export function DictationGame({ name, setStudents, onExit }) {
           <div style={{fontSize:32}}>⭐</div><div style={{fontSize:16,fontWeight:900,color:T.text}}>+{pts} 포인트</div>
         </Card>
         <div style={{display:"flex",gap:10,maxWidth:280,margin:"0 auto"}}>
-          <Btn v="secondary" size="lg" onClick={()=>{setRound(0);setScore(0);setInput("");setFeedback(null);setPlayed(false);setMode(null);}} style={{flex:1}}>🔄 다시</Btn>
+          <Btn v="secondary" size="lg" onClick={()=>{setRound(0);setScore(0);setInput("");setFeedback(null);setPlayed(false);setMode(null);awardedRef.current=false;}} style={{flex:1}}>🔄 다시</Btn>
           <Btn v="primary" size="lg" onClick={onExit} style={{flex:1}}>홈으로</Btn>
         </div>
       </div>

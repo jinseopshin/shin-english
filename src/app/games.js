@@ -1571,11 +1571,32 @@ export function WordSearchGame({ name, setStudents, onExit }) {
   const selected = getSelected();
   const CELL = 30;
 
+  // 점수 저장은 렌더링 중이 아니라 effect에서 한 번만
+  const awardedRef = useRef(false);
+  useEffect(() => {
+    if (!done || awardedRef.current) return;
+    awardedRef.current = true;
+    const pts = found.length * 15;
+    if (typeof setStudents === "function") {
+      setStudents(prev => {
+        const s = prev[name] || {};
+        return {
+          ...prev,
+          [name]: {
+            ...s,
+            points: (s.points || 0) + pts,
+            records: [
+              ...(s.records || []),
+              { type: "game", gameType: "단어찾기퍼즐", score: found.length, total: placed.length, points: pts, date: new Date().toISOString() }
+            ].slice(-50)
+          }
+        };
+      });
+    }
+  }, [done]);
+
   if (done) {
     const pts = found.length * 15;
-    if (typeof setStudents==="function") {
-      setStudents(prev=>{const s=prev[name]||{};return{...prev,[name]:{...s,points:(s.points||0)+pts,records:[...(s.records||[]),{type:"game",gameType:"단어찾기퍼즐",score:found.length,total:placed.length,points:pts,date:new Date().toISOString()}].slice(-50)}};});
-    }
     return (
       <div style={{minHeight:"100vh",background:T.bg,padding:"48px 20px",textAlign:"center"}}>
         <div style={{fontSize:64,marginBottom:12}}>🔍</div>

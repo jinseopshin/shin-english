@@ -35,6 +35,8 @@ import {
 } from "./games";
 import { AIQuestionGenerator } from "./aiQuestions";
 import { supabase, isSupabaseReady, testConnection, getAdapter } from "./supabaseClient";
+import { SupabaseMigration } from "./SupabaseMigration";
+import { MyWordbook } from "./MyWordbook";
 
 // ── 음성 합성 (발음 기능) ─────────────────────────────────────────────────
 function speak(text) {

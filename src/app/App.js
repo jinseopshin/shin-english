@@ -128,28 +128,66 @@ function useResponsive() {
 // 서버와 클라이언트 첫 렌더를 항상 initial로 맞추고,
 // 마운트 후 useEffect에서 localStorage 값으로 교체
 function useStorage(key, initial) {
-  const [val, setVal] = useState(initial); // 항상 initial로 시작 (hydration 일치)
+  const [val, setVal] = useState(initial);
   const [hydrated, setHydrated] = useState(false);
+  const saveTimeoutRef = useRef(null);
 
-  // 마운트 후 한 번만 localStorage에서 읽기
+  // 마운트 시: Supabase 우선, 실패 시 localStorage 폴백
   useEffect(() => {
-    try {
-      const v = window.localStorage.getItem(key);
-      if (v !== null) setVal(JSON.parse(v));
-    } catch {}
-    setHydrated(true);
+    let cancelled = false;
+    const load = async () => {
+      const adapter = getAdapter(key);
+      // 1) Supabase 시도
+      if (adapter && isSupabaseReady()) {
+        try {
+          const data = await adapter.fetch();
+          if (!cancelled && data !== undefined && data !== null) {
+            setVal(data);
+            // localStorage에도 캐시 (오프라인 폴백)
+            try { window.localStorage.setItem(key, JSON.stringify(data)); } catch {}
+            setHydrated(true);
+            return;
+          }
+        } catch (e) {
+          console.warn(`Supabase 읽기 실패 (${key}), localStorage 폴백:`, e.message);
+        }
+      }
+      // 2) localStorage 폴백
+      try {
+        const v = window.localStorage.getItem(key);
+        if (!cancelled && v !== null) setVal(JSON.parse(v));
+      } catch {}
+      if (!cancelled) setHydrated(true);
+    };
+    load();
+    return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
-  // 값이 바뀌면 저장 (hydration 완료 후에만)
+  // 값 변경 시: localStorage 즉시 저장 + Supabase는 디바운스(500ms)로 저장
   useEffect(() => {
     if (!hydrated) return;
+    // localStorage 즉시 저장 (백업)
     try { window.localStorage.setItem(key, JSON.stringify(val)); } catch {}
+    // Supabase 디바운스 저장 (연속 변경을 1회로 묶음)
+    const adapter = getAdapter(key);
+    if (adapter && isSupabaseReady()) {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = setTimeout(async () => {
+        try {
+          await adapter.save(val);
+        } catch (e) {
+          console.warn(`Supabase 저장 실패 (${key}):`, e.message);
+        }
+      }, 500);
+    }
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    };
   }, [key, val, hydrated]);
 
   return [val, setVal, hydrated];
 }
-
 // 학생 기록 저장 헬퍼
 function saveStudentRecord(setStudents, name, record) {
   setStudents(prev => {

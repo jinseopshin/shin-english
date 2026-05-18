@@ -2918,6 +2918,7 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
   if (screen === "game-spell")    return <SpellingGame  name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
   if (screen === "game-speed")    return <SpeedQuiz     name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
   if (screen === "game-flash")    return <FlashCard     name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
+  if (screen === "wordbook") return <MyWordbook studentName={name} onExit={exitGame} />;
   if (screen === "custom-exam-play") return <CustomExamPlay student={me} name={name} setStudents={setStudents} onExit={() => setScreen("home")} />;
   if (screen === "game-sentence") return <SentenceGame  name={name} setStudents={setStudents} onExit={exitGame} />;
   // 신규 8개 게임
@@ -3066,6 +3067,20 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
 
         {tab === "game" && (
           <>
+          {/* 📚 내 단어장 빠른 진입 */}
+            <Card onClick={() => setScreen("wordbook")} style={{
+              marginBottom: 14, padding: "14px 16px",
+              background: `linear-gradient(135deg, ${T.purple}, ${T.accent})`,
+              color: "white", cursor: "pointer", border: "none",
+              display: "flex", alignItems: "center", gap: 12,
+            }}>
+              <div style={{ fontSize: 32 }}>📚</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 900 }}>내 단어장</div>
+                <div style={{ fontSize: 11, opacity: 0.9, marginTop: 2 }}>⭐ 모은 단어로 복습하기</div>
+              </div>
+              <div style={{ fontSize: 20, opacity: 0.7 }}>›</div>
+            </Card>
             {/* 목표 위젯 */}
             <StudentGoalWidget studentName={name} goals={goals} />
 

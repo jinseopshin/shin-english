@@ -42,6 +42,7 @@ import { supabase, isSupabaseReady, testConnection, getAdapter } from "./supabas
 import { SupabaseMigration } from "./SupabaseMigration";
 import { MyWordbook } from "./MyWordbook";
 import { ReviewCard } from "./ReviewCard";
+import { StudentWordStatsCard } from "./StudentWordStatsCard";
 import { recordWordEncounter } from "./studentWords";
 import { addToWordbook, removeFromWordbook, isInWordbook } from "./studentWords";
 
@@ -2248,7 +2249,12 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
         {screen === "attendance"      && <AttendanceManager students={students} attendance={attendance} setAttendance={setAttendance} />}
         {screen === "word-homework"   && <WordHomeworkManager students={students} setStudents={setStudents} onNav={onNav} />}
         {screen === "custom-exam"     && <CustomExamManager students={students} setStudents={setStudents} bank={bank} onNav={onNav} />}
-        {screen === "student-report"  && <StudentDetailReport student={reportStudent} onBack={() => onNav("students")} />}
+        {screen === "student-report"  && reportStudent && (
+          <>
+            <StudentWordStatsCard studentName={reportStudent.name} />
+            <StudentDetailReport student={reportStudent} onBack={() => onNav("students")} />
+          </>
+        )}
         {/* 더보기 메뉴 */}
         {screen === "more" && (
           <div>

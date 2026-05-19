@@ -1410,12 +1410,6 @@ function TeacherHome({ bank, exams, students, onNav }) {
   const activeExams = studentsArr.filter(s => s.customExam?.active);
   const activeExamCount = activeExams.length;
   const completedExamCount = activeExams.filter(s => s.customExam?.completed).length;
-
-  // 진행중인 맞춤 시험 통계
-  const activeExams = studentsArr.filter(s => s.customExam?.active);
-  const activeExamCount = activeExams.length;
-  const completedExamCount = activeExams.filter(s => s.customExam?.completed).length;
-
   return (
     <div>
       <div style={{

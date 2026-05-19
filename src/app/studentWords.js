@@ -2,26 +2,29 @@
 import { supabase, isSupabaseReady } from "./supabaseClient";
 
 // ══════════════════════════════════════════════════════════════════════════
-//   학생 단어 학습 이력 시스템
+//   학생 단어 학습 이력 시스템 — v2 (안정성 강화)
+//
+//   v2 변경 사항:
+//   - Race condition 제거: select + insert/update 분기 → upsert로 통합
+//   - getStudentWordStats의 total을 "실제 학습한 단어"로 정확히 계산
+//   - 미사용 함수 recordWordResult 삭제
 //
 //   Phase 1: 단어장 (즐겨찾기)
 //   Phase 2: 망각 곡선 (자동 복습 일정)
 //   Phase 3: 발음 점수
 //
 //   세 기능 모두 같은 student_words 테이블을 공유합니다.
+//
+//   ⚠️ upsert가 동작하려면 Supabase 테이블의 student_words에
+//      (student_name, word_en) 조합에 unique constraint가 있어야 합니다.
+//      이미 있다면 별도 작업 불필요.
 // ══════════════════════════════════════════════════════════════════════════
 
-// ── 망각 곡선 간격 (Phase 2에서 사용) ─────────────────────────────────────
 const REVIEW_INTERVALS = [
-  null,   // level 0: 신규 (복습 일정 없음)
-  1,      // level 1: 1일 후
-  3,      // level 2: 3일 후
-  7,      // level 3: 7일 후
-  14,     // level 4: 14일 후
-  30,     // level 5: 30일 후 (마스터)
+  null,   // level 0: 신규
+  1, 3, 7, 14, 30,  // level 1~5
 ];
 
-// 다음 복습 날짜 계산
 function calcNextReviewDate(level) {
   const days = REVIEW_INTERVALS[level];
   if (!days) return null;
@@ -31,22 +34,19 @@ function calcNextReviewDate(level) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-//  단어 학습 기록 (게임에서 호출하는 핵심 함수)
-//  - 단어 한 개의 정답/오답을 기록
-//  - 망각 곡선 레벨 자동 업데이트
-//  - localStorage 폴백 지원
+//  단어 학습 기록 (게임에서 호출하는 핵심 함수) — v2 upsert 패턴
 // ──────────────────────────────────────────────────────────────────────────
 export async function recordWordEncounter(studentName, word, isCorrect) {
   if (!studentName || !word?.en) return;
   
-  // 1) localStorage에도 기록 (오프라인 폴백)
+  // 1) localStorage 폴백
   recordWordToLocalStorage(studentName, word, isCorrect);
   
-  // 2) Supabase에 기록
+  // 2) Supabase
   if (!isSupabaseReady()) return;
   
   try {
-    // 기존 기록 조회
+    // 기존 값 조회 (누적 계산용)
     const { data: existing } = await supabase
       .from("student_words")
       .select("*")
@@ -56,55 +56,48 @@ export async function recordWordEncounter(studentName, word, isCorrect) {
     
     const now = new Date().toISOString();
     
+    const oldEncounter = existing?.encounter_count || 0;
+    const oldCorrect = existing?.correct_count || 0;
+    const oldWrong = existing?.wrong_count || 0;
+    const oldLevel = existing?.review_level || 0;
+    
+    const newEncounter = oldEncounter + 1;
+    const newCorrect = oldCorrect + (isCorrect ? 1 : 0);
+    const newWrong = oldWrong + (isCorrect ? 0 : 1);
+    
+    let newLevel;
     if (existing) {
-      // 기존 기록 업데이트
-      const newCorrect = existing.correct_count + (isCorrect ? 1 : 0);
-      const newWrong = existing.wrong_count + (isCorrect ? 0 : 1);
-      const newEncounter = existing.encounter_count + 1;
-      
-      // 망각 곡선 레벨 업데이트
-      let newLevel = existing.review_level || 0;
-      if (isCorrect) {
-        newLevel = Math.min(5, newLevel + 1); // 정답이면 한 단계 ↑ (최대 5)
-      } else {
-        newLevel = Math.max(1, Math.floor(newLevel / 2)); // 오답이면 절반으로
-      }
-      
-      await supabase.from("student_words").update({
-        encounter_count: newEncounter,
-        correct_count: newCorrect,
-        wrong_count: newWrong,
-        review_level: newLevel,
-        next_review_date: calcNextReviewDate(newLevel),
-        last_studied_at: now,
-        updated_at: now,
-      }).eq("id", existing.id);
-      
+      newLevel = isCorrect
+        ? Math.min(5, oldLevel + 1)
+        : Math.max(1, Math.floor(oldLevel / 2));
     } else {
-      // 새 기록 생성
-      const initialLevel = isCorrect ? 1 : 0;
-      await supabase.from("student_words").insert({
-        student_name: studentName,
-        word_en: word.en,
-        word_ko: word.ko,
-        encounter_count: 1,
-        correct_count: isCorrect ? 1 : 0,
-        wrong_count: isCorrect ? 0 : 1,
-        review_level: initialLevel,
-        next_review_date: calcNextReviewDate(initialLevel),
-        first_seen_at: now,
-        last_studied_at: now,
-      });
+      newLevel = isCorrect ? 1 : 0;
     }
+    
+    // ✅ upsert — race condition 안전
+    const payload = {
+      student_name: studentName,
+      word_en: word.en,
+      word_ko: word.ko,
+      encounter_count: newEncounter,
+      correct_count: newCorrect,
+      wrong_count: newWrong,
+      review_level: newLevel,
+      next_review_date: calcNextReviewDate(newLevel),
+      last_studied_at: now,
+      updated_at: now,
+    };
+    if (!existing) payload.first_seen_at = now;
+    
+    await supabase
+      .from("student_words")
+      .upsert(payload, { onConflict: "student_name,word_en" });
+    
   } catch (e) {
     console.warn(`recordWordEncounter 실패 (${word.en}):`, e.message);
   }
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-//  localStorage 폴백 (Supabase 못 쓸 때 / 오프라인 대비)
-//  기존 angela_wrong_{name} 키 형식 유지
-// ──────────────────────────────────────────────────────────────────────────
 function recordWordToLocalStorage(studentName, word, isCorrect) {
   if (typeof window === "undefined") return;
   try {
@@ -113,46 +106,57 @@ function recordWordToLocalStorage(studentName, word, isCorrect) {
     data[word.en] = data[word.en] || { wrong: 0, correct: 0, ko: word.ko };
     if (isCorrect) data[word.en].correct++;
     else data[word.en].wrong++;
-    data[word.en].ko = word.ko; // 한글 뜻 캐시
+    data[word.en].ko = word.ko;
     window.localStorage.setItem(key, JSON.stringify(data));
   } catch {}
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-//  ⭐ 단어장 (즐겨찾기) — Phase 1 핵심
+//  ⭐ 단어장 (즐겨찾기) — Phase 1, v2 upsert
 // ──────────────────────────────────────────────────────────────────────────
 
-// 단어를 단어장에 추가 (이미 학습 기록 있으면 favorite만 ON)
 export async function addToWordbook(studentName, word) {
   if (!studentName || !word?.en || !isSupabaseReady()) return false;
   
   try {
+    // 기존 학습 데이터 보존을 위해 조회
     const { data: existing } = await supabase
       .from("student_words")
-      .select("id")
+      .select("*")
       .eq("student_name", studentName)
       .eq("word_en", word.en)
       .maybeSingle();
     
     const now = new Date().toISOString();
     
+    const payload = {
+      student_name: studentName,
+      word_en: word.en,
+      word_ko: word.ko,
+      is_favorite: true,
+      favorited_at: now,
+      updated_at: now,
+    };
+    
     if (existing) {
-      await supabase.from("student_words").update({
-        is_favorite: true,
-        favorited_at: now,
-        updated_at: now,
-      }).eq("id", existing.id);
+      // 기존 학습 데이터 모두 보존
+      payload.encounter_count = existing.encounter_count || 0;
+      payload.correct_count = existing.correct_count || 0;
+      payload.wrong_count = existing.wrong_count || 0;
+      payload.review_level = existing.review_level || 0;
+      payload.next_review_date = existing.next_review_date;
+      payload.last_studied_at = existing.last_studied_at;
+      payload.first_seen_at = existing.first_seen_at;
+      payload.pronunciation_avg = existing.pronunciation_avg;
+      payload.pronunciation_count = existing.pronunciation_count;
     } else {
-      await supabase.from("student_words").insert({
-        student_name: studentName,
-        word_en: word.en,
-        word_ko: word.ko,
-        is_favorite: true,
-        favorited_at: now,
-        first_seen_at: now,
-        last_studied_at: now,
-      });
+      payload.first_seen_at = now;
+      payload.last_studied_at = now;
     }
+    
+    await supabase
+      .from("student_words")
+      .upsert(payload, { onConflict: "student_name,word_en" });
     return true;
   } catch (e) {
     console.warn(`addToWordbook 실패:`, e.message);
@@ -160,7 +164,6 @@ export async function addToWordbook(studentName, word) {
   }
 }
 
-// 단어를 단어장에서 제거 (학습 기록은 유지, favorite만 OFF)
 export async function removeFromWordbook(studentName, wordEn) {
   if (!isSupabaseReady()) return false;
   try {
@@ -176,7 +179,6 @@ export async function removeFromWordbook(studentName, wordEn) {
   }
 }
 
-// 학생의 단어장 (즐겨찾기 목록) 가져오기
 export async function getWordbook(studentName) {
   if (!isSupabaseReady() || !studentName) return [];
   try {
@@ -203,7 +205,6 @@ export async function getWordbook(studentName) {
   }
 }
 
-// 특정 단어가 단어장에 있는지 빠르게 확인
 export async function isInWordbook(studentName, wordEn) {
   if (!isSupabaseReady() || !studentName || !wordEn) return false;
   try {
@@ -220,10 +221,9 @@ export async function isInWordbook(studentName, wordEn) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-//  🔔 망각 곡선 — Phase 2에서 사용 (지금은 컬럼만 준비됨)
+//  🔔 망각 곡선 — Phase 2
 // ──────────────────────────────────────────────────────────────────────────
 
-// 오늘 복습해야 할 단어 가져오기
 export async function getTodayReviewWords(studentName, limit = 20) {
   if (!isSupabaseReady() || !studentName) return [];
   try {
@@ -249,10 +249,9 @@ export async function getTodayReviewWords(studentName, limit = 20) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-//  🎤 발음 점수 기록 (Phase 3)
+//  🎤 발음 점수 (Phase 3) — v2 upsert
 // ──────────────────────────────────────────────────────────────────────────
 
-// 발음 점수 기록 (단어 한 개에 대해)
 export async function recordPronunciation(studentName, word, score) {
   if (!studentName || !word?.en || !isSupabaseReady()) return false;
   
@@ -266,31 +265,39 @@ export async function recordPronunciation(studentName, word, score) {
     
     const now = new Date().toISOString();
     
+    const oldAvg = existing?.pronunciation_avg || 0;
+    const oldCount = existing?.pronunciation_count || 0;
+    const newCount = oldCount + 1;
+    const newAvg = newCount > 0
+      ? Math.round((oldAvg * oldCount + score) / newCount)
+      : score;
+    
+    const payload = {
+      student_name: studentName,
+      word_en: word.en,
+      word_ko: word.ko,
+      pronunciation_avg: newAvg,
+      pronunciation_count: newCount,
+      last_studied_at: now,
+      updated_at: now,
+    };
+    
     if (existing) {
-      // 기존 평균과 합쳐서 새 평균 계산
-      const oldAvg = existing.pronunciation_avg || 0;
-      const oldCount = existing.pronunciation_count || 0;
-      const newCount = oldCount + 1;
-      const newAvg = Math.round((oldAvg * oldCount + score) / newCount);
-      
-      await supabase.from("student_words").update({
-        pronunciation_avg: newAvg,
-        pronunciation_count: newCount,
-        last_studied_at: now,
-        updated_at: now,
-      }).eq("id", existing.id);
+      payload.encounter_count = existing.encounter_count || 0;
+      payload.correct_count = existing.correct_count || 0;
+      payload.wrong_count = existing.wrong_count || 0;
+      payload.review_level = existing.review_level || 0;
+      payload.next_review_date = existing.next_review_date;
+      payload.first_seen_at = existing.first_seen_at;
+      payload.is_favorite = existing.is_favorite;
+      payload.favorited_at = existing.favorited_at;
     } else {
-      // 새 기록 생성
-      await supabase.from("student_words").insert({
-        student_name: studentName,
-        word_en: word.en,
-        word_ko: word.ko,
-        pronunciation_avg: score,
-        pronunciation_count: 1,
-        first_seen_at: now,
-        last_studied_at: now,
-      });
+      payload.first_seen_at = now;
     }
+    
+    await supabase
+      .from("student_words")
+      .upsert(payload, { onConflict: "student_name,word_en" });
     return true;
   } catch (e) {
     console.warn(`recordPronunciation 실패:`, e.message);
@@ -298,7 +305,6 @@ export async function recordPronunciation(studentName, word, score) {
   }
 }
 
-// 학생의 평균 발음 점수 가져오기
 export async function getPronunciationStats(studentName) {
   if (!isSupabaseReady() || !studentName) return null;
   try {
@@ -309,13 +315,12 @@ export async function getPronunciationStats(studentName) {
       .not("pronunciation_avg", "is", null);
     if (error) throw error;
     
-    if (!data || data.length === 0) return { avg: 0, count: 0, words: [] };
+    if (!data || data.length === 0) return { avg: 0, count: 0, words: [], weakWords: [] };
     
     const totalCount = data.reduce((sum, w) => sum + w.pronunciation_count, 0);
     const weightedSum = data.reduce((sum, w) => sum + w.pronunciation_avg * w.pronunciation_count, 0);
     const avg = totalCount > 0 ? Math.round(weightedSum / totalCount) : 0;
     
-    // 점수 낮은 단어 TOP 5 (60점 미만)
     const weakWords = data
       .filter(w => w.pronunciation_avg < 60)
       .sort((a, b) => a.pronunciation_avg - b.pronunciation_avg)
@@ -329,7 +334,7 @@ export async function getPronunciationStats(studentName) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-//  📊 학생 학습 통계 (선생님 대시보드용)
+//  📊 학생 학습 통계 (선생님 대시보드용) — v2 정확한 total 계산
 // ──────────────────────────────────────────────────────────────────────────
 
 export async function getStudentWordStats(studentName) {
@@ -341,10 +346,17 @@ export async function getStudentWordStats(studentName) {
       .eq("student_name", studentName);
     if (error) throw error;
     
-    const total = data?.length || 0;
-    const mastered = data?.filter(w => w.review_level >= 5).length || 0;
-    const favorited = data?.filter(w => w.is_favorite).length || 0;
-    const struggling = data?.filter(w => w.wrong_count > w.correct_count && w.encounter_count >= 2).length || 0;
+    const all = data || [];
+    
+    // ✅ v2: 실제 학습한 단어만 total로 카운트
+    const studied = all.filter(w => (w.encounter_count || 0) > 0);
+    const total = studied.length;
+    
+    const mastered = studied.filter(w => (w.review_level || 0) >= 5).length;
+    const favorited = all.filter(w => w.is_favorite).length;
+    const struggling = studied.filter(
+      w => (w.wrong_count || 0) > (w.correct_count || 0) && (w.encounter_count || 0) >= 2
+    ).length;
     
     return { total, mastered, favorited, struggling };
   } catch (e) {
@@ -353,10 +365,6 @@ export async function getStudentWordStats(studentName) {
   }
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-//  🔙 기존 recordWrong 함수 호환 (게임 코드에서 그대로 동작)
-//  games.js의 recordWrong을 더 강력한 recordWordEncounter로 라우팅
-// ──────────────────────────────────────────────────────────────────────────
-export function recordWordResult(studentName, wordEn, wordKo, isCorrect) {
-  return recordWordEncounter(studentName, { en: wordEn, ko: wordKo || "" }, isCorrect);
-}
+// ══════════════════════════════════════════════════════════════════════════
+//   v2: recordWordResult 함수 제거됨 (어디서도 사용되지 않음)
+// ══════════════════════════════════════════════════════════════════════════

@@ -14,8 +14,10 @@ function getGameWordPool(levelId, student) {
       return notMastered.length > 0 ? notMastered : hw.words; // 다 마스터하면 복습용으로 전체
     }
   }
-  // 망각 곡선 복습은 부모 컴포넌트가 직접 words를 넘겨주므로 여기서는 처리 안 함
-  // (실제 복습 단어는 ReviewCard.js의 onStartReview에서 전달됨)
+  // 망각 곡선 복습 모드: student.reviewWords로 주입된 단어들 사용
+  if (levelId === "review" && student?.reviewWords?.length) {
+    return student.reviewWords;
+  }
   return getWordsByLevel(levelId);
 }
 import {
@@ -2996,6 +2998,7 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
   const [quizSet, setQuizSet] = useState(null);
   const [pendingGame, setPendingGame] = useState(null);
   const [selectedLevel, setSelectedLevel] = useState("all");
+  const [reviewWords, setReviewWords] = useState(null); // 복습 모드용 단어 목록
   const [newBadges, setNewBadges] = useState([]);
   const [tab, setTab] = useState("game"); // game | badge
 
@@ -3038,7 +3041,7 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
   }, []);
 
   if (screen === "level-select" && pendingGame) return <LevelSelect gameInfo={pendingGame} onSelect={onLevelSelected} onCancel={exitGame} student={me} />;
-  if (screen === "game-match")    return <WordMatchGame name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
+  if (screen === "game-match")    return <WordMatchGame name={name} setStudents={setStudents} student={selectedLevel === "review" ? { ...me, reviewWords } : me} onExit={() => { exitGame(); setReviewWords(null); }} levelId={selectedLevel} />;
   if (screen === "game-spell")    return <SpellingGame  name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
   if (screen === "game-speed")    return <SpeedQuiz     name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
   if (screen === "game-flash")    return <FlashCard     name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
@@ -3106,10 +3109,10 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
       <ScheduleBanner schedules={schedules} />
 
       <div className="app-container">
-        {/* 🔔 오늘의 복습 (Phase 2: 망각 곡선) */}
+       {/* 🔔 오늘의 복습 (Phase 2: 망각 곡선) */}
         <ReviewCard studentName={name} onStartReview={(words) => {
+          setReviewWords(words);
           setSelectedLevel("review");
-          setPendingGame({ id: "game-match", name: "오늘의 복습" });
           setScreen("game-match");
         }} />
         

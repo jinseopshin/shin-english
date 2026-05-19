@@ -40,6 +40,7 @@ import { supabase, isSupabaseReady, testConnection, getAdapter } from "./supabas
 import { SupabaseMigration } from "./SupabaseMigration";
 import { MyWordbook } from "./MyWordbook";
 import { ReviewCard } from "./ReviewCard";
+import { recordWordEncounter } from "./studentWords";
 import { addToWordbook, removeFromWordbook, isInWordbook } from "./studentWords";
 
 // ── 음성 합성 (발음 기능) ─────────────────────────────────────────────────
@@ -2454,9 +2455,11 @@ function WordMatchGame({ name, setStudents, student, onExit, levelId = "all" }) 
 
   const q = questions[round];
 
-  const pick = (idx) => {
+const pick = (idx) => {
     if (feedback) return;
-    if (idx === q.ansIdx) {
+    const isCorrect = idx === q.ansIdx;
+    recordWordEncounter(name, q, isCorrect);  // ✅ 망각 곡선 자동 업데이트
+    if (isCorrect) {
       setScore(score + 1);
       setFeedback("correct");
       setWrongWord(null);
@@ -2620,6 +2623,7 @@ function SpellingGame({ name, setStudents, student, onExit, levelId = "all" }) {
   const submit = () => {
     if (feedback) return;
     const isCorrect = input.trim().toLowerCase() === q.en.toLowerCase();
+    recordWordEncounter(name, q, isCorrect);  // ✅ 망각 곡선 자동 업데이트
     if (isCorrect) {
       setScore(score + 1); setFeedback("correct");
     } else setFeedback("wrong");
@@ -2747,13 +2751,13 @@ function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" }) {
   const q = questions[round];
   const isKo2En = q.dir === "ko2en";
 
-  const pick = (idx) => {
+const pick = (idx) => {
     const isCorrect = idx === q.ansIdx;
+    recordWordEncounter(name, q, isCorrect);  // ✅ 망각 곡선 자동 업데이트
     if (isCorrect) setScore(score + 1);
     if (levelId === "homework") updateWordMastery(setStudents, name, q.en, isCorrect);
     setRound(round + 1);
   };
-
   return (
     <div style={{ minHeight: "100vh", background: T.bg, padding: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
@@ -2819,9 +2823,12 @@ function FlashCard({ name, setStudents, student, onExit, levelId = "all" }) {
   const [favLoading, setFavLoading] = useState(false);
   const [studied, setStudied] = useState(0);
 
-  // 카드가 바뀌면 자동으로 발음 재생
+    // 카드가 바뀌면 자동으로 발음 재생 + 학습 이력 기록
   useEffect(() => {
-    if (cards[idx]) speak(cards[idx].en);
+    if (cards[idx]) {
+      speak(cards[idx].en);
+      recordWordEncounter(name, cards[idx], true);  // ✅ 플래시카드는 봤다는 기록
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx]);
 

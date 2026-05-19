@@ -914,7 +914,7 @@ function StudentManager({ students, setStudents }) {
   const [activeTab, setActiveTab] = useState("active"); // "active" | "inactive"
 
   // 추가/편집 폼 상태
-  const [form, setForm] = useState({ name: "", grade: "초등5", avatar: "🦊", memo: "" });
+  const [form, setForm] = useState({ name: "", grade: "초등5", avatar: "🦊", memo: "", password: "0000" });
   const [formErr, setFormErr] = useState("");
 
   // CSV 일괄 등록 상태
@@ -1046,13 +1046,13 @@ const filtered = studentList
     });
 
   const openAdd = () => {
-    setForm({ name: "", grade: "초등5", avatar: "🦊", memo: "" });
+    setForm({ name: "", grade: "초등5", avatar: "🦊", memo: "", password: "0000" });
     setFormErr("");
     setMode("add");
   };
 
   const openEdit = (s) => {
-    setForm({ name: s.name, grade: s.grade || "초등5", avatar: s.avatar || "🦊", memo: s.memo || "" });
+    setForm({ name: s.name, grade: s.grade || "초등5", avatar: s.avatar || "🦊", memo: s.memo || "", password: s.password || "0000" });
     setEditTarget(s.name);
     setFormErr("");
     setMode("edit");
@@ -1063,6 +1063,10 @@ const filtered = studentList
     if (!n) { setFormErr("이름을 입력해주세요"); return; }
     if (n.length < 2) { setFormErr("이름은 2자 이상이어야 해요"); return; }
     if (students[n]) { setFormErr("이미 같은 이름의 학생이 있어요"); return; }
+// PIN 유효성 검사
+    const pin = (form.password || "0000").padStart(4, "0").slice(0, 4);
+    if (!/^\d{4}$/.test(pin)) { setFormErr("비밀번호는 4자리 숫자여야 해요"); return; }
+
     setStudents(prev => ({
       ...prev,
       [n]: {
@@ -1070,6 +1074,7 @@ const filtered = studentList
         grade: form.grade,
         avatar: form.avatar,
         memo: form.memo,
+        password: pin,
         joinDate: new Date().toISOString().slice(0, 10),
         points: 0,
         records: []
@@ -1081,9 +1086,13 @@ const filtered = studentList
   const saveEdit = () => {
     const n = form.name.trim();
     if (!n) { setFormErr("이름을 입력해주세요"); return; }
+// PIN 유효성 검사
+    const pin = (form.password || "0000").padStart(4, "0").slice(0, 4);
+    if (!/^\d{4}$/.test(pin)) { setFormErr("비밀번호는 4자리 숫자여야 해요"); return; }
+
     setStudents(prev => {
       const old = prev[editTarget];
-      const updated = { ...old, grade: form.grade, avatar: form.avatar, memo: form.memo };
+      const updated = { ...old, grade: form.grade, avatar: form.avatar, memo: form.memo, password: pin };
       // 이름이 바뀌면 key도 교체
       if (n !== editTarget) {
         if (prev[n]) { setFormErr("이미 같은 이름의 학생이 있어요"); return prev; }
@@ -1309,7 +1318,29 @@ const filtered = studentList
               <option key={g} value={g}>{g}</option>
             ))}
           </select>
-
+{/* PIN 비밀번호 */}
+          <div style={{ fontSize: 12, fontWeight: 800, color: T.text, marginBottom: 6 }}>
+            🔑 비밀번호 (4자리 숫자)
+            {form.password === "0000" && (
+              <span style={{ marginLeft: 6, fontSize: 10, color: T.orange, fontWeight: 700 }}>* 기본값 사용 중</span>
+            )}
+          </div>
+          <Input
+            value={form.password}
+            onChange={e => {
+              const v = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
+              setForm(f => ({ ...f, password: v }));
+              setFormErr("");
+            }}
+            placeholder="0000"
+            maxLength={4}
+            inputMode="numeric"
+            style={{ marginBottom: 6, fontSize: 16, letterSpacing: 4, textAlign: "center", fontWeight: 800 }}
+          />
+          <div style={{ fontSize: 10, color: T.textMid, marginBottom: 12, lineHeight: 1.4 }}>
+            💡 학생이 로그인할 때 입력하는 4자리 숫자예요.<br/>
+            학생이 잊으면 여기서 다시 0000으로 초기화할 수 있어요.
+          </div>
           {/* 메모 */}
           <div style={{ fontSize: 12, fontWeight: 800, color: T.text, marginBottom: 6 }}>메모 (선택)</div>
           <textarea

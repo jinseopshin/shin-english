@@ -45,7 +45,7 @@ import { ReviewCard } from "./ReviewCard";
 import { StudentWordStatsCard } from "./StudentWordStatsCard";
 import { PronunciationGame } from "./PronunciationGame";
 import { PronunciationWidget } from "./PronunciationWidget";
-import { recordWordEncounter } from "./studentWords";
+import { recordWordEncounter, getTodayReviewWords } from "./studentWords";
 import { addToWordbook, removeFromWordbook, isInWordbook } from "./studentWords";
 
 // ── 음성 합성 (발음 기능) ─────────────────────────────────────────────────
@@ -3009,6 +3009,15 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
   const [reviewWords, setReviewWords] = useState(null); // 복습 모드용 단어 목록
   const [newBadges, setNewBadges] = useState([]);
   const [tab, setTab] = useState("game"); // game | badge
+  const [reviewCount, setReviewCount] = useState(0);
+  useEffect(() => {
+    if (!name) return;
+    let cancelled = false;
+    getTodayReviewWords(name, 50).then(words => {
+      if (!cancelled) setReviewCount(words?.length || 0);
+    });
+    return () => { cancelled = true; };
+  }, [name, screen]);
   const [showFreeQuiz, setShowFreeQuiz] = useState(() => {
     if (typeof window === "undefined") return false;
     try { return window.localStorage.getItem("angela_free_quiz_open_" + name) === "true"; }
@@ -3174,7 +3183,7 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
         })()}
  
         {/* ════════════════════════════════════════════════ */}
-        {/*  ⭐ 오늘의 학습 — 발음 / 단어장 / 복습 (3개 가로 배치)  */}
+        {/*  ⭐ 오늘의 학습 — 발음 / 단어장 / 복습  */}
         {/* ════════════════════════════════════════════════ */}
         <div style={{
           fontSize: 12, fontWeight: 800, color: T.textMid,
@@ -3187,29 +3196,71 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
  
           {/* 단어장 + 복습 카드 가로 배치 */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 8 }}>
-            {/* 내 단어장 */}
+            {/* 📚 내 단어장 */}
             <Card onClick={() => setScreen("wordbook")} style={{
-              padding: "14px 12px",
+              padding: "16px 12px",
               background: `linear-gradient(135deg, ${T.purple}, ${T.accent})`,
               color: "white", cursor: "pointer", border: "none",
-              textAlign: "center"
+              textAlign: "center",
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+              minHeight: 110
             }}>
-              <div style={{ fontSize: 26, marginBottom: 4 }}>📚</div>
-              <div style={{ fontSize: 12, fontWeight: 900 }}>내 단어장</div>
-              <div style={{ fontSize: 10, opacity: 0.85, marginTop: 2 }}>⭐ 모은 단어 복습</div>
+              <div style={{ fontSize: 30, marginBottom: 4 }}>📚</div>
+              <div style={{ fontSize: 13, fontWeight: 900 }}>내 단어장</div>
+              <div style={{ fontSize: 10, opacity: 0.85, marginTop: 3 }}>⭐ 모은 단어로 복습</div>
             </Card>
  
-            {/* 망각 곡선 복습 카드 (있을 때만, 없으면 빈 자리) */}
-            <ReviewCard
-              studentName={name}
-              onStartReview={(words) => {
-                setReviewWords(words);
-                setSelectedLevel("review");
-                setScreen("game-match");
-              }}
-              compact
-            />
+            {/* 🔔 복습 카드 (있으면 강조, 없으면 안내) */}
+            {reviewCount > 0 ? (
+              <Card
+                onClick={async () => {
+                  const words = await getTodayReviewWords(name, 20);
+                  if (words && words.length > 0) {
+                    setReviewWords(words);
+                    setSelectedLevel("review");
+                    setScreen("game-match");
+                  }
+                }}
+                style={{
+                  padding: "16px 12px",
+                  background: `linear-gradient(135deg, ${T.orange}, ${T.red})`,
+                  color: "white", cursor: "pointer", border: "none",
+                  textAlign: "center",
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  minHeight: 110, position: "relative"
+                }}>
+                {/* 알림 배지 */}
+                <div style={{
+                  position: "absolute", top: 6, right: 6,
+                  background: "white", color: T.red,
+                  fontSize: 10, fontWeight: 900,
+                  padding: "2px 7px", borderRadius: 8,
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.15)"
+                }}>{reviewCount}</div>
+                <div style={{ fontSize: 30, marginBottom: 4 }}>🔔</div>
+                <div style={{ fontSize: 13, fontWeight: 900 }}>오늘의 복습</div>
+                <div style={{ fontSize: 10, opacity: 0.95, marginTop: 3 }}>잊기 전에 다시 봐요!</div>
+              </Card>
+            ) : (
+              <Card style={{
+                padding: "16px 12px",
+                background: T.greenLight,
+                border: `1.5px solid ${T.green}33`,
+                textAlign: "center",
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                minHeight: 110,
+                cursor: "default"
+              }}>
+                <div style={{ fontSize: 30, marginBottom: 4 }}>✅</div>
+                <div style={{ fontSize: 13, fontWeight: 900, color: T.green }}>복습 완료!</div>
+                <div style={{ fontSize: 10, color: T.textMid, marginTop: 3 }}>오늘 복습할 단어가 없어요</div>
+              </Card>
+            )}
           </div>
+ 
+          {/* 학생 목표 위젯 (있을 때만) */}
+          <StudentGoalWidget studentName={name} goals={goals} />
+        </div>
  
           {/* 학생 목표 위젯 (있을 때만) */}
           <StudentGoalWidget studentName={name} goals={goals} />

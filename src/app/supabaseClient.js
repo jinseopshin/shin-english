@@ -1,8 +1,10 @@
 // ══════════════════════════════════════════════════════════════════════════
-// Angela's English Academy — Supabase 클라이언트 v2
+// Angela's English Academy — Supabase 클라이언트 v3 (데이터 보호 강화)
 //
-// localStorage 키와 Supabase 테이블 간의 매핑을 자동으로 처리합니다.
-// 모든 데이터 작업이 Supabase 우선, localStorage는 백업으로 동작합니다.
+// v3 변경 사항 (2026-05-19):
+// - 안전장치 추가: 빈 데이터로 save 시도되면 거부 (시크릿 모드 사고 방지)
+// - 학생/시험/문제은행 등 핵심 데이터의 대량 삭제 방지
+// - 콘솔에 명확한 경고 메시지
 // ══════════════════════════════════════════════════════════════════════════
 
 import { createClient } from "@supabase/supabase-js";
@@ -27,9 +29,6 @@ export const supabase = (supabaseUrl && supabaseAnonKey)
 
 export const isSupabaseReady = () => supabase !== null;
 
-// ──────────────────────────────────────────────────────────────────────────
-// 연결 테스트
-// ──────────────────────────────────────────────────────────────────────────
 export async function testConnection() {
   if (!supabase) {
     return { ok: false, message: "Supabase 클라이언트가 초기화되지 않았어요" };
@@ -44,14 +43,41 @@ export async function testConnection() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
+//  🛡️ v3 안전장치: 빈 데이터 save 거부
+//
+//  로컬에 데이터가 비어있는데 DB엔 threshold개 이상 있을 때 save를 거부합니다.
+//  시크릿 모드, 캐시 초기화, 다른 PC에서 처음 로그인 같은 상황에서
+//  의도치 않게 모든 데이터가 삭제되는 사고를 막아줍니다.
+//
+//  threshold = DB에 N개 이상 있을 때만 안전장치 동작
+//  (1~2개만 있을 땐 진섭님이 의도적으로 삭제했을 수 있으니 허용)
+// ══════════════════════════════════════════════════════════════════════════
+async function isUnsafeEmptyOverwrite(tableName, newRowCount, threshold = 3) {
+  try {
+    const { count, error } = await supabase
+      .from(tableName)
+      .select("*", { count: "exact", head: true });
+    if (error) return false;
+    
+    const dbCount = count || 0;
+    if (newRowCount === 0 && dbCount >= threshold) {
+      console.warn(
+        `🛡️ [안전장치] ${tableName} 테이블에 ${dbCount}개 row가 있는데 ` +
+        `빈 데이터로 save 시도됨 — 거부합니다. 새로고침 후 다시 시도하세요.`
+      );
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
 // 데이터 매핑 정의
-// localStorage 키별로 어떻게 Supabase와 주고받을지 정의합니다.
 // ══════════════════════════════════════════════════════════════════════════
 
-// students: { "민준": {...}, "서연": {...} } 형태 (객체)
-// 행 단위로 students 테이블에 저장
 const studentsAdapter = {
-  // Supabase → 앱 (행 배열 → 객체)
   async fetch() {
     const { data, error } = await supabase.from("students").select("*");
     if (error) throw error;
@@ -71,7 +97,6 @@ const studentsAdapter = {
     });
     return obj;
   },
-  // 앱 → Supabase (객체 → 행 배열)
   async save(value) {
     const rows = Object.values(value || {}).map(s => ({
       name: s.name,
@@ -86,7 +111,9 @@ const studentsAdapter = {
       updated_at: new Date().toISOString(),
     }));
 
-    // 현재 DB에 있는 학생 목록 가져와서 삭제할 학생 찾기
+    // 🛡️ v3 안전장치
+    if (await isUnsafeEmptyOverwrite("students", rows.length)) return false;
+
     const { data: existing } = await supabase.from("students").select("name");
     const currentNames = new Set(rows.map(r => r.name));
     const toDelete = (existing || []).filter(e => !currentNames.has(e.name)).map(e => e.name);
@@ -102,7 +129,6 @@ const studentsAdapter = {
   }
 };
 
-// question_banks: { "id1": {...}, "id2": {...} } 형태 (객체, id 키)
 const banksAdapter = {
   async fetch() {
     const { data, error } = await supabase.from("question_banks").select("*");
@@ -129,6 +155,8 @@ const banksAdapter = {
       updated_at: new Date().toISOString(),
     }));
 
+    if (await isUnsafeEmptyOverwrite("question_banks", rows.length)) return false;
+
     const { data: existing } = await supabase.from("question_banks").select("id");
     const currentIds = new Set(rows.map(r => r.id));
     const toDelete = (existing || []).filter(e => !currentIds.has(e.id)).map(e => e.id);
@@ -144,7 +172,6 @@ const banksAdapter = {
   }
 };
 
-// exams: [{ id, ...}, ...] 형태 (배열)
 const examsAdapter = {
   async fetch() {
     const { data, error } = await supabase.from("exams").select("*").order("created_at", { ascending: false });
@@ -170,6 +197,8 @@ const examsAdapter = {
       set_ids: e.setIds || [],
     }));
 
+    if (await isUnsafeEmptyOverwrite("exams", rows.length)) return false;
+
     const { data: existing } = await supabase.from("exams").select("id");
     const currentIds = new Set(rows.map(r => r.id));
     const toDelete = (existing || []).filter(e => !currentIds.has(e.id)).map(e => e.id);
@@ -185,7 +214,6 @@ const examsAdapter = {
   }
 };
 
-// assignments: [{ id, studentName, ...}] 형태 (배열)
 const assignmentsAdapter = {
   async fetch() {
     const { data, error } = await supabase.from("assignments").select("*");
@@ -212,6 +240,8 @@ const assignmentsAdapter = {
       status: a.status || "pending",
     }));
 
+    if (await isUnsafeEmptyOverwrite("assignments", rows.length)) return false;
+
     const { data: existing } = await supabase.from("assignments").select("id");
     const currentIds = new Set(rows.map(r => r.id));
     const toDelete = (existing || []).filter(e => !currentIds.has(e.id)).map(e => e.id);
@@ -227,7 +257,6 @@ const assignmentsAdapter = {
   }
 };
 
-// groups/notices/goals/schedules: [{...}, ...] 배열, data 컬럼에 통째로 저장
 const makeJsonListAdapter = (tableName) => ({
   async fetch() {
     const { data, error } = await supabase.from(tableName).select("*");
@@ -241,6 +270,8 @@ const makeJsonListAdapter = (tableName) => ({
       data: item,
       updated_at: new Date().toISOString(),
     }));
+
+    if (await isUnsafeEmptyOverwrite(tableName, rows.length)) return false;
 
     const { data: existing } = await supabase.from(tableName).select("id");
     const currentIds = new Set(rows.map(r => r.id));
@@ -257,7 +288,6 @@ const makeJsonListAdapter = (tableName) => ({
   }
 });
 
-// attendance: { "key1": {...}, "key2": {...} } 객체, key 컬럼 사용
 const attendanceAdapter = {
   async fetch() {
     const { data, error } = await supabase.from("attendance").select("*");
@@ -275,6 +305,9 @@ const attendanceAdapter = {
       updated_at: new Date().toISOString(),
     }));
 
+    // 🛡️ 출석 기록은 더 보수적으로 (5개 이상이면 안전장치 발동)
+    if (await isUnsafeEmptyOverwrite("attendance", rows.length, 5)) return false;
+
     const { data: existing } = await supabase.from("attendance").select("key");
     const currentKeys = new Set(rows.map(r => r.key));
     const toDelete = (existing || []).filter(e => !currentKeys.has(e.key)).map(e => e.key);
@@ -290,7 +323,7 @@ const attendanceAdapter = {
   }
 };
 
-// settings: 단일 키-값 (비밀번호, 다크모드 등 작은 값들)
+// settings: 단일 키-값 (안전장치 불필요 — upsert만 사용)
 const settingsAdapter = (settingKey) => ({
   async fetch() {
     const { data, error } = await supabase
@@ -311,8 +344,7 @@ const settingsAdapter = (settingKey) => ({
 });
 
 // ══════════════════════════════════════════════════════════════════════════
-// 매핑 테이블: localStorage 키 → Supabase 어댑터
-// 이 매핑에 정의되지 않은 키는 localStorage만 사용합니다 (안전 폴백)
+// 매핑 테이블
 // ══════════════════════════════════════════════════════════════════════════
 export const STORAGE_ADAPTERS = {
   angela_students: studentsAdapter,
@@ -328,7 +360,6 @@ export const STORAGE_ADAPTERS = {
   angela_dark: settingsAdapter("dark"),
 };
 
-// 어댑터 가져오기 (없으면 null)
 export function getAdapter(key) {
   return STORAGE_ADAPTERS[key] || null;
 }

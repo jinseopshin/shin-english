@@ -756,6 +756,7 @@ function StudentManager({ students, setStudents }) {
   const [editTarget, setEditTarget] = useState(null);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("name"); // name | grade | points | recent
+  const [activeTab, setActiveTab] = useState("active"); // "active" | "inactive"
 
   // 추가/편집 폼 상태
   const [form, setForm] = useState({ name: "", grade: "초등5", avatar: "🦊", memo: "" });
@@ -766,7 +767,9 @@ function StudentManager({ students, setStudents }) {
   const [csvPreview, setCsvPreview] = useState([]);
   const [csvMsg, setCsvMsg] = useState("");
 
-  const studentList = Object.values(students || {}).filter(s => s.active !== false);
+  const studentList = Object.values(students || {});
+  const activeCount = studentList.filter(s => s.active !== false).length;
+  const inactiveCount = studentList.filter(s => s.active === false).length;
 
   // ── CSV 파일 업로드 ─────────────────────────────────────────
   const handleCsvFile = (e) => {
@@ -872,7 +875,8 @@ function StudentManager({ students, setStudents }) {
     URL.revokeObjectURL(url);
   };
 
-  const filtered = studentList
+const filtered = studentList
+    .filter(s => activeTab === "active" ? s.active !== false : s.active === false)
     .filter(s => !search || s.name.includes(search))
     .sort((a, b) => {
       if (sortBy === "name") return a.name.localeCompare(b.name, "ko");

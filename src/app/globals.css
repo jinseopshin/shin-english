@@ -120,3 +120,14 @@ input, textarea, select { font-family: inherit; }
   .app-container { max-width: none !important; padding: 0 !important; }
   @page { margin: 15mm 15mm; size: A4; }
 }
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

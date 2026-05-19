@@ -43,6 +43,7 @@ import { SupabaseMigration } from "./SupabaseMigration";
 import { MyWordbook } from "./MyWordbook";
 import { ReviewCard } from "./ReviewCard";
 import { StudentWordStatsCard } from "./StudentWordStatsCard";
+import { PronunciationGame } from "./PronunciationGame";
 import { recordWordEncounter } from "./studentWords";
 import { addToWordbook, removeFromWordbook, isInWordbook } from "./studentWords";
 
@@ -3067,6 +3068,7 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
   if (screen === "game-lines")    return <WordMatchLines  name={name} setStudents={setStudents} onExit={exitGame} />;
   if (screen === "game-search")   return <WordSearchGame  name={name} setStudents={setStudents} onExit={exitGame} />;
   if (screen === "game-dictation")return <DictationGame   name={name} setStudents={setStudents} onExit={exitGame} />;
+  if (screen === "game-pronunciation") return <PronunciationGame name={name} setStudents={setStudents} student={me} onExit={exitGame} />;
   if (screen === "quiz" && quizSet) return <StudentQuiz name={name} setStudents={setStudents} qset={quizSet} onExit={() => { setScreen("home"); setQuizSet(null); }} />;
 
   const hour = new Date().getHours();
@@ -3247,6 +3249,7 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
                 { id:"game-lines",    icon:"🔗", name:"단어 연결",     sub:"영어-한글 매칭",    bg:T.purpleLight },
                 { id:"game-search",   icon:"🔍", name:"단어 찾기",     sub:"숨겨진 단어 찾기",  bg:T.greenLight },
                 { id:"game-dictation",icon:"🎤", name:"받아쓰기",      sub:"듣고 받아써요",     bg:T.accentLight },
+                { id:"game-pronunciation", icon:"🗣️", name:"발음 챌린지", sub:"🎤 AI 발음 채점!", bg:T.purpleLight, badge:"🆕 NEW" },
                 { id:"game-wrong",    icon:"📒", name:"오답 노트",     sub:"틀린 단어 복습",    bg:T.redLight },
               ].map(g => (
                 <Card key={g.id}

@@ -3264,6 +3264,12 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
   const [reviewWords, setReviewWords] = useState(null); // 복습 모드용 단어 목록
   const [newBadges, setNewBadges] = useState([]);
   const [tab, setTab] = useState("game"); // game | badge
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [pinChangeStep, setPinChangeStep] = useState("current"); // "current" | "new" | "confirm"
+  const [pinChangeInput, setPinChangeInput] = useState({ current: "", new: "", confirm: "", error: "", success: false });
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [pinChangeStep, setPinChangeStep] = useState("new"); // "new" | "confirm" | "done"
+  const [pinChangeData, setPinChangeData] = useState({ newPin: "", confirmPin: "", error: "" });
   const [reviewCount, setReviewCount] = useState(0);
   useEffect(() => {
     if (!name) return;
@@ -3347,7 +3353,170 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
 
   const hour = new Date().getHours();
   const greet = hour < 12 ? "Good Morning ☀️" : hour < 18 ? "Good Afternoon 👋" : "Good Evening 🌙";
- 
+
+// ── PIN 변경 화면 ──────────────────────────────────────────────────
+  if (showPasswordChange) {
+    const me = students[name] || {};
+    const currentPin = me.password || "0000";
+
+    const handleNewPin = (digit) => {
+      if (pinChangeStep === "new") {
+        if (pinChangeData.newPin.length >= 4) return;
+        const next = pinChangeData.newPin + digit;
+        setPinChangeData(d => ({ ...d, newPin: next, error: "" }));
+        if (next.length === 4) {
+          setTimeout(() => setPinChangeStep("confirm"), 150);
+        }
+      } else if (pinChangeStep === "confirm") {
+        if (pinChangeData.confirmPin.length >= 4) return;
+        const next = pinChangeData.confirmPin + digit;
+        setPinChangeData(d => ({ ...d, confirmPin: next, error: "" }));
+        if (next.length === 4) {
+          setTimeout(() => {
+            if (next === pinChangeData.newPin) {
+              // 성공 → 저장
+              if (next === currentPin) {
+                setPinChangeData(d => ({ ...d, error: "현재 비밀번호와 같아요. 새 비밀번호를 입력해주세요." }));
+                setPinChangeStep("new");
+                setPinChangeData(d => ({ ...d, newPin: "", confirmPin: "", error: "현재 비밀번호와 같아요. 새 비밀번호를 입력해주세요." }));
+                return;
+              }
+              setStudents(prev => ({
+                ...prev,
+                [name]: { ...prev[name], password: next }
+              }));
+              setPinChangeStep("done");
+              setTimeout(() => {
+                setShowPasswordChange(false);
+                setPinChangeStep("new");
+                setPinChangeData({ newPin: "", confirmPin: "", error: "" });
+              }, 1800);
+            } else {
+              // 불일치 → 다시 입력
+              setPinChangeData({ newPin: "", confirmPin: "", error: "두 비밀번호가 달라요. 다시 입력해주세요." });
+              setPinChangeStep("new");
+              if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(200);
+            }
+          }, 150);
+        }
+      }
+    };
+
+    const handleBack = () => {
+      if (pinChangeStep === "new") {
+        setPinChangeData(d => ({ ...d, newPin: d.newPin.slice(0, -1), error: "" }));
+      } else if (pinChangeStep === "confirm") {
+        setPinChangeData(d => ({ ...d, confirmPin: d.confirmPin.slice(0, -1), error: "" }));
+      }
+    };
+
+    const cancelChange = () => {
+      setShowPasswordChange(false);
+      setPinChangeStep("new");
+      setPinChangeData({ newPin: "", confirmPin: "", error: "" });
+    };
+
+    const displayedPin = pinChangeStep === "new" ? pinChangeData.newPin : pinChangeData.confirmPin;
+    const stepTitle = pinChangeStep === "new" ? "새 비밀번호 4자리" : pinChangeStep === "confirm" ? "한 번 더 입력해주세요" : "변경 완료!";
+    const stepIcon = pinChangeStep === "done" ? "✅" : pinChangeStep === "confirm" ? "🔁" : "🔑";
+
+    return (
+      <div style={{
+        minHeight: "100vh",
+        background: `linear-gradient(135deg, ${T.purple} 0%, ${T.accent} 100%)`,
+        display: "flex", alignItems: "center", justifyContent: "center", padding: 20
+      }}>
+        <Card style={{ maxWidth: 380, width: "100%", padding: 24 }}>
+          <div style={{ textAlign: "center", marginBottom: 18 }}>
+            <div style={{ fontSize: 48, marginBottom: 8 }}>{stepIcon}</div>
+            <div style={{ fontSize: 17, fontWeight: 900, color: T.text }}>비밀번호 변경</div>
+            <div style={{ fontSize: 12, color: T.textMid, marginTop: 4 }}>{stepTitle}</div>
+          </div>
+
+          {pinChangeStep === "done" ? (
+            <div style={{
+              textAlign: "center", padding: "20px 10px",
+              background: T.greenLight, borderRadius: 12, marginBottom: 12
+            }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: T.green }}>비밀번호가 변경되었어요!</div>
+              <div style={{ fontSize: 11, color: T.textMid, marginTop: 4 }}>잊지 않게 잘 기억해주세요 🤫</div>
+            </div>
+          ) : (
+            <>
+              {/* PIN 표시 (4개 동그라미) */}
+              <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 16 }}>
+                {[0, 1, 2, 3].map(i => (
+                  <div key={i} style={{
+                    width: 18, height: 18, borderRadius: "50%",
+                    background: displayedPin.length > i ? T.accent : "transparent",
+                    border: `2px solid ${displayedPin.length > i ? T.accent : T.border}`,
+                    transition: "all 0.15s",
+                  }} />
+                ))}
+              </div>
+
+              {/* 에러 메시지 */}
+              {pinChangeData.error && (
+                <div style={{
+                  textAlign: "center", color: T.red, fontSize: 12, fontWeight: 700,
+                  marginBottom: 12, padding: "8px 10px", background: T.redLight, borderRadius: 8
+                }}>
+                  ⚠️ {pinChangeData.error}
+                </div>
+              )}
+
+              {/* 숫자 키패드 */}
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 8, marginBottom: 14
+              }}>
+                {["1","2","3","4","5","6","7","8","9"].map(d => (
+                  <button key={d} onClick={() => handleNewPin(d)}
+                    style={{
+                      padding: "16px 0", borderRadius: 12,
+                      background: T.bg, border: `1.5px solid ${T.border}`,
+                      fontSize: 22, fontWeight: 800, color: T.text,
+                      cursor: "pointer", transition: "all 0.1s"
+                    }}
+                  >{d}</button>
+                ))}
+                <button onClick={handleBack}
+                  style={{
+                    padding: "16px 0", borderRadius: 12,
+                    background: T.bg, border: `1.5px solid ${T.border}`,
+                    fontSize: 18, fontWeight: 800, color: T.textMid,
+                    cursor: "pointer"
+                  }}>←</button>
+                <button onClick={() => handleNewPin("0")}
+                  style={{
+                    padding: "16px 0", borderRadius: 12,
+                    background: T.bg, border: `1.5px solid ${T.border}`,
+                    fontSize: 22, fontWeight: 800, color: T.text,
+                    cursor: "pointer"
+                  }}>0</button>
+                <button onClick={() => {
+                  if (pinChangeStep === "new") setPinChangeData(d => ({ ...d, newPin: "", error: "" }));
+                  else setPinChangeData(d => ({ ...d, confirmPin: "", error: "" }));
+                }}
+                  style={{
+                    padding: "16px 0", borderRadius: 12,
+                    background: T.bg, border: `1.5px solid ${T.border}`,
+                    fontSize: 11, fontWeight: 800, color: T.textMid,
+                    cursor: "pointer"
+                  }}>지우기</button>
+              </div>
+
+              <Btn v="ghost" size="md" onClick={cancelChange} style={{ width: "100%" }}>
+                취소
+              </Btn>
+            </>
+          )}
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <>
     <div style={{ minHeight: "100vh", background: T.bg, paddingBottom: 40 }}>
@@ -3368,9 +3537,13 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
             <span style={{ fontSize: 13 }}>⭐</span>
             <span style={{ fontSize: 14, fontWeight: 900 }}>{points}</span>
           </div>
-          <button onClick={() => setDarkMode && setDarkMode(d => !d)} title={darkMode ? "라이트" : "다크"}
+<button onClick={() => setDarkMode && setDarkMode(d => !d)} title={darkMode ? "라이트" : "다크"}
             style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, padding: "4px 6px", borderRadius: 8 }}>
             {darkMode ? "☀️" : "🌙"}
+          </button>
+          <button onClick={() => setShowPasswordChange(true)} title="비밀번호 변경"
+            style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, padding: "4px 6px", borderRadius: 8 }}>
+            🔑
           </button>
           <Btn v="ghost" size="sm" onClick={onLogout} style={{ fontSize: 11 }}>로그아웃</Btn>
         </div>

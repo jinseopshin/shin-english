@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
@@ -746,20 +746,47 @@ const SENTENCE_QUESTIONS = [
 ];
 
 export function SentenceGame({ name, setStudents, onExit }) {
+  // ⚠️ 모든 Hook은 early return보다 위에 (React error #310 방지)
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState(null);
   const [showHint, setShowHint] = useState(false);
+  const awardedRef = useRef(false);
 
   const questions = useMemo(()=>[...SENTENCE_QUESTIONS].sort(()=>Math.random()-0.5).slice(0,10),[]);
 
-  if (round >= questions.length) {
-    if (typeof setStudents==="function") {
-      setStudents(prev=>{
-        const s=prev[name]||{};
-        return {...prev,[name]:{...s,points:(s.points||0)+score*12,records:[...(s.records||[]),(()=>{const r={type:"game",gameType:"문장 빈칸",score,total:questions.length,points:score*12,date:new Date().toISOString()};return r;})()].slice(-50)}};
+  const gameOver = round >= questions.length;
+
+  // ✅ 게임 종료 시 점수 저장 (한 번만, useEffect 안에서 안전하게)
+  useEffect(() => {
+    if (!gameOver || awardedRef.current) return;
+    awardedRef.current = true;
+    if (typeof setStudents === "function") {
+      setStudents(prev => {
+        const s = prev[name] || {};
+        return {
+          ...prev,
+          [name]: {
+            ...s,
+            points: (s.points || 0) + score * 12,
+            records: [
+              ...(s.records || []),
+              {
+                type: "game",
+                gameType: "문장 빈칸",
+                score,
+                total: questions.length,
+                points: score * 12,
+                date: new Date().toISOString()
+              }
+            ].slice(-50)
+          }
+        };
       });
     }
+  }, [gameOver, score, questions.length, name, setStudents]);
+
+  if (gameOver) {
     return (
       <div style={{minHeight:"100vh",background:T.bg,padding:"60px 20px",textAlign:"center"}}>
         <div style={{fontSize:64,marginBottom:14}}>{score>=8?"🎉":score>=5?"👏":"💪"}</div>

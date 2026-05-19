@@ -2137,7 +2137,7 @@ function AssignmentManager({ students, bank, assignments, setAssignments }) {
     />;
   }
 
-  const studentList = Object.values(students || {});
+  const studentList = Object.values(students || {}).filter(s => s.active !== false);
   const filtered = search
     ? studentList.filter(s => s.name.includes(search))
     : studentList;

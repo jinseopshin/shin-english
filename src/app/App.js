@@ -46,6 +46,7 @@ import { StudentWordStatsCard } from "./StudentWordStatsCard";
 import { PronunciationGame } from "./PronunciationGame";
 import { PronunciationWidget } from "./PronunciationWidget";
 import { recordWordEncounter, getTodayReviewWords } from "./studentWords";
+import WordLearningDashboard from "./WordLearningDashboard";
 import { addToWordbook, removeFromWordbook, isInWordbook } from "./studentWords";
 
 // ── 음성 합성 (발음 기능) ─────────────────────────────────────────────────
@@ -2446,6 +2447,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
     attendance:   { title:"출석 기록",         back: "more" },
     "word-homework": { title:"📚 단어 숙제 관리", back: "dashboard" },
     "custom-exam":   { title:"📝 맞춤 시험지", back: "dashboard" },
+    "word-stats":     { title:"📖 단어 학습 현황", back: "more" },
     "student-report": { title:"학생 상세 리포트", back: "students" },
   };
 
@@ -2506,6 +2508,16 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
         {screen === "attendance"      && <AttendanceManager students={students} attendance={attendance} setAttendance={setAttendance} />}
         {screen === "word-homework"   && <WordHomeworkManager students={students} setStudents={setStudents} onNav={onNav} />}
         {screen === "custom-exam"     && <CustomExamManager students={students} setStudents={setStudents} bank={bank} onNav={onNav} />}
+         {screen === "word-stats" && (
+          <WordLearningDashboard
+            students={students}
+            T={T}
+            Card={Card}
+            Btn={Btn}
+            Tag={Tag}
+            onStudentClick={(s) => { setReportStudent(s); onNav("student-report"); }}
+          />
+        )}
         {screen === "student-report"  && reportStudent && (
           <>
             <StudentWordStatsCard studentName={reportStudent.name} />
@@ -2527,6 +2539,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
                 { id:"exam-builder", icon:"✏️", label:"시험지 만들기",    desc:"새 시험지 생성" },
                 { id:"exams",        icon:"📋", label:"시험지 목록",      desc:"만든 시험지 보기 / 인쇄" },
                 { id:"students",     icon:"📈", label:"학생 통계",        desc:"전체 학습 현황 분석" },
+                { id:"word-stats",   icon:"📖", label:"단어 학습 현황",  desc:"전체 학생 단어 진도 통계" },
               ].map(m => (
                 <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 14, textAlign: "center" }}>
                   <div style={{ fontSize: 28, marginBottom: 8 }}>{m.icon}</div>

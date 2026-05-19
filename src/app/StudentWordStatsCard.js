@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { getStudentWordStats } from "./studentWords";
+import { getStudentWordStats, getPronunciationStats } from "./studentWords";
 import { supabase, isSupabaseReady } from "./supabaseClient";
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -26,18 +26,23 @@ const T = {
 export function StudentWordStatsCard({ studentName }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [pronunStats, setPronunStats] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
   const [detailWords, setDetailWords] = useState({ mastered: [], struggling: [], favorites: [] });
   const [detailLoading, setDetailLoading] = useState(false);
 
-  // 기본 통계 로드
+// 기본 통계 + 발음 통계 로드
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const data = await getStudentWordStats(studentName);
+      const [wordStats, pronStats] = await Promise.all([
+        getStudentWordStats(studentName),
+        getPronunciationStats(studentName),
+      ]);
       if (!cancelled) {
-        setStats(data);
+        setStats(wordStats);
+        setPronunStats(pronStats);
         setLoading(false);
       }
     })();
@@ -198,6 +203,61 @@ export function StudentWordStatsCard({ studentName }) {
           </div>
         </div>
       </div>
+
+{/* 🎤 발음 학습 통계 (Phase 3) */}
+      {pronunStats && pronunStats.count > 0 && (
+        <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${T.border}` }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+            <div style={{ fontSize: 18 }}>🎤</div>
+            <div style={{ fontSize: 13, fontWeight: 900, color: T.text }}>발음 학습 통계</div>
+          </div>
+          
+          <div style={{
+            background: pronunStats.avg >= 80 ? T.greenLight : pronunStats.avg >= 60 ? T.accentLight : T.yellowLight,
+            borderRadius: 12, padding: 12, marginBottom: 10,
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+          }}>
+            <div>
+              <div style={{ fontSize: 11, color: T.textMid, fontWeight: 700 }}>평균 발음 점수</div>
+              <div style={{ fontSize: 24, fontWeight: 900, color: pronunStats.avg >= 80 ? T.green : pronunStats.avg >= 60 ? T.accent : T.yellow }}>
+                {pronunStats.avg}<span style={{ fontSize: 14, opacity: 0.7 }}>점</span>
+              </div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 11, color: T.textMid, fontWeight: 700 }}>도전한 단어</div>
+              <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{pronunStats.count}개</div>
+            </div>
+          </div>
+
+          {pronunStats.weakWords && pronunStats.weakWords.length > 0 && (
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 800, color: T.red, marginBottom: 6 }}>
+                💪 발음 약점 단어 TOP {pronunStats.weakWords.length}
+              </div>
+              <div style={{ background: T.redLight, borderRadius: 10, padding: "8px 10px" }}>
+                {pronunStats.weakWords.map((w, i) => (
+                  <div key={w.word_en} style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    padding: "4px 0",
+                    borderBottom: i < pronunStats.weakWords.length - 1 ? `1px solid ${T.redLight}` : "none",
+                  }}>
+                    <div>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: T.text }}>{w.word_en}</span>
+                      <span style={{ fontSize: 11, color: T.textMid, marginLeft: 6 }}>{w.word_ko}</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: T.red, fontWeight: 700 }}>
+                      {w.pronunciation_avg}점 · {w.pronunciation_count}회 시도
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ fontSize: 10, color: T.textDim, marginTop: 4 }}>
+                💡 이 단어들을 따로 발음 연습시켜보세요
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 상세 단어 목록 (펼치기) */}
       {showDetails && (

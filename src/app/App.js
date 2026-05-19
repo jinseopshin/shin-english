@@ -3277,6 +3277,7 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
   const [reviewWords, setReviewWords] = useState(null); // 복습 모드용 단어 목록
   const [newBadges, setNewBadges] = useState([]);
   const [tab, setTab] = useState("game"); // game | badge
+  const [welcomeToast, setWelcomeToast] = useState({ show: false, message: "", icon: "" });
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [pinChangeStep, setPinChangeStep] = useState("new"); // "new" | "confirm" | "done"
   const [pinChangeData, setPinChangeData] = useState({ newPin: "", confirmPin: "", error: "" });
@@ -3289,6 +3290,43 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
     });
     return () => { cancelled = true; };
   }, [name, screen]);
+  // 로그인 환영 메시지 (한 번만 표시)
+  useEffect(() => {
+    if (!name) return;
+    let cancelled = false;
+    // 약간 딜레이 후 표시 (화면이 그려진 다음에)
+    const timer = setTimeout(async () => {
+      try {
+        const words = await getTodayReviewWords(name, 100);
+        const count = words?.length || 0;
+        if (cancelled) return;
+
+        let icon, message;
+        if (count >= 30) {
+          icon = "🔥";
+          message = `오늘 복습 ${count}개! 잊기 전에 해봐요`;
+        } else if (count >= 10) {
+          icon = "📚";
+          message = `오늘 복습 ${count}개 있어요`;
+        } else if (count >= 1) {
+          icon = "🌱";
+          message = `오늘 복습 ${count}개 있어요`;
+        } else {
+          icon = "✨";
+          message = "오늘은 새 단어를 배워볼까요?";
+        }
+
+        setWelcomeToast({ show: true, message, icon });
+        // 3초 후 자동 사라짐
+        setTimeout(() => {
+          if (!cancelled) setWelcomeToast(t => ({ ...t, show: false }));
+        }, 3000);
+      } catch (e) {
+        console.warn("환영 메시지 실패:", e);
+      }
+    }, 300);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, []); // 마운트 시 한 번만
   const [showFreeQuiz, setShowFreeQuiz] = useState(() => {
     if (typeof window === "undefined") return false;
     try { return window.localStorage.getItem("angela_free_quiz_open_" + name) === "true"; }
@@ -3530,7 +3568,41 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
   return (
     <>
     <div style={{ minHeight: "100vh", background: T.bg, paddingBottom: 40 }}>
- 
+      {/* 환영 토스트 (3초 후 자동 사라짐) */}
+      {welcomeToast.show && (
+        <div style={{
+          position: "fixed",
+          top: 70,
+          right: 16,
+          left: 16,
+          maxWidth: 380,
+          margin: "0 auto",
+          background: `linear-gradient(135deg, ${T.accent}, ${T.purple})`,
+          color: "white",
+          padding: "12px 16px",
+          borderRadius: 12,
+          boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
+          zIndex: 100,
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          animation: "slideDownFade 0.4s ease-out",
+        }}>
+          <div style={{ fontSize: 24 }}>{welcomeToast.icon}</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: 900, marginBottom: 2 }}>{name}님 환영해요! 👋</div>
+            <div style={{ fontSize: 11, opacity: 0.95, lineHeight: 1.4 }}>{welcomeToast.message}</div>
+          </div>
+          <button onClick={() => setWelcomeToast(t => ({ ...t, show: false }))}
+            style={{
+              background: "rgba(255,255,255,0.2)", border: "none",
+              borderRadius: 6, color: "white", padding: "4px 8px",
+              fontSize: 14, fontWeight: 800, cursor: "pointer",
+              flexShrink: 0
+            }}>×</button>
+        </div>
+      )}
+
       {/* ── 통합 상단 헤더 (인사 + 포인트 한 줄) ── */}
       <div className="topbar" style={{ background: T.card, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 50 }}>
         <div className="top-bar-inner">

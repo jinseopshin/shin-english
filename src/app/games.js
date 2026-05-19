@@ -523,14 +523,24 @@ export function WrongNoteGame({ name, students, setStudents, onExit }) {
 }
 
 // 오답 기록 저장 헬퍼 (다른 게임에서 호출)
-export function recordWrong(name, wordEn, isCorrect) {
+// Phase 2: 이제 망각 곡선까지 자동 업데이트됨
+export function recordWrong(name, wordEn, isCorrect, wordKo = "") {
+  // 1) localStorage 폴백 (오프라인 대비)
   try {
     const key=`angela_wrong_${name}`;
     const data=ls.get(key, {});
     data[wordEn]=data[wordEn]||{wrong:0,correct:0};
     if(isCorrect)data[wordEn].correct++; else data[wordEn].wrong++;
+    if (wordKo) data[wordEn].ko = wordKo;
     ls.set(key, data);
   } catch {}
+
+  // 2) Supabase의 student_words 테이블에도 기록 (망각 곡선 자동 업데이트)
+  if (!name || !wordEn) return;
+  // 동적 import로 순환 참조 방지 + 비동기로 실행 (게임 흐름 막지 않음)
+  import("./studentWords").then(m => {
+    m.recordWordEncounter(name, { en: wordEn, ko: wordKo || "" }, isCorrect);
+  }).catch(() => {});
 }
 
 // ══════════════════════════════════════════════════════════════════════════

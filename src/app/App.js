@@ -2591,21 +2591,31 @@ const pick = (idx) => {
 }
 
 // ── 게임 2: 스펠링 ────────────────────────────────────────────────────────
+ 
 function SpellingGame({ name, setStudents, student, onExit, levelId = "all" }) {
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState(null);
-
+  const awardedRef = useRef(false);
+ 
   const questions = useMemo(() => shuffle(getGameWordPool(levelId, student)).slice(0, 8), [levelId, student?.wordHomework]);
-
-  if (round >= questions.length) {
+ 
+  // ✅ 게임 종료 시 점수 저장 (렌더링 중이 아니라 effect에서 한 번만)
+  useEffect(() => {
+    if (awardedRef.current) return;
+    if (questions.length === 0 || round < questions.length) return;
+    awardedRef.current = true;
     saveStudentRecord(setStudents, name, {
       type: "game", gameType: "스펠링",
       score, total: questions.length,
       category: questions[0]?.cat || "기타",
       points: score * 15
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [round, questions.length]);
+ 
+  if (round >= questions.length) {
     return (
       <div style={{ minHeight: "100vh", background: T.bg, padding: "60px 20px", textAlign: "center" }}>
         <div style={{ fontSize: 64, marginBottom: 14 }}>🔤</div>
@@ -2613,13 +2623,18 @@ function SpellingGame({ name, setStudents, student, onExit, levelId = "all" }) {
         <Card style={{ maxWidth: 320, margin: "20px auto 14px", background: T.yellowLight }}>
           <div style={{ fontSize: 14, fontWeight: 800 }}>⭐ +{score * 15} 포인트</div>
         </Card>
-        <Btn v="primary" size="lg" onClick={onExit}>홈으로</Btn>
+        <div style={{ display: "flex", gap: 10, maxWidth: 320, margin: "0 auto" }}>
+          <Btn v="secondary" size="lg" onClick={() => { setRound(0); setScore(0); setInput(""); setFeedback(null); awardedRef.current = false; }} style={{ flex: 1 }}>
+            🔄 다시하기
+          </Btn>
+          <Btn v="primary" size="lg" onClick={onExit} style={{ flex: 1 }}>홈으로</Btn>
+        </div>
       </div>
     );
   }
-
+ 
   const q = questions[round];
-
+ 
   const submit = () => {
     if (feedback) return;
     const isCorrect = input.trim().toLowerCase() === q.en.toLowerCase();
@@ -2630,7 +2645,7 @@ function SpellingGame({ name, setStudents, student, onExit, levelId = "all" }) {
     if (levelId === "homework") updateWordMastery(setStudents, name, q.en, isCorrect);
     setTimeout(() => { setFeedback(null); setInput(""); setRound(round + 1); }, 1200);
   };
-
+ 
   return (
     <div style={{ minHeight: "100vh", background: T.bg, padding: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
@@ -2638,16 +2653,16 @@ function SpellingGame({ name, setStudents, student, onExit, levelId = "all" }) {
         <Tag color="blue">{round + 1} / {questions.length}</Tag>
         <Tag color="yellow">⭐ {score}</Tag>
       </div>
-
+ 
       <Card style={{ marginBottom: 16, textAlign: "center", padding: 28, background: T.greenLight }}>
         <div style={{ fontSize: 12, color: T.textMid, marginBottom: 6 }}>이 단어의 영어 스펠링은?</div>
         <div style={{ fontSize: 36, fontWeight: 900, color: T.green }}>{q.ko}</div>
         <div style={{ fontSize: 11, color: T.textMid, marginTop: 6 }}>힌트: {q.en.length}글자, {q.en[0]}로 시작</div>
       </Card>
-
+ 
       <Input value={input} onChange={e => setInput(e.target.value)} placeholder="영어로 입력하세요" style={{ fontSize: 22, textAlign: "center", marginBottom: 12 }} />
       <Btn v="primary" size="lg" onClick={submit} style={{ width: "100%" }} disabled={!input.trim()}>확인</Btn>
-
+ 
       {feedback && (
         <div style={{ textAlign: "center", marginTop: 16, fontSize: 18, fontWeight: 900,
           color: feedback === "correct" ? T.green : T.red }}>
@@ -2657,6 +2672,7 @@ function SpellingGame({ name, setStudents, student, onExit, levelId = "all" }) {
     </div>
   );
 }
+ 
 
 // ── 게임 3: 스피드 퀴즈 (10초 + 방향 선택) ───────────────────────────────
 function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" }) {
@@ -2664,7 +2680,8 @@ function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" }) {
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(10);
-
+  const awardedRef = useRef(false);
+ 
   const questions = useMemo(() => {
     if (!mode) return [];
     const pool = getGameWordPool(levelId, student);
@@ -2678,7 +2695,8 @@ function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" }) {
       return { ...w, dir, qField, aField, opts, ansIdx: opts.findIndex(o => o.en === w.en) };
     });
   }, [mode, levelId, student?.wordHomework]);
-
+ 
+  // 카운트다운 타이머
   useEffect(() => {
     if (!mode || round >= questions.length) return;
     setTime(10);
@@ -2690,7 +2708,21 @@ function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" }) {
     }, 1000);
     return () => clearInterval(interval);
   }, [round, mode, questions.length]);
-
+ 
+  // ✅ 게임 종료 시 점수 저장 (렌더링 중이 아니라 effect에서 한 번만)
+  useEffect(() => {
+    if (!mode || awardedRef.current) return;
+    if (questions.length === 0 || round < questions.length) return;
+    awardedRef.current = true;
+    saveStudentRecord(setStudents, name, {
+      type: "game", gameType: "스피드 퀴즈",
+      score, total: questions.length,
+      category: questions[0]?.cat || "기타",
+      points: score * 12
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, round, questions.length]);
+ 
   // 방향 선택 화면
   if (!mode) {
     return (
@@ -2725,14 +2757,8 @@ function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" }) {
       </div>
     );
   }
-
+ 
   if (round >= questions.length) {
-    saveStudentRecord(setStudents, name, {
-      type: "game", gameType: "스피드 퀴즈",
-      score, total: questions.length,
-      category: questions[0]?.cat || "기타",
-      points: score * 12
-    });
     return (
       <div style={{ minHeight: "100vh", background: T.bg, padding: "60px 20px", textAlign: "center" }}>
         <div style={{ fontSize: 64, marginBottom: 14 }}>⚡</div>
@@ -2741,23 +2767,24 @@ function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" }) {
           <div style={{ fontSize: 14, fontWeight: 800 }}>⭐ +{score * 12} 포인트</div>
         </Card>
         <div style={{ display: "flex", gap: 10, maxWidth: 320, margin: "0 auto" }}>
-          <Btn v="secondary" size="lg" onClick={() => { setMode(null); setRound(0); setScore(0); }} style={{ flex: 1 }}>🔄</Btn>
+          <Btn v="secondary" size="lg" onClick={() => { setMode(null); setRound(0); setScore(0); awardedRef.current = false; }} style={{ flex: 1 }}>🔄</Btn>
           <Btn v="primary" size="lg" onClick={onExit} style={{ flex: 1 }}>홈으로</Btn>
         </div>
       </div>
     );
   }
-
+ 
   const q = questions[round];
   const isKo2En = q.dir === "ko2en";
-
-const pick = (idx) => {
+ 
+  const pick = (idx) => {
     const isCorrect = idx === q.ansIdx;
     recordWordEncounter(name, q, isCorrect);  // ✅ 망각 곡선 자동 업데이트
     if (isCorrect) setScore(score + 1);
     if (levelId === "homework") updateWordMastery(setStudents, name, q.en, isCorrect);
     setRound(round + 1);
   };
+ 
   return (
     <div style={{ minHeight: "100vh", background: T.bg, padding: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
@@ -2765,11 +2792,11 @@ const pick = (idx) => {
         <Tag color={time <= 3 ? "red" : "yellow"}>⏱️ {time}초</Tag>
         <Tag color="yellow">⭐ {score}</Tag>
       </div>
-
+ 
       <div style={{ height: 6, background: T.border, borderRadius: 3, marginBottom: 14, overflow: "hidden" }}>
         <div style={{ height: "100%", width: `${time * 10}%`, background: time <= 3 ? T.red : T.yellow, transition: "width 1s linear" }} />
       </div>
-
+ 
       <Card style={{ marginBottom: 14, textAlign: "center", padding: 28, background: T.yellowLight }}>
         <div style={{ fontSize: 12, color: T.textMid, marginBottom: 6 }}>
           {isKo2En ? "다음 뜻의 영어 단어는?" : "이 영어 단어의 뜻은?"}
@@ -2800,7 +2827,7 @@ const pick = (idx) => {
           </div>
         )}
       </Card>
-
+ 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         {q.opts.map((o, idx) => (
           <button key={idx} onClick={() => pick(idx)} style={{

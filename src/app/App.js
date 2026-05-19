@@ -1389,21 +1389,27 @@ const filtered = studentList
 }
 
 function TeacherHome({ bank, exams, students, onNav }) {
-  const studentCount = Object.keys(students || {}).length;
+  // 활성 학생만 통계에 반영
+  const studentsArr = Object.values(students || {}).filter(s => s.active !== false);
+  const studentCount = studentsArr.length;
   const questionCount = Object.values(bank).reduce((a, s) => a + s.questions.length, 0);
-  const todayActive = Object.values(students || {}).filter(s => {
+  const todayActive = studentsArr.filter(s => {
     const last = (s.records || []).slice(-1)[0]?.date?.slice(0, 10);
     return last === new Date().toISOString().slice(0, 10);
   }).length;
 
-  // 진행중인 단어 숙제 통계
-  const studentsArr = Object.values(students || {});
+  // 진행중인 단어 숙제 통계 (활성 학생만)
   const activeHomeworks = studentsArr.filter(s => s.wordHomework?.active);
   const activeHwCount = activeHomeworks.length;
   const completedHwCount = activeHomeworks.filter(s => {
     const hw = s.wordHomework;
     return hw?.words?.length > 0 && hw.words.every(w => w.mastered);
   }).length;
+
+  // 진행중인 맞춤 시험 통계 (활성 학생만)
+  const activeExams = studentsArr.filter(s => s.customExam?.active);
+  const activeExamCount = activeExams.length;
+  const completedExamCount = activeExams.filter(s => s.customExam?.completed).length;
 
   // 진행중인 맞춤 시험 통계
   const activeExams = studentsArr.filter(s => s.customExam?.active);

@@ -3082,181 +3082,209 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
   if (screen === "quiz" && quizSet) return <StudentQuiz name={name} setStudents={setStudents} qset={quizSet} onExit={() => { setScreen("home"); setQuizSet(null); }} />;
 
   const hour = new Date().getHours();
-  const greet = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
-
+  const greet = hour < 12 ? "Good Morning ☀️" : hour < 18 ? "Good Afternoon 👋" : "Good Evening 🌙";
+ 
   return (
     <>
     <div style={{ minHeight: "100vh", background: T.bg, paddingBottom: 40 }}>
-
-      {/* 상단 헤더 — 항상 표시 */}
+ 
+      {/* ── 통합 상단 헤더 (인사 + 포인트 한 줄) ── */}
       <div className="topbar" style={{ background: T.card, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 50 }}>
-       <div className="top-bar-inner">
-        <div style={{ fontSize: 18 }}>🧒</div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 13, fontWeight: 900, color: T.text }}>{name}님</div>
-          <div style={{ fontSize: 10, color: T.textDim }}>⭐ {points}p</div>
-        </div>
-        <button onClick={() => setDarkMode && setDarkMode(d => !d)} title={darkMode?"라이트":"다크"} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, padding:"4px 6px", borderRadius:8 }}>
-          {darkMode ? "☀️" : "🌙"}
-        </button>
-        <Btn v="ghost" size="sm" onClick={onLogout} style={{ fontSize: 11 }}>로그아웃</Btn>
-       </div>
-      </div>
-
-      <div style={{
-        background: `linear-gradient(135deg, ${T.pink} 0%, ${T.accent} 100%)`,
-        padding: "16px 16px 24px", color: "white"
-      }}>
-       <div style={{ width: "100%", maxWidth: 1280, margin: "0 auto" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-          <div>
-            <div style={{ fontSize: 11, opacity: 0.9 }}>{greet} 👋</div>
-            <div style={{ fontSize: 20, fontWeight: 900, marginTop: 2 }}>{name}님</div>
-            <div style={{ fontSize: 11, opacity: 0.85, marginTop: 4 }}>오늘도 영어 공부 화이팅!</div>
+        <div className="top-bar-inner">
+          <div style={{ fontSize: 22 }}>🧒</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 10, color: T.textDim, fontWeight: 600 }}>{greet}</div>
+            <div style={{ fontSize: 14, fontWeight: 900, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}님</div>
           </div>
-          <div style={{ textAlign: "center", background: "rgba(255,255,255,0.2)", borderRadius: 14, padding: "10px 14px" }}>
-            <div style={{ fontSize: 22, fontWeight: 900 }}>{points}</div>
-            <div style={{ fontSize: 10, opacity: 0.85 }}>⭐ 포인트</div>
+          <div style={{
+            background: `linear-gradient(135deg, ${T.yellow}, ${T.orange})`,
+            color: "white", borderRadius: 10, padding: "5px 12px",
+            display: "flex", alignItems: "center", gap: 4
+          }}>
+            <span style={{ fontSize: 13 }}>⭐</span>
+            <span style={{ fontSize: 14, fontWeight: 900 }}>{points}</span>
           </div>
+          <button onClick={() => setDarkMode && setDarkMode(d => !d)} title={darkMode ? "라이트" : "다크"}
+            style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, padding: "4px 6px", borderRadius: 8 }}>
+            {darkMode ? "☀️" : "🌙"}
+          </button>
+          <Btn v="ghost" size="sm" onClick={onLogout} style={{ fontSize: 11 }}>로그아웃</Btn>
         </div>
-       </div>
       </div>
-
+ 
       {/* 공지/일정 배너 */}
       <NoticeBanner notices={notices} />
       <ScheduleBanner schedules={schedules} />
-
+ 
       <div className="app-container">
-        {/* 🎤 이번 주 발음 위젯 (Phase 3) */}
-        <PronunciationWidget studentName={name} onStart={() => setScreen("game-pronunciation")} />
-
-       {/* 🔔 오늘의 복습 (Phase 2: 망각 곡선) */}
-        <ReviewCard studentName={name} onStartReview={(words) => {
-          setReviewWords(words);
-          setSelectedLevel("review");
-          setScreen("game-match");
-        }} />
-        
-        {/* 단어 숙제 배너 — 진행 중인 숙제가 있으면 최상단에 표시 */}
+ 
+        {/* ════════════════════════════════════════════════ */}
+        {/*  📌 진행 중인 과제 / 숙제 / 시험 (있을 때만 최상단)  */}
+        {/* ════════════════════════════════════════════════ */}
+ 
+        {/* 단어 숙제 배너 */}
         <WordHomeworkBanner student={me} onStart={() => {
           setSelectedLevel("homework");
           setPendingGame({ id: "game-match", name: "단어 맞추기" });
           setScreen("game-match");
         }} />
-
-        {/* 맞춤 시험지 배너 — 진행 중인 시험이 있으면 표시 */}
+ 
+        {/* 맞춤 시험지 배너 */}
         <CustomExamBanner student={me} onStart={() => setScreen("custom-exam-play")} />
-
-        {/* 배정된 과제 */}
+ 
+        {/* 배정된 과제 (있을 때만) */}
         {(() => {
           const myAssigns = (typeof window !== "undefined"
-            ? (()=>{try{return JSON.parse(localStorage.getItem("angela_assignments")||"[]");}catch{return [];}})()
+            ? (() => { try { return JSON.parse(localStorage.getItem("angela_assignments") || "[]"); } catch { return []; } })()
             : []).filter(a => a.studentName === name);
           const assignedBankIds = myAssigns.map(a => a.bankId);
           const assignedSets = assignedBankIds.map(id => bank[id]).filter(Boolean);
-          const otherSets = Object.values(bank).filter(s => !assignedBankIds.includes(s.id));
-
-          return (
-            <>
-              {assignedSets.length > 0 && (
-                <>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: T.red, marginBottom: 8, letterSpacing: 0.5, display: "flex", alignItems: "center", gap: 6 }}>
-                    📬 선생님이 배정한 과제
-                    <span style={{ background: T.red, color: "white", fontSize: 10, fontWeight: 900, borderRadius: 8, padding: "2px 7px" }}>{assignedSets.length}</span>
-                  </div>
-                  <div style={{ marginBottom: 18 }}>
-                    {assignedSets.map(s => {
-                      const assign = myAssigns.find(a => a.bankId === s.id);
-                      const isOverdue = assign?.dueDate && new Date(assign.dueDate) < new Date();
-                      return (
-                        <Card key={s.id} onClick={() => { setQuizSet({ ...s, assignmentId: assign?.id }); setScreen("quiz"); }}
-                          style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 12, border: `2px solid ${T.red}33`, background: T.redLight }}>
-                          <div style={{ width: 42, height: 42, background: T.red, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>📬</div>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>{s.title}</div>
-                            <div style={{ fontSize: 11, color: T.textMid }}>
-                              {s.grade} · {s.questions.length}문항
-                              {assign?.dueDate && <span style={{ color: isOverdue ? T.red : T.yellow, marginLeft: 6 }}>마감 {assign.dueDate}</span>}
-                            </div>
-                          </div>
-                          <Btn v="primary" size="sm" onClick={e => { e.stopPropagation(); setQuizSet({ ...s, assignmentId: assign?.id }); setScreen("quiz"); }}>풀기</Btn>
-                        </Card>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-
-           {otherSets.length > 0 && (
-  <div style={{ marginBottom: 18 }}>
-    {/* 접기/펼치기 헤더 */}
-    <button
-      onClick={() => setShowFreeQuiz(s => !s)}
-      style={{
-        width: "100%",
-        background: T.card,
-        border: `1px solid ${T.border}`,
-        borderRadius: 12,
-        padding: "12px 14px",
-        cursor: "pointer",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        marginBottom: showFreeQuiz ? 8 : 0,
-        transition: "all 0.15s",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <span style={{ fontSize: 20 }}>📚</span>
-        <div style={{ textAlign: "left" }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>자유 풀기</div>
-          <div style={{ fontSize: 11, color: T.textMid, marginTop: 2 }}>
-            {otherSets.length}개 문제집 · 원할 때 풀어보세요
-          </div>
-        </div>
-      </div>
-      <div style={{
-        fontSize: 14,
-        color: T.textMid,
-        fontWeight: 800,
-        transition: "transform 0.2s",
-        transform: showFreeQuiz ? "rotate(180deg)" : "rotate(0deg)",
-      }}>
-        ▼
-      </div>
-    </button>
  
-    {/* 펼쳐졌을 때 목록 표시 */}
-    {showFreeQuiz && (
-      <div>
-        {otherSets.map(s => (
-          <Card
-            key={s.id}
-            onClick={() => { setQuizSet(s); setScreen("quiz"); }}
-            style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 12 }}
-          >
-            <div style={{
-              width: 42, height: 42, background: T.pinkLight, borderRadius: 12,
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22
-            }}>📝</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>{s.title}</div>
-              <div style={{ fontSize: 11, color: T.textMid }}>{s.grade} · {s.questions.length}문항</div>
+          if (assignedSets.length === 0) return null;
+ 
+          return (
+            <div style={{ marginBottom: 18 }}>
+              <div style={{
+                fontSize: 12, fontWeight: 800, color: T.red, marginBottom: 10,
+                letterSpacing: 0.5, display: "flex", alignItems: "center", gap: 6
+              }}>
+                📬 선생님이 배정한 과제
+                <span style={{ background: T.red, color: "white", fontSize: 10, fontWeight: 900, borderRadius: 8, padding: "2px 7px" }}>{assignedSets.length}</span>
+              </div>
+              {assignedSets.map(s => {
+                const assign = myAssigns.find(a => a.bankId === s.id);
+                const isOverdue = assign?.dueDate && new Date(assign.dueDate) < new Date();
+                return (
+                  <Card key={s.id} onClick={() => { setQuizSet({ ...s, assignmentId: assign?.id }); setScreen("quiz"); }}
+                    style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 12, border: `2px solid ${T.red}33`, background: T.redLight }}>
+                    <div style={{ width: 42, height: 42, background: T.red, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>📬</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>{s.title}</div>
+                      <div style={{ fontSize: 11, color: T.textMid }}>
+                        {s.grade} · {s.questions.length}문항
+                        {assign?.dueDate && <span style={{ color: isOverdue ? T.red : T.yellow, marginLeft: 6 }}>마감 {assign.dueDate}</span>}
+                      </div>
+                    </div>
+                    <Btn v="primary" size="sm" onClick={e => { e.stopPropagation(); setQuizSet({ ...s, assignmentId: assign?.id }); setScreen("quiz"); }}>풀기</Btn>
+                  </Card>
+                );
+              })}
             </div>
-            <div style={{ fontSize: 18, color: T.textDim }}>›</div>
-          </Card>
-        ))}
-      </div>
-    )}
-  </div>
-)}
-            </>
           );
         })()}
-
-        {/* 탭 선택 */}
+ 
+        {/* ════════════════════════════════════════════════ */}
+        {/*  ⭐ 오늘의 학습 — 발음 / 단어장 / 복습 (3개 가로 배치)  */}
+        {/* ════════════════════════════════════════════════ */}
+        <div style={{
+          fontSize: 12, fontWeight: 800, color: T.textMid,
+          marginBottom: 10, letterSpacing: 0.5
+        }}>⭐ 오늘의 학습</div>
+ 
+        <div style={{ marginBottom: 18 }}>
+          {/* 발음 점수 위젯 */}
+          <PronunciationWidget studentName={name} onStart={() => setScreen("game-pronunciation")} />
+ 
+          {/* 단어장 + 복습 카드 가로 배치 */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 8 }}>
+            {/* 내 단어장 */}
+            <Card onClick={() => setScreen("wordbook")} style={{
+              padding: "14px 12px",
+              background: `linear-gradient(135deg, ${T.purple}, ${T.accent})`,
+              color: "white", cursor: "pointer", border: "none",
+              textAlign: "center"
+            }}>
+              <div style={{ fontSize: 26, marginBottom: 4 }}>📚</div>
+              <div style={{ fontSize: 12, fontWeight: 900 }}>내 단어장</div>
+              <div style={{ fontSize: 10, opacity: 0.85, marginTop: 2 }}>⭐ 모은 단어 복습</div>
+            </Card>
+ 
+            {/* 망각 곡선 복습 카드 (있을 때만, 없으면 빈 자리) */}
+            <ReviewCard
+              studentName={name}
+              onStartReview={(words) => {
+                setReviewWords(words);
+                setSelectedLevel("review");
+                setScreen("game-match");
+              }}
+              compact
+            />
+          </div>
+ 
+          {/* 학생 목표 위젯 (있을 때만) */}
+          <StudentGoalWidget studentName={name} goals={goals} />
+        </div>
+ 
+        {/* ════════════════════════════════════════════════ */}
+        {/*  📚 자유 풀기 (접힘 / 펼침)  */}
+        {/* ════════════════════════════════════════════════ */}
+        {(() => {
+          const myAssigns = (typeof window !== "undefined"
+            ? (() => { try { return JSON.parse(localStorage.getItem("angela_assignments") || "[]"); } catch { return []; } })()
+            : []).filter(a => a.studentName === name);
+          const assignedBankIds = myAssigns.map(a => a.bankId);
+          const otherSets = Object.values(bank).filter(s => !assignedBankIds.includes(s.id));
+ 
+          if (otherSets.length === 0) return null;
+ 
+          return (
+            <div style={{ marginBottom: 18 }}>
+              <button
+                onClick={() => setShowFreeQuiz(s => !s)}
+                style={{
+                  width: "100%",
+                  background: T.card,
+                  border: `1px solid ${T.border}`,
+                  borderRadius: 12,
+                  padding: "12px 14px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: showFreeQuiz ? 8 : 0,
+                  transition: "all 0.15s",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 20 }}>📝</span>
+                  <div style={{ textAlign: "left" }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>자유 풀기</div>
+                    <div style={{ fontSize: 11, color: T.textMid, marginTop: 2 }}>
+                      {otherSets.length}개 문제집 · 원할 때 풀어보세요
+                    </div>
+                  </div>
+                </div>
+                <div style={{
+                  fontSize: 14, color: T.textMid, fontWeight: 800,
+                  transition: "transform 0.2s",
+                  transform: showFreeQuiz ? "rotate(180deg)" : "rotate(0deg)",
+                }}>▼</div>
+              </button>
+ 
+              {showFreeQuiz && (
+                <div>
+                  {otherSets.map(s => (
+                    <Card key={s.id} onClick={() => { setQuizSet(s); setScreen("quiz"); }}
+                      style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 12 }}>
+                      <div style={{ width: 42, height: 42, background: T.pinkLight, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>📝</div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>{s.title}</div>
+                        <div style={{ fontSize: 11, color: T.textMid }}>{s.grade} · {s.questions.length}문항</div>
+                      </div>
+                      <div style={{ fontSize: 18, color: T.textDim }}>›</div>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })()}
+ 
+        {/* ════════════════════════════════════════════════ */}
+        {/*  🎮 게임 / 🏅 뱃지 탭  */}
+        {/* ════════════════════════════════════════════════ */}
         <div style={{ display: "flex", gap: 6, marginBottom: 14, background: T.card, padding: 5, borderRadius: 12, boxShadow: T.shadow }}>
-          {[{ id:"game", label:"🎮 게임" }, { id:"badge", label:"🏅 내 뱃지" }].map(t => (
+          {[{ id: "game", label: "🎮 게임" }, { id: "badge", label: "🏅 내 뱃지" }].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)} style={{
               flex: 1, padding: "9px 6px", borderRadius: 8, border: "none", cursor: "pointer",
               fontSize: 13, fontWeight: 800,
@@ -3265,57 +3293,46 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
             }}>{t.label}</button>
           ))}
         </div>
-
+ 
+        {/* ════════════════════════════════════════════════ */}
+        {/*  🎮 게임 (카테고리화)  */}
+        {/* ════════════════════════════════════════════════ */}
         {tab === "game" && (
           <>
-          {/* 📚 내 단어장 빠른 진입 */}
-            <Card onClick={() => setScreen("wordbook")} style={{
-              marginBottom: 14, padding: "14px 16px",
-              background: `linear-gradient(135deg, ${T.purple}, ${T.accent})`,
-              color: "white", cursor: "pointer", border: "none",
-              display: "flex", alignItems: "center", gap: 12,
-            }}>
-              <div style={{ fontSize: 32 }}>📚</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 900 }}>내 단어장</div>
-                <div style={{ fontSize: 11, opacity: 0.9, marginTop: 2 }}>⭐ 모은 단어로 복습하기</div>
-              </div>
-              <div style={{ fontSize: 20, opacity: 0.7 }}>›</div>
-            </Card>
-            {/* 목표 위젯 */}
-            <StudentGoalWidget studentName={name} goals={goals} />
-
-            {/* 게임 모음 */}
-            <div style={{ fontSize: 12, fontWeight: 800, color: T.textMid, marginBottom: 8, letterSpacing: 0.5 }}>🎮 게임</div>
-            <div className="grid-2" style={{ marginBottom: 16 }}>
+            {/* 카테고리 1: 기초 학습 */}
+            <div style={{ fontSize: 11, fontWeight: 800, color: T.accent, marginBottom: 8, letterSpacing: 0.5, display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 14 }}>📖</span> 기초 학습
+            </div>
+            <div className="grid-2" style={{ marginBottom: 18 }}>
               {[
-                // 기본 단어 학습 게임
-                { id:"game-match",    icon:"🎯", name:"단어 맞추기",   sub:"뜻↔영어 선택",     bg:T.accentLight, isLevel:true },
-                { id:"game-spell",    icon:"🔤", name:"스펠링",         sub:"철자 직접 입력",    bg:T.greenLight,  isLevel:true },
-                { id:"game-speed",    icon:"⚡", name:"스피드 퀴즈",   sub:"10초 안에!",        bg:T.yellowLight, isLevel:true },
-                { id:"game-flash",    icon:"🧩", name:"플래시카드",    sub:"🔊 발음 포함",      bg:T.pinkLight,   isLevel:true },
-                // 매일/도전 게임 (배지 표시)
-                { id:"game-daily",    icon:"📅", name:"데일리 챌린지", sub:"오늘의 5단어",      bg:T.yellowLight, badge:"매일 새로워요!" },
-                { id:"game-rpg",      icon:"🗺️", name:"단어 월드 RPG", sub:"보스를 물리쳐요!", bg:T.purpleLight, badge:"🔥 인기" },
-                // 신규 게임들
-                { id:"game-sentence", icon:"📝", name:"문장 빈칸",     sub:"문장 속 단어 찾기", bg:T.purpleLight },
-                { id:"game-memory",   icon:"🧠", name:"메모리 카드",   sub:"짝 맞추기",         bg:T.accentLight },
-                { id:"game-anagram",  icon:"🔤", name:"철자 조립",     sub:"섞인 철자 맞추기",  bg:T.greenLight },
-                { id:"game-typing",   icon:"⌨️", name:"타이핑 레이스", sub:"단어가 내려와요!",  bg:T.pinkLight },
-                { id:"game-relay",    icon:"🔗", name:"단어 릴레이",   sub:"콤보를 이어가요!",  bg:T.tealLight },
-                { id:"game-twenty",   icon:"🔍", name:"단어 스무고개", sub:"힌트로 추리해요!",  bg:T.orangeLight },
-                { id:"game-picture",  icon:"🖼️", name:"그림 단어",     sub:"그림 보고 맞추기",  bg:T.yellowLight },
-                { id:"game-lines",    icon:"🔗", name:"단어 연결",     sub:"영어-한글 매칭",    bg:T.purpleLight },
-                { id:"game-search",   icon:"🔍", name:"단어 찾기",     sub:"숨겨진 단어 찾기",  bg:T.greenLight },
-                { id:"game-dictation",icon:"🎤", name:"받아쓰기",      sub:"듣고 받아써요",     bg:T.accentLight },
-                { id:"game-pronunciation", icon:"🗣️", name:"발음 챌린지", sub:"🎤 AI 발음 채점!", bg:T.purpleLight, badge:"🆕 NEW" },
-                { id:"game-wrong",    icon:"📒", name:"오답 노트",     sub:"틀린 단어 복습",    bg:T.redLight },
+                { id: "game-match", icon: "🎯", name: "단어 맞추기", sub: "뜻↔영어 선택", bg: T.accentLight, isLevel: true },
+                { id: "game-spell", icon: "🔤", name: "스펠링", sub: "철자 직접 입력", bg: T.greenLight, isLevel: true },
+                { id: "game-speed", icon: "⚡", name: "스피드 퀴즈", sub: "10초 안에!", bg: T.yellowLight, isLevel: true },
+                { id: "game-flash", icon: "🧩", name: "플래시카드", sub: "🔊 발음 포함", bg: T.pinkLight, isLevel: true },
               ].map(g => (
                 <Card key={g.id}
-                  onClick={() => {
-                    if (g.isLevel) startGame(g);          // 레벨 선택이 필요한 게임
-                    else setScreen(g.id);                  // 바로 시작
-                  }}
+                  onClick={() => { if (g.isLevel) startGame(g); else setScreen(g.id); }}
+                  style={{ padding: 14, textAlign: "center" }}>
+                  <div style={{ width: 50, height: 50, borderRadius: 14, background: g.bg, margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>{g.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: T.text }}>{g.name}</div>
+                  <div style={{ fontSize: 10, color: T.textMid, marginTop: 2 }}>{g.sub}</div>
+                </Card>
+              ))}
+            </div>
+ 
+            {/* 카테고리 2: 챌린지 */}
+            <div style={{ fontSize: 11, fontWeight: 800, color: T.pink, marginBottom: 8, letterSpacing: 0.5, display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 14 }}>🔥</span> 챌린지
+            </div>
+            <div className="grid-2" style={{ marginBottom: 18 }}>
+              {[
+                { id: "game-daily", icon: "📅", name: "데일리 챌린지", sub: "오늘의 5단어", bg: T.yellowLight, badge: "매일 새로워요!" },
+                { id: "game-rpg", icon: "🗺️", name: "단어 월드 RPG", sub: "보스를 물리쳐요!", bg: T.purpleLight, badge: "🔥 인기" },
+                { id: "game-pronunciation", icon: "🗣️", name: "발음 챌린지", sub: "🎤 AI 발음 채점!", bg: T.purpleLight, badge: "🆕 NEW" },
+                { id: "game-wrong", icon: "📒", name: "오답 노트", sub: "틀린 단어 복습", bg: T.redLight },
+              ].map(g => (
+                <Card key={g.id}
+                  onClick={() => setScreen(g.id)}
                   style={{ padding: 14, textAlign: "center", position: "relative" }}>
                   {g.badge && (
                     <div style={{ position: "absolute", top: 6, right: 6, background: T.accent, color: "white", fontSize: 9, fontWeight: 800, padding: "2px 6px", borderRadius: 6 }}>{g.badge}</div>
@@ -3326,17 +3343,44 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
                 </Card>
               ))}
             </div>
+ 
+            {/* 카테고리 3: 심화 게임 */}
+            <div style={{ fontSize: 11, fontWeight: 800, color: T.purple, marginBottom: 8, letterSpacing: 0.5, display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 14 }}>🎲</span> 더 많은 게임
+            </div>
+            <div className="grid-2" style={{ marginBottom: 18 }}>
+              {[
+                { id: "game-sentence", icon: "📝", name: "문장 빈칸", sub: "문장 속 단어 찾기", bg: T.purpleLight },
+                { id: "game-memory", icon: "🧠", name: "메모리 카드", sub: "짝 맞추기", bg: T.accentLight },
+                { id: "game-anagram", icon: "🔤", name: "철자 조립", sub: "섞인 철자 맞추기", bg: T.greenLight },
+                { id: "game-typing", icon: "⌨️", name: "타이핑 레이스", sub: "단어가 내려와요!", bg: T.pinkLight },
+                { id: "game-relay", icon: "🔗", name: "단어 릴레이", sub: "콤보를 이어가요!", bg: T.tealLight },
+                { id: "game-twenty", icon: "🔍", name: "단어 스무고개", sub: "힌트로 추리해요!", bg: T.orangeLight },
+                { id: "game-picture", icon: "🖼️", name: "그림 단어", sub: "그림 보고 맞추기", bg: T.yellowLight },
+                { id: "game-lines", icon: "🔗", name: "단어 연결", sub: "영어-한글 매칭", bg: T.purpleLight },
+                { id: "game-search", icon: "🔍", name: "단어 찾기", sub: "숨겨진 단어 찾기", bg: T.greenLight },
+                { id: "game-dictation", icon: "🎤", name: "받아쓰기", sub: "듣고 받아써요", bg: T.accentLight },
+              ].map(g => (
+                <Card key={g.id}
+                  onClick={() => setScreen(g.id)}
+                  style={{ padding: 14, textAlign: "center" }}>
+                  <div style={{ width: 50, height: 50, borderRadius: 14, background: g.bg, margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>{g.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: T.text }}>{g.name}</div>
+                  <div style={{ fontSize: 10, color: T.textMid, marginTop: 2 }}>{g.sub}</div>
+                </Card>
+              ))}
+            </div>
           </>
         )}
-
+ 
         {tab === "badge" && (
           <BadgeDisplay student={me} />
         )}
-
+ 
         <Btn v="ghost" size="md" onClick={onLogout} style={{ width: "100%", marginTop: 20, color: T.textDim, fontSize: 12 }}>← 로그아웃</Btn>
       </div>
     </div>
-
+ 
     {/* 뱃지 획득 축하 */}
     {newBadges.length > 0 && (
       <BadgeCelebration badges={newBadges} onClose={() => setNewBadges([])} />
@@ -3344,6 +3388,7 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
     </>
   );
 }
+ 
 
 // ── 학생 퀴즈 (과제 풀기) ────────────────────────────────────────────────
 function StudentQuiz({ name, setStudents, qset, onExit }) {

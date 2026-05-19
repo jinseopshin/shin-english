@@ -14,6 +14,8 @@ function getGameWordPool(levelId, student) {
       return notMastered.length > 0 ? notMastered : hw.words; // 다 마스터하면 복습용으로 전체
     }
   }
+  // 망각 곡선 복습은 부모 컴포넌트가 직접 words를 넘겨주므로 여기서는 처리 안 함
+  // (실제 복습 단어는 ReviewCard.js의 onStartReview에서 전달됨)
   return getWordsByLevel(levelId);
 }
 import {
@@ -37,6 +39,7 @@ import { AIQuestionGenerator } from "./aiQuestions";
 import { supabase, isSupabaseReady, testConnection, getAdapter } from "./supabaseClient";
 import { SupabaseMigration } from "./SupabaseMigration";
 import { MyWordbook } from "./MyWordbook";
+import { ReviewCard } from "./ReviewCard";
 import { addToWordbook, removeFromWordbook, isInWordbook } from "./studentWords";
 
 // ── 음성 합성 (발음 기능) ─────────────────────────────────────────────────
@@ -3069,6 +3072,13 @@ function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, se
       <ScheduleBanner schedules={schedules} />
 
       <div className="app-container">
+        {/* 🔔 오늘의 복습 (Phase 2: 망각 곡선) */}
+        <ReviewCard studentName={name} onStartReview={(words) => {
+          setSelectedLevel("review");
+          setPendingGame({ id: "game-match", name: "오늘의 복습" });
+          setScreen("game-match");
+        }} />
+        
         {/* 단어 숙제 배너 — 진행 중인 숙제가 있으면 최상단에 표시 */}
         <WordHomeworkBanner student={me} onStart={() => {
           setSelectedLevel("homework");

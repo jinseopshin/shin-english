@@ -368,3 +368,166 @@ export async function getStudentWordStats(studentName) {
 // ══════════════════════════════════════════════════════════════════════════
 //   v2: recordWordResult 함수 제거됨 (어디서도 사용되지 않음)
 // ══════════════════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════════════════
+//   📖 단어 학습 현황 대시보드 (선생님용) — v1
+// ══════════════════════════════════════════════════════════════════════════
+
+// ──────────────────────────────────────────────────────────────────────────
+//  1. 전체 학생의 단어 통계 합계
+// ──────────────────────────────────────────────────────────────────────────
+export async function getAllStudentsStats(studentNames) {
+  if (!isSupabaseReady() || !studentNames || studentNames.length === 0) {
+    return { totalStudied: 0, totalMastered: 0, totalLearning: 0, totalStruggling: 0, totalFavorited: 0 };
+  }
+  try {
+    const { data, error } = await supabase
+      .from("student_words")
+      .select("encounter_count, correct_count, wrong_count, review_level, is_favorite, student_name")
+      .in("student_name", studentNames);
+    if (error) throw error;
+    
+    const studied = (data || []).filter(w => (w.encounter_count || 0) > 0);
+    
+    const totalStudied = studied.length;
+    const totalMastered = studied.filter(w => (w.review_level || 0) >= 5).length;
+    const totalLearning = studied.filter(w => (w.review_level || 0) >= 1 && (w.review_level || 0) < 5).length;
+    const totalStruggling = studied.filter(
+      w => (w.wrong_count || 0) > (w.correct_count || 0) && (w.encounter_count || 0) >= 2
+    ).length;
+    const totalFavorited = (data || []).filter(w => w.is_favorite).length;
+    
+    return { totalStudied, totalMastered, totalLearning, totalStruggling, totalFavorited };
+  } catch (e) {
+    console.warn(`getAllStudentsStats 실패:`, e.message);
+    return { totalStudied: 0, totalMastered: 0, totalLearning: 0, totalStruggling: 0, totalFavorited: 0 };
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+//  2. 학생별 진도 랭킹
+// ──────────────────────────────────────────────────────────────────────────
+export async function getStudentRanking(studentNames) {
+  if (!isSupabaseReady() || !studentNames || studentNames.length === 0) return [];
+  try {
+    const { data, error } = await supabase
+      .from("student_words")
+      .select("student_name, encounter_count, correct_count, wrong_count, review_level")
+      .in("student_name", studentNames);
+    if (error) throw error;
+    
+    // 학생별 집계
+    const map = {};
+    (data || []).forEach(w => {
+      const n = w.student_name;
+      if (!map[n]) map[n] = { name: n, studied: 0, mastered: 0, correct: 0, total: 0 };
+      if ((w.encounter_count || 0) > 0) {
+        map[n].studied++;
+        if ((w.review_level || 0) >= 5) map[n].mastered++;
+        map[n].correct += (w.correct_count || 0);
+        map[n].total += (w.correct_count || 0) + (w.wrong_count || 0);
+      }
+    });
+    
+    // 정확도 계산 + 정렬
+    const ranking = Object.values(map).map(s => ({
+      ...s,
+      accuracy: s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0,
+    }));
+    
+    // 마스터 단어 많은 순, 같으면 정확도 높은 순
+    ranking.sort((a, b) => {
+      if (b.mastered !== a.mastered) return b.mastered - a.mastered;
+      return b.accuracy - a.accuracy;
+    });
+    
+    return ranking;
+  } catch (e) {
+    console.warn(`getStudentRanking 실패:`, e.message);
+    return [];
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+//  3. 오늘 복습 대기 중인 학생 목록
+// ──────────────────────────────────────────────────────────────────────────
+export async function getStudentsWithPendingReview(studentNames) {
+  if (!isSupabaseReady() || !studentNames || studentNames.length === 0) return [];
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const { data, error } = await supabase
+      .from("student_words")
+      .select("student_name, word_en")
+      .in("student_name", studentNames)
+      .lte("next_review_date", today)
+      .not("next_review_date", "is", null);
+    if (error) throw error;
+    
+    // 학생별 개수 집계
+    const map = {};
+    (data || []).forEach(w => {
+      const n = w.student_name;
+      if (!map[n]) map[n] = 0;
+      map[n]++;
+    });
+    
+    // 복습 개수 많은 순
+    const list = Object.entries(map)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+    
+    return list;
+  } catch (e) {
+    console.warn(`getStudentsWithPendingReview 실패:`, e.message);
+    return [];
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+//  4. 최근 7일간 학습량 추이 (전체 학생)
+// ──────────────────────────────────────────────────────────────────────────
+export async function getLearningTrend7Days(studentNames) {
+  if (!isSupabaseReady() || !studentNames || studentNames.length === 0) {
+    return [];
+  }
+  try {
+    // 7일 전 날짜 계산
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // 오늘 포함 7일
+    const fromDate = sevenDaysAgo.toISOString().slice(0, 10);
+    
+    const { data, error } = await supabase
+      .from("student_words")
+      .select("last_studied_at, encounter_count")
+      .in("student_name", studentNames)
+      .gte("last_studied_at", fromDate + "T00:00:00")
+      .not("last_studied_at", "is", null);
+    if (error) throw error;
+    
+    // 날짜별 집계 (학습한 단어 수)
+    const map = {};
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      map[key] = 0;
+    }
+    
+    (data || []).forEach(w => {
+      const date = w.last_studied_at?.slice(0, 10);
+      if (date && map[date] !== undefined) {
+        map[date]++;
+      }
+    });
+    
+    // 차트용 배열 변환 (날짜 짧게)
+    return Object.entries(map).map(([date, count]) => {
+      const d = new Date(date);
+      const label = `${d.getMonth() + 1}/${d.getDate()}`;
+      return { date: label, fullDate: date, count };
+    });
+  } catch (e) {
+    console.warn(`getLearningTrend7Days 실패:`, e.message);
+    return [];
+  }
+}

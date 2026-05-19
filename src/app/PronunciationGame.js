@@ -4,11 +4,14 @@ import { ALL_WORDS, getWordsByLevel } from "./wordData";
 import { recordPronunciation } from "./studentWords";
 
 // ══════════════════════════════════════════════════════════════════════════
-//   🎤 발음 챌린지 게임 (Phase 3)
+//   🎤 발음 챌린지 게임 (Phase 3) - 안전 버전 v2
 //
-//   Web Speech API의 SpeechRecognition으로 학생 발음을 인식.
-//   Levenshtein 거리로 정답 단어와 유사도 계산 → 별 1~5점 부여.
-//   점수는 student_words 테이블에 누적 저장.
+//   v2 변경 사항:
+//   - 자동 진행 완전 제거 (사용자가 명시적으로 "다음 단어 →" 눌러야 함)
+//   - 마이크 버튼과 결과 카드를 완전히 분리 (둘 다 동시에 보이지 않음)
+//   - 모든 클릭 이벤트에 stopPropagation 추가
+//   - 디버그 로그 추가 (콘솔에서 진단 가능)
+//   - aborted 에러는 lastResult 만들지 않음 (재시도 가능)
 // ══════════════════════════════════════════════════════════════════════════
 
 const T = {
@@ -25,10 +28,6 @@ const T = {
   shadowLg: "0 8px 32px rgba(79,142,247,0.18)",
 };
 
-// ──────────────────────────────────────────────────────────────────────────
-//  Levenshtein 거리 알고리즘 (단어 유사도 측정)
-//  반환값: 0~100 (100이면 완벽 일치)
-// ──────────────────────────────────────────────────────────────────────────
 function calcSimilarity(a, b) {
   const s1 = a.toLowerCase().trim().replace(/[^a-z]/g, "");
   const s2 = b.toLowerCase().trim().replace(/[^a-z]/g, "");
@@ -44,9 +43,9 @@ function calcSimilarity(a, b) {
     for (let j = 1; j <= len2; j++) {
       const cost = s1[i-1] === s2[j-1] ? 0 : 1;
       matrix[i][j] = Math.min(
-        matrix[i-1][j] + 1,        // 삭제
-        matrix[i][j-1] + 1,        // 삽입
-        matrix[i-1][j-1] + cost,   // 교체
+        matrix[i-1][j] + 1,
+        matrix[i][j-1] + 1,
+        matrix[i-1][j-1] + cost,
       );
     }
   }
@@ -56,7 +55,6 @@ function calcSimilarity(a, b) {
   return Math.round(((maxLen - distance) / maxLen) * 100);
 }
 
-// 점수 → 별점 변환
 function scoreToStars(score) {
   if (score >= 90) return 5;
   if (score >= 75) return 4;
@@ -65,7 +63,6 @@ function scoreToStars(score) {
   return 1;
 }
 
-// 점수 → 메시지 변환
 function scoreToMessage(score) {
   if (score >= 90) return { msg: "완벽해요! 🌟", color: T.green };
   if (score >= 75) return { msg: "훌륭해요!", color: T.green };
@@ -74,7 +71,6 @@ function scoreToMessage(score) {
   return { msg: "다시 들어볼까요?", color: T.red };
 }
 
-// 발음 재생 헬퍼
 function speak(text) {
   if (typeof window === "undefined" || !window.speechSynthesis) return;
   try {
@@ -86,25 +82,21 @@ function speak(text) {
   } catch {}
 }
 
-// 단어 배열 섞기
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
-// ══════════════════════════════════════════════════════════════════════════
-//  메인 컴포넌트
-// ══════════════════════════════════════════════════════════════════════════
-
 export function PronunciationGame({ name, setStudents, student, onExit, levelId = "all" }) {
-  const [level, setLevel] = useState(null); // null = 레벨 선택 화면
+  const [level, setLevel] = useState(null);
   const [idx, setIdx] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
-  const [results, setResults] = useState([]); // [{word, score, transcript}, ...]
+  const [results, setResults] = useState([]);
   const [recording, setRecording] = useState(false);
   const [lastResult, setLastResult] = useState(null);
   const [browserSupport, setBrowserSupport] = useState(true);
+  const [debugMsg, setDebugMsg] = useState("");
   const recognitionRef = useRef(null);
   const awardedRef = useRef(false);
+  const recordingStartTimeRef = useRef(0);
 
-  // 게임에 사용할 단어 10개 (레벨 선택 후)
   const words = level
     ? shuffle(level === "all" ? ALL_WORDS : getWordsByLevel(level)).slice(0, 10)
     : [];
@@ -116,7 +108,7 @@ export function PronunciationGame({ name, setStudents, student, onExit, levelId 
     if (!SpeechRecognition) setBrowserSupport(false);
   }, []);
 
-  // 게임 종료 시 학생 기록 저장 (한 번만)
+  // 게임 종료 시 학생 기록 저장
   useEffect(() => {
     if (awardedRef.current) return;
     if (!level || words.length === 0 || idx < words.length) return;
@@ -126,7 +118,6 @@ export function PronunciationGame({ name, setStudents, student, onExit, levelId 
       ? Math.round(results.reduce((s, r) => s + r.score, 0) / results.length)
       : 0;
     
-    // 학생 기록에 저장
     if (setStudents) {
       setStudents(prev => {
         const cur = prev[name] || { name, points: 0, records: [] };
@@ -151,28 +142,73 @@ export function PronunciationGame({ name, setStudents, student, onExit, levelId 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [level, idx, words.length]);
 
-  // 발음 인식 시작
-  const startRecording = () => {
-    if (recording || !browserSupport) return;
-    
+  // 컴포넌트 언마운트 시 인식 정리
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.abort(); } catch {}
+      }
+    };
+  }, []);
+
+  // 발음 인식 시작 (안전 버전)
+  const startRecording = (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    if (recording) {
+      console.log("[Pronunciation] 이미 녹음 중, 무시");
+      return;
+    }
+
+    if (lastResult) {
+      console.log("[Pronunciation] 결과 카드가 있음, 다음 단어 버튼을 눌러주세요");
+      return;
+    }
+
+    if (!browserSupport) {
+      setDebugMsg("브라우저가 음성 인식을 지원하지 않아요");
+      return;
+    }
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setDebugMsg("브라우저가 음성 인식을 지원하지 않아요");
+      return;
+    }
+
+    if (window.speechSynthesis && window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+    }
+
+    console.log("[Pronunciation] 인식 시작:", words[idx].en);
+    setDebugMsg("🎤 인식 시작...");
+    recordingStartTimeRef.current = Date.now();
+    
     const rec = new SpeechRecognition();
     rec.lang = "en-US";
     rec.interimResults = false;
     rec.maxAlternatives = 3;
+    rec.continuous = false;
 
     rec.onstart = () => {
+      console.log("[Pronunciation] onstart 호출됨");
       setRecording(true);
-      setLastResult(null);
+      setDebugMsg("🔴 듣고 있어요...");
     };
 
     rec.onresult = async (event) => {
-      // 여러 후보 중 가장 점수 높은 것 선택
-      const alternatives = Array.from(event.results[0]).map(a => a.transcript);
-      const target = words[idx].en;
+      const elapsed = Date.now() - recordingStartTimeRef.current;
+      console.log("[Pronunciation] onresult, 경과시간:", elapsed + "ms");
       
+      const alternatives = Array.from(event.results[0]).map(a => a.transcript);
+      console.log("[Pronunciation] 인식 후보:", alternatives);
+      
+      const target = words[idx].en;
       let bestScore = 0;
-      let bestTranscript = alternatives[0];
+      let bestTranscript = alternatives[0] || "";
       for (const alt of alternatives) {
         const score = calcSimilarity(alt, target);
         if (score > bestScore) {
@@ -182,48 +218,106 @@ export function PronunciationGame({ name, setStudents, student, onExit, levelId 
       }
       
       const result = { word: words[idx], score: bestScore, transcript: bestTranscript };
+      console.log("[Pronunciation] 결과:", result);
       setLastResult(result);
       setResults(prev => [...prev, result]);
       setTotalScore(prev => prev + bestScore);
+      setRecording(false);
+      setDebugMsg("");
       
-      // Supabase에 발음 점수 기록
       try {
         await recordPronunciation(name, words[idx], bestScore);
-      } catch {}
-      
-      setRecording(false);
-    };
-
-    rec.onerror = (e) => {
-      console.warn("Speech recognition error:", e.error);
-      setRecording(false);
-      if (e.error === "no-speech") {
-        setLastResult({ word: words[idx], score: 0, transcript: "(소리가 안 들렸어요)" });
-      } else if (e.error === "not-allowed") {
-        alert("마이크 권한이 필요해요. 주소창 옆 자물쇠 아이콘에서 허용해주세요!");
+      } catch (e) {
+        console.warn("[Pronunciation] DB 저장 실패:", e);
       }
     };
 
-    rec.onend = () => setRecording(false);
+    rec.onerror = (e) => {
+      const elapsed = Date.now() - recordingStartTimeRef.current;
+      console.warn("[Pronunciation] onerror:", e.error, "경과:", elapsed + "ms");
+      setRecording(false);
+      
+      let transcript = "";
+      let score = 0;
+      
+      if (e.error === "no-speech") {
+        transcript = "(소리가 안 들렸어요)";
+        setDebugMsg("");
+      } else if (e.error === "not-allowed") {
+        transcript = "(마이크 권한이 필요해요)";
+        setDebugMsg("⚠️ 주소창 자물쇠 → 마이크 허용");
+        alert("마이크 권한이 필요해요!\n주소창 왼쪽 자물쇠(🔒) 아이콘 → 사이트 설정 → 마이크 → '허용'");
+      } else if (e.error === "aborted") {
+        console.log("[Pronunciation] aborted - 결과 카드 안 만듦");
+        setDebugMsg("");
+        return; // aborted는 결과 카드 만들지 않음
+      } else if (e.error === "audio-capture") {
+        transcript = "(마이크를 못 찾았어요)";
+        setDebugMsg("⚠️ 마이크가 연결되어 있는지 확인");
+      } else {
+        transcript = `(에러: ${e.error})`;
+        setDebugMsg(`에러: ${e.error}`);
+      }
+      
+      const result = { word: words[idx], score, transcript };
+      setLastResult(result);
+      setResults(prev => [...prev, result]);
+    };
 
-    recognitionRef.current = rec;
-    rec.start();
-  };
+    rec.onend = () => {
+      console.log("[Pronunciation] onend 호출됨");
+      setRecording(false);
+    };
 
-  const stopRecording = () => {
-    if (recognitionRef.current && recording) {
-      try { recognitionRef.current.stop(); } catch {}
+    try {
+      recognitionRef.current = rec;
+      rec.start();
+    } catch (e) {
+      console.error("[Pronunciation] start 실패:", e);
+      setDebugMsg(`시작 실패: ${e.message}`);
+      const result = { word: words[idx], score: 0, transcript: `(시작 실패: ${e.message})` };
+      setLastResult(result);
+      setResults(prev => [...prev, result]);
     }
   };
 
-  const next = () => {
+  const stopRecording = (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (recognitionRef.current && recording) {
+      try { 
+        recognitionRef.current.stop(); 
+        console.log("[Pronunciation] 수동 중지");
+      } catch (e) {
+        console.warn("[Pronunciation] stop 실패:", e);
+      }
+    }
+  };
+
+  const next = (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    console.log("[Pronunciation] 다음 단어로:", idx + 1);
     setLastResult(null);
     setIdx(idx + 1);
   };
 
-  // ────────────────────────────────────────────────────────────
-  //  화면 1: 브라우저 미지원
-  // ────────────────────────────────────────────────────────────
+  const retry = (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    console.log("[Pronunciation] 다시 시도");
+    setResults(prev => prev.slice(0, -1));
+    setTotalScore(prev => prev - (lastResult?.score || 0));
+    setLastResult(null);
+  };
+
+  // 화면 1: 브라우저 미지원
   if (!browserSupport) {
     return (
       <div style={{ minHeight: "100vh", background: T.bg, padding: 16 }}>
@@ -241,17 +335,14 @@ export function PronunciationGame({ name, setStudents, student, onExit, levelId 
           </div>
           <div style={{ fontSize: 13, lineHeight: 1.6, color: T.textMid }}>
             <strong>크롬(Chrome)</strong>이나 <strong>엣지(Edge)</strong> 브라우저로<br/>
-            접속하면 발음 챌린지를 즐길 수 있어요!<br/><br/>
-            iPhone은 Safari에서도 일부 지원돼요.
+            접속하면 발음 챌린지를 즐길 수 있어요!
           </div>
         </div>
       </div>
     );
   }
 
-  // ────────────────────────────────────────────────────────────
-  //  화면 2: 레벨 선택
-  // ────────────────────────────────────────────────────────────
+  // 화면 2: 레벨 선택
   if (!level) {
     const levels = [
       { id: "elementary", icon: "🌱", label: "기초", desc: "초등 기본 단어", bg: T.greenLight, color: T.green },
@@ -283,10 +374,7 @@ export function PronunciationGame({ name, setStudents, student, onExit, levelId 
               background: T.card, borderRadius: 16, padding: 18,
               boxShadow: T.shadow, border: `2px solid ${T.border}`,
               display: "flex", alignItems: "center", gap: 14, cursor: "pointer",
-              transition: "all 0.15s",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = lv.color; e.currentTarget.style.transform = "translateY(-2px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.transform = "none"; }}>
+            }}>
               <div style={{
                 width: 54, height: 54, borderRadius: 14, background: lv.bg,
                 display: "flex", alignItems: "center", justifyContent: "center",
@@ -312,9 +400,7 @@ export function PronunciationGame({ name, setStudents, student, onExit, levelId 
     );
   }
 
-  // ────────────────────────────────────────────────────────────
-  //  화면 3: 게임 종료 (결과 화면)
-  // ────────────────────────────────────────────────────────────
+  // 화면 3: 게임 종료 (결과 화면)
   if (idx >= words.length) {
     const avgScore = results.length > 0
       ? Math.round(results.reduce((s, r) => s + r.score, 0) / results.length)
@@ -344,7 +430,6 @@ export function PronunciationGame({ name, setStudents, student, onExit, levelId 
           </div>
         </div>
 
-        {/* 결과 상세 */}
         <div style={{ maxWidth: 500, margin: "0 auto" }}>
           <div style={{ fontSize: 13, fontWeight: 800, color: T.textMid, marginBottom: 8, padding: "0 4px" }}>
             📊 단어별 결과
@@ -395,9 +480,7 @@ export function PronunciationGame({ name, setStudents, student, onExit, levelId 
     );
   }
 
-  // ────────────────────────────────────────────────────────────
-  //  화면 4: 게임 진행 중
-  // ────────────────────────────────────────────────────────────
+  // 화면 4: 게임 진행 중
   const currentWord = words[idx];
   const message = lastResult ? scoreToMessage(lastResult.score) : null;
 
@@ -444,7 +527,7 @@ export function PronunciationGame({ name, setStudents, student, onExit, levelId 
         <div style={{ fontSize: 14, color: T.textMid, marginBottom: 16 }}>
           {currentWord.ko}
         </div>
-        <button onClick={() => speak(currentWord.en)} style={{
+        <button type="button" onClick={(e) => { e.stopPropagation(); speak(currentWord.en); }} style={{
           background: T.accentLight, color: T.accent, border: "none",
           borderRadius: 12, padding: "8px 18px", fontSize: 13, fontWeight: 800,
           cursor: "pointer",
@@ -453,28 +536,8 @@ export function PronunciationGame({ name, setStudents, student, onExit, levelId 
         </button>
       </div>
 
-      {/* 마이크 버튼 (가운데 큰 버튼) */}
-      <div style={{ textAlign: "center", marginBottom: 16 }}>
-        <button
-          onClick={recording ? stopRecording : startRecording}
-          disabled={!!lastResult}
-          style={{
-            width: 100, height: 100, borderRadius: "50%",
-            background: lastResult ? T.border : recording ? T.red : `linear-gradient(135deg, ${T.purple}, ${T.accent})`,
-            color: "white", border: "none",
-            fontSize: 44, cursor: lastResult ? "default" : "pointer",
-            boxShadow: recording ? "0 0 0 12px rgba(239,68,68,0.2)" : T.shadowLg,
-            transition: "all 0.2s",
-            animation: recording ? "pulse 1.5s ease-in-out infinite" : "none",
-          }}
-        >🎤</button>
-        <div style={{ fontSize: 12, color: T.textMid, marginTop: 10, fontWeight: 700 }}>
-          {lastResult ? "결과 확인 후 다음으로!" : recording ? "🔴 듣고 있어요... 말해보세요!" : "마이크 버튼을 누르고 말해보세요"}
-        </div>
-      </div>
-
-      {/* 인식 결과 */}
-      {lastResult && (
+      {/* 결과 카드 또는 마이크 버튼 (둘 중 하나만 보임) */}
+      {lastResult ? (
         <div style={{
           background: T.card, borderRadius: 16, padding: 16,
           marginBottom: 16, boxShadow: T.shadow,
@@ -504,17 +567,49 @@ export function PronunciationGame({ name, setStudents, student, onExit, levelId 
             {message.msg}
           </div>
           
-          <button onClick={next} style={{
-            width: "100%", marginTop: 12,
-            background: T.accent, color: "white", border: "none",
-            borderRadius: 12, padding: 12, fontSize: 14, fontWeight: 800, cursor: "pointer",
-          }}>
-            {idx === words.length - 1 ? "🏁 결과 보기" : "다음 단어 →"}
-          </button>
+          <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+            <button type="button" onClick={retry} style={{
+              flex: 1,
+              background: T.accentLight, color: T.accent, border: "none",
+              borderRadius: 12, padding: 12, fontSize: 13, fontWeight: 800, cursor: "pointer",
+            }}>
+              🔄 다시
+            </button>
+            <button type="button" onClick={next} style={{
+              flex: 2,
+              background: T.accent, color: "white", border: "none",
+              borderRadius: 12, padding: 12, fontSize: 14, fontWeight: 800, cursor: "pointer",
+            }}>
+              {idx === words.length - 1 ? "🏁 결과 보기" : "다음 단어 →"}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div style={{ textAlign: "center", marginBottom: 16 }}>
+          <button
+            type="button"
+            onClick={recording ? stopRecording : startRecording}
+            style={{
+              width: 100, height: 100, borderRadius: "50%",
+              background: recording ? T.red : `linear-gradient(135deg, ${T.purple}, ${T.accent})`,
+              color: "white", border: "none",
+              fontSize: 44, cursor: "pointer",
+              boxShadow: recording ? "0 0 0 12px rgba(239,68,68,0.2)" : T.shadowLg,
+              transition: "all 0.2s",
+              animation: recording ? "pulse 1.5s ease-in-out infinite" : "none",
+            }}
+          >🎤</button>
+          <div style={{ fontSize: 12, color: T.textMid, marginTop: 10, fontWeight: 700 }}>
+            {recording ? "🔴 듣고 있어요... 말해보세요!" : "마이크 버튼을 누르고 말해보세요"}
+          </div>
+          {debugMsg && (
+            <div style={{ fontSize: 10, color: T.textDim, marginTop: 6 }}>
+              {debugMsg}
+            </div>
+          )}
         </div>
       )}
 
-      {/* 키프레임 애니메이션 (마이크 펄스) */}
       <style>{`
         @keyframes pulse {
           0%, 100% { box-shadow: 0 0 0 12px rgba(239,68,68,0.2); }

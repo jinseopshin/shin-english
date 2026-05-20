@@ -1399,6 +1399,37 @@ function TeacherHome({ bank, exams, students, onNav }) {
         </Card>
       </div>
 
+      {/* 🔤 파닉스 학습 관리 — 큰 카드 (눈에 잘 띄게) */}
+      <Card onClick={() => onNav("phonics")} style={{
+        padding: "18px 20px",
+        background: `linear-gradient(135deg, #fbbf24, #ec4899, #a855f7)`,
+        color: "white", cursor: "pointer", border: "none",
+        marginBottom: 16, position: "relative", overflow: "hidden",
+        boxShadow: T.shadowLg
+      }}>
+        <div style={{
+          position: "absolute", right: -30, top: -20,
+          fontSize: 140, opacity: 0.15, transform: "rotate(15deg)", pointerEvents: "none"
+        }}>🔤</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, position: "relative", zIndex: 1 }}>
+          <div style={{ fontSize: 48 }}>🔤</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <span style={{ fontSize: 16, fontWeight: 900 }}>파닉스 학습 관리</span>
+              <span style={{
+                fontSize: 10, fontWeight: 800,
+                background: "rgba(255,255,255,0.25)",
+                padding: "2px 8px", borderRadius: 8
+              }}>NEW</span>
+            </div>
+            <div style={{ fontSize: 11, opacity: 0.95, lineHeight: 1.5 }}>
+              유치부 파닉스 단어집 만들기 · 학생 배정 · 수업 모드
+            </div>
+          </div>
+          <div style={{ fontSize: 24, opacity: 0.85 }}>›</div>
+        </div>
+      </Card>
+
       <div style={{ fontSize: 13, fontWeight: 800, color: T.textMid, marginBottom: 10, letterSpacing: 0.5 }}>⚡ 자주 쓰는 작업</div>
       <div className="grid-2" style={{ marginBottom: 16 }}>
         {[
@@ -1406,8 +1437,8 @@ function TeacherHome({ bank, exams, students, onNav }) {
           { id: "custom-exam",   icon: "📝", label: "맞춤 시험지 만들기", desc: "문제 골라서 시험 출제",    color: T.pink,   bg: T.pinkLight },
           { id: "manage",        icon: "👤", label: "학생 관리",        desc: "학생 등록 · 정보 수정",   color: T.green,  bg: T.greenLight },
           { id: "assign",        icon: "📬", label: "과제 배정",        desc: "문제집을 학생에게 배정",  color: T.orange, bg: T.orangeLight },
-          { id: "students",      icon: "📈", label: "학생 통계 보기",   desc: "전체 학습 현황 분석",     color: T.purple, bg: T.purpleLight },
-          { id: "bank",          icon: "🗂️", label: "문제 은행",        desc: "문제 추가 · 편집",        color: T.accent, bg: T.accentLight },
+          { id: "phonics",       icon: "🔤", label: "파닉스 단어집",    desc: "파닉스 단어집 만들기",    color: T.pink,   bg: T.pinkLight },
+          { id: "word-stats",    icon: "📖", label: "단어 학습 현황",   desc: "학생별 단어 진도 통계",   color: T.purple, bg: T.purpleLight },
         ].map(m => (
           <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 16 }}>
             <div style={{
@@ -2238,47 +2269,134 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
         )}
         {screen === "more" && (
           <div>
-            <div style={{ fontSize: 16, fontWeight: 900, color: T.text, marginBottom: 4 }}>✨ 더 많은 기능</div>
-            <div style={{ fontSize: 11, color: T.textMid, marginBottom: 14 }}>학습 자료 · 통계 · 관리</div>
+            <div style={{ fontSize: 16, fontWeight: 900, color: T.text, marginBottom: 4 }}>✨ 모든 기능</div>
+            <div style={{ fontSize: 11, color: T.textMid, marginBottom: 16 }}>역할별로 정리된 모든 메뉴</div>
 
-            <div style={{ fontSize: 11, fontWeight: 800, color: T.accent, marginBottom: 8, letterSpacing: 0.5 }}>📖 학습 자료</div>
-            <div className="grid-2" style={{ marginBottom: 16 }}>
-              {[
-                { id:"custom-exam",  icon:"📝", label:"맞춤 시험지",      desc:"학생별 문제 골라 출제" },
-                { id:"bank",         icon:"📚", label:"문제 은행",        desc:"문제 추가 / 편집" },
-                { id:"exam-builder", icon:"✏️", label:"시험지 만들기",    desc:"새 시험지 생성" },
-                { id:"exams",        icon:"📋", label:"시험지 목록",      desc:"만든 시험지 보기 / 인쇄" },
-                { id:"phonics",      icon:"🔤", label:"파닉스 단어집",    desc:"유치부 파닉스 단어집 관리" },
-                { id:"students",     icon:"📈", label:"학생 통계",        desc:"전체 학습 현황 분석" },
-                { id:"word-stats",   icon:"📖", label:"단어 학습 현황",  desc:"전체 학생 단어 진도 통계" },
-              ].map(m => (
-                <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 14, textAlign: "center" }}>
-                  <div style={{ fontSize: 28, marginBottom: 8 }}>{m.icon}</div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: T.text, marginBottom: 4 }}>{m.label}</div>
-                  <div style={{ fontSize: 10, color: T.textMid, lineHeight: 1.4 }}>{m.desc}</div>
-                </Card>
-              ))}
+            {/* 📊 학습 현황 보기 (대시보드) */}
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+                <div style={{
+                  width: 4, height: 16, background: T.purple, borderRadius: 2
+                }} />
+                <div style={{ fontSize: 12, fontWeight: 800, color: T.purple, letterSpacing: 0.5 }}>
+                  📊 학습 현황 보기
+                </div>
+              </div>
+              <div className="grid-2">
+                {[
+                  { id:"students",   icon:"📈", label:"학생 통계",      desc:"전체 학습 현황 분석" },
+                  { id:"word-stats", icon:"📖", label:"단어 학습 현황", desc:"학생별 단어 진도 통계" },
+                  { id:"league",     icon:"🏆", label:"주간 리그",      desc:"이번 주 포인트 순위" },
+                  { id:"attendance", icon:"🔔", label:"출석 기록",      desc:"수업 출결 체크 & 통계" },
+                ].map(m => (
+                  <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 14, textAlign: "center" }}>
+                    <div style={{ fontSize: 28, marginBottom: 8 }}>{m.icon}</div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: T.text, marginBottom: 4 }}>{m.label}</div>
+                    <div style={{ fontSize: 10, color: T.textMid, lineHeight: 1.4 }}>{m.desc}</div>
+                  </Card>
+                ))}
+              </div>
             </div>
 
-            <div style={{ fontSize: 11, fontWeight: 800, color: T.purple, marginBottom: 8, letterSpacing: 0.5 }}>🛠️ 관리 & 운영</div>
-            <div className="grid-2">
-              {[
-                { id:"groups",     icon:"👥", label:"반별 그룹 관리",  desc:"반 만들고 일괄 과제 배정" },
-                { id:"goals",      icon:"🎯", label:"목표 설정",        desc:"학생별 월간 목표 지정" },
-                { id:"notice",     icon:"💬", label:"공지 & 메시지",    desc:"학생 앱에 공지 띄우기" },
-                { id:"schedule",   icon:"📅", label:"수업 일정",        desc:"일정 → 학생 D-day 알림" },
-                { id:"league",     icon:"🏆", label:"주간 리그",        desc:"이번 주 포인트 순위" },
-                { id:"report",     icon:"📋", label:"월간 성적표",      desc:"PDF 인쇄용 성적표" },
-                { id:"parent",     icon:"👨‍👩‍👧", label:"학부모 뷰어",     desc:"자녀 학습 현황 보기" },
-                { id:"attendance", icon:"🔔", label:"출석 기록",        desc:"수업 출결 체크 & 통계" },
-                { id:"settings",   icon:"⚙️", label:"설정",            desc:"비밀번호 · 다크모드" },
-              ].map(m => (
-                <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 14, textAlign: "center" }}>
-                  <div style={{ fontSize: 28, marginBottom: 8 }}>{m.icon}</div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: T.text, marginBottom: 4 }}>{m.label}</div>
-                  <div style={{ fontSize: 10, color: T.textMid, lineHeight: 1.4 }}>{m.desc}</div>
-                </Card>
-              ))}
+            {/* 📚 콘텐츠 만들기 */}
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+                <div style={{
+                  width: 4, height: 16, background: T.accent, borderRadius: 2
+                }} />
+                <div style={{ fontSize: 12, fontWeight: 800, color: T.accent, letterSpacing: 0.5 }}>
+                  📚 콘텐츠 만들기
+                </div>
+              </div>
+              <div className="grid-2">
+                {[
+                  { id:"bank",         icon:"🗂️", label:"문제 은행",     desc:"문제 추가 · 편집" },
+                  { id:"exam-builder", icon:"✏️", label:"시험지 만들기", desc:"새 시험지 생성" },
+                  { id:"exams",        icon:"📋", label:"시험지 목록",   desc:"만든 시험지 보기 / 인쇄" },
+                  { id:"custom-exam",  icon:"📝", label:"맞춤 시험지",   desc:"학생별 문제 골라 출제" },
+                  { id:"phonics",      icon:"🔤", label:"파닉스 단어집", desc:"유치부 파닉스 관리" },
+                ].map(m => (
+                  <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 14, textAlign: "center" }}>
+                    <div style={{ fontSize: 28, marginBottom: 8 }}>{m.icon}</div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: T.text, marginBottom: 4 }}>{m.label}</div>
+                    <div style={{ fontSize: 10, color: T.textMid, lineHeight: 1.4 }}>{m.desc}</div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* 👥 학생 관리 */}
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+                <div style={{
+                  width: 4, height: 16, background: T.green, borderRadius: 2
+                }} />
+                <div style={{ fontSize: 12, fontWeight: 800, color: T.green, letterSpacing: 0.5 }}>
+                  👥 학생 관리
+                </div>
+              </div>
+              <div className="grid-2">
+                {[
+                  { id:"manage", icon:"👤", label:"학생 등록 · 수정", desc:"학생 정보 · PIN 관리" },
+                  { id:"assign", icon:"📬", label:"과제 배정",         desc:"문제집을 학생에게 배정" },
+                  { id:"groups", icon:"👥", label:"반별 그룹 관리",   desc:"반 만들고 일괄 배정" },
+                  { id:"goals",  icon:"🎯", label:"목표 설정",         desc:"학생별 월간 목표 지정" },
+                ].map(m => (
+                  <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 14, textAlign: "center" }}>
+                    <div style={{ fontSize: 28, marginBottom: 8 }}>{m.icon}</div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: T.text, marginBottom: 4 }}>{m.label}</div>
+                    <div style={{ fontSize: 10, color: T.textMid, lineHeight: 1.4 }}>{m.desc}</div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* 💬 소통 & 학부모 */}
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+                <div style={{
+                  width: 4, height: 16, background: T.pink, borderRadius: 2
+                }} />
+                <div style={{ fontSize: 12, fontWeight: 800, color: T.pink, letterSpacing: 0.5 }}>
+                  💬 소통 & 학부모
+                </div>
+              </div>
+              <div className="grid-2">
+                {[
+                  { id:"notice",   icon:"💬", label:"공지 & 메시지", desc:"학생 앱에 공지 띄우기" },
+                  { id:"schedule", icon:"📅", label:"수업 일정",     desc:"일정 · D-day 알림" },
+                  { id:"report",   icon:"📋", label:"월간 성적표",   desc:"PDF 인쇄용 성적표" },
+                  { id:"parent",   icon:"👨‍👩‍👧", label:"학부모 뷰어",  desc:"자녀 학습 현황 보기" },
+                ].map(m => (
+                  <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 14, textAlign: "center" }}>
+                    <div style={{ fontSize: 28, marginBottom: 8 }}>{m.icon}</div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: T.text, marginBottom: 4 }}>{m.label}</div>
+                    <div style={{ fontSize: 10, color: T.textMid, lineHeight: 1.4 }}>{m.desc}</div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* ⚙️ 시스템 */}
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+                <div style={{
+                  width: 4, height: 16, background: T.textMid, borderRadius: 2
+                }} />
+                <div style={{ fontSize: 12, fontWeight: 800, color: T.textMid, letterSpacing: 0.5 }}>
+                  ⚙️ 시스템
+                </div>
+              </div>
+              <Card onClick={() => onNav("settings")} style={{ padding: 14, display: "flex", alignItems: "center", gap: 14 }}>
+                <div style={{ fontSize: 32 }}>⚙️</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>설정</div>
+                  <div style={{ fontSize: 10, color: T.textMid, marginTop: 2 }}>
+                    비밀번호 · 다크 모드 · 기타 설정
+                  </div>
+                </div>
+                <div style={{ fontSize: 18, color: T.textDim }}>›</div>
+              </Card>
             </div>
           </div>
         )}

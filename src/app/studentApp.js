@@ -19,10 +19,10 @@ import {
   PictureWordGame, WordMatchLines, WordSearchGame, DictationGame
 } from "./games";
 import { MyWordbook } from "./MyWordbook";
-import { ReviewCard } from "./ReviewCard";
 import { PronunciationGame } from "./PronunciationGame";
 import { PronunciationWidget } from "./PronunciationWidget";
 import { getTodayReviewWords } from "./studentWords";
+import { isSoundEnabled, setSoundEnabled, getVolume, setVolume, playClick } from "./soundEffects";
 
 // ══════════════════════════════════════════════════════════════════════════
 //   🧒 STUDENT APP — 학생 모드 화면
@@ -52,8 +52,39 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
     catch { return false; }
   });
 
+  // ── 설정 메뉴 / 도움말 / 투어 ──
+  const [showSettings, setShowSettings] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [soundOn, setSoundOnState] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return isSoundEnabled();
+  });
+  const [volume, setVolumeState] = useState(() => {
+    if (typeof window === "undefined") return 0.6;
+    return getVolume();
+  });
+  const [showTour, setShowTour] = useState(false);
+  const [tourStep, setTourStep] = useState(0);
+
   const me = students[name] || {};
   const points = me.points || 0;
+
+  // 첫 로그인 시 자동 투어 (학생별)
+  useEffect(() => {
+    if (!name) return;
+    if (typeof window === "undefined") return;
+    try {
+      const seen = window.localStorage.getItem("angela_tour_seen_" + name);
+      if (!seen) {
+        // 환영 토스트 끝난 다음(3.5초 후)에 투어 시작
+        const t = setTimeout(() => {
+          setShowTour(true);
+          setTourStep(0);
+        }, 3500);
+        return () => clearTimeout(t);
+      }
+    } catch {}
+  }, [name]);
 
   // 자유풀기 펼침 상태 저장
   useEffect(() => {
@@ -355,6 +386,289 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
             }}>×</button>
         </div>
       )}
+
+      {/* ⚙️ 설정 모달 */}
+      {showSettings && (
+        <div onClick={() => setShowSettings(false)} style={{
+          position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)",
+          zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 16
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: T.card, borderRadius: 16, padding: 20,
+            maxWidth: 360, width: "100%", maxHeight: "85vh", overflowY: "auto",
+            boxShadow: "0 12px 40px rgba(0,0,0,0.25)"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+              <div style={{ fontSize: 16, fontWeight: 900, color: T.text }}>⚙️ 설정</div>
+              <button onClick={() => setShowSettings(false)} style={{
+                background: "none", border: "none", fontSize: 20, cursor: "pointer", color: T.textMid
+              }}>✕</button>
+            </div>
+
+            {/* 사운드 토글 */}
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "12px 14px", background: T.bg, borderRadius: 10, marginBottom: 8
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 22 }}>{soundOn ? "🔊" : "🔇"}</span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>사운드</div>
+                  <div style={{ fontSize: 10, color: T.textMid }}>{soundOn ? "켜짐" : "꺼짐"}</div>
+                </div>
+              </div>
+              <button onClick={() => {
+                const next = !soundOn;
+                setSoundEnabled(next);
+                setSoundOnState(next);
+                if (next) playClick();
+              }} style={{
+                width: 50, height: 28, borderRadius: 14, border: "none",
+                background: soundOn ? T.green : T.border, cursor: "pointer",
+                position: "relative", transition: "all 0.2s"
+              }}>
+                <div style={{
+                  position: "absolute", top: 3, left: soundOn ? 25 : 3,
+                  width: 22, height: 22, borderRadius: "50%", background: "white",
+                  transition: "all 0.2s", boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                }} />
+              </button>
+            </div>
+
+            {/* 볼륨 슬라이더 (사운드 켜져 있을 때만) */}
+            {soundOn && (
+              <div style={{
+                padding: "12px 14px", background: T.bg, borderRadius: 10, marginBottom: 8
+              }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontSize: 22 }}>🔉</span>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>볼륨</div>
+                      <div style={{ fontSize: 10, color: T.textMid }}>{Math.round(volume * 100)}%</div>
+                    </div>
+                  </div>
+                </div>
+                <input
+                  type="range"
+                  min="0" max="100" step="5"
+                  value={Math.round(volume * 100)}
+                  onChange={e => {
+                    const v = parseInt(e.target.value, 10) / 100;
+                    setVolume(v);
+                    setVolumeState(v);
+                  }}
+                  onMouseUp={() => playClick()}
+                  onTouchEnd={() => playClick()}
+                  style={{ width: "100%", accentColor: T.accent }}
+                />
+              </div>
+            )}
+
+            {/* 다크 모드 */}
+            {setDarkMode && (
+              <div style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "12px 14px", background: T.bg, borderRadius: 10, marginBottom: 8
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 22 }}>{darkMode ? "🌙" : "☀️"}</span>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>화면 모드</div>
+                    <div style={{ fontSize: 10, color: T.textMid }}>{darkMode ? "다크" : "라이트"}</div>
+                  </div>
+                </div>
+                <button onClick={() => { playClick(); setDarkMode(d => !d); }} style={{
+                  width: 50, height: 28, borderRadius: 14, border: "none",
+                  background: darkMode ? T.purple : T.border, cursor: "pointer",
+                  position: "relative", transition: "all 0.2s"
+                }}>
+                  <div style={{
+                    position: "absolute", top: 3, left: darkMode ? 25 : 3,
+                    width: 22, height: 22, borderRadius: "50%", background: "white",
+                    transition: "all 0.2s", boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                  }} />
+                </button>
+              </div>
+            )}
+
+            {/* 비밀번호 변경 */}
+            <button onClick={() => { playClick(); setShowSettings(false); setShowPasswordChange(true); }} style={{
+              width: "100%", display: "flex", alignItems: "center", gap: 10,
+              padding: "12px 14px", background: T.bg, borderRadius: 10, marginBottom: 8,
+              border: "none", cursor: "pointer", textAlign: "left"
+            }}>
+              <span style={{ fontSize: 22 }}>🔑</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>비밀번호 변경</div>
+                <div style={{ fontSize: 10, color: T.textMid }}>4자리 PIN 변경</div>
+              </div>
+              <span style={{ fontSize: 18, color: T.textDim }}>›</span>
+            </button>
+
+            {/* 도움말 */}
+            <button onClick={() => { playClick(); setShowSettings(false); setShowHelp(true); }} style={{
+              width: "100%", display: "flex", alignItems: "center", gap: 10,
+              padding: "12px 14px", background: T.bg, borderRadius: 10, marginBottom: 8,
+              border: "none", cursor: "pointer", textAlign: "left"
+            }}>
+              <span style={{ fontSize: 22 }}>❓</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>도움말</div>
+                <div style={{ fontSize: 10, color: T.textMid }}>기능 안내 보기</div>
+              </div>
+              <span style={{ fontSize: 18, color: T.textDim }}>›</span>
+            </button>
+
+            {/* 투어 다시 보기 */}
+            <button onClick={() => {
+              playClick();
+              setShowSettings(false);
+              setTourStep(0);
+              setShowTour(true);
+            }} style={{
+              width: "100%", display: "flex", alignItems: "center", gap: 10,
+              padding: "12px 14px", background: T.bg, borderRadius: 10,
+              border: "none", cursor: "pointer", textAlign: "left"
+            }}>
+              <span style={{ fontSize: 22 }}>🎓</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>처음 시작 안내 다시 보기</div>
+                <div style={{ fontSize: 10, color: T.textMid }}>주요 기능 둘러보기</div>
+              </div>
+              <span style={{ fontSize: 18, color: T.textDim }}>›</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ❓ 도움말 모달 */}
+      {showHelp && (
+        <div onClick={() => setShowHelp(false)} style={{
+          position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)",
+          zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 16
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: T.card, borderRadius: 16, padding: 20,
+            maxWidth: 380, width: "100%", maxHeight: "85vh", overflowY: "auto",
+            boxShadow: "0 12px 40px rgba(0,0,0,0.25)"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+              <div style={{ fontSize: 16, fontWeight: 900, color: T.text }}>❓ 도움말</div>
+              <button onClick={() => setShowHelp(false)} style={{
+                background: "none", border: "none", fontSize: 20, cursor: "pointer", color: T.textMid
+              }}>✕</button>
+            </div>
+
+            <div style={{ fontSize: 12, color: T.text, lineHeight: 1.8 }}>
+              {[
+                { icon: "🔔", title: "오늘의 복습", desc: "전에 배운 단어 중 잊을 만한 것을 다시 풀어요" },
+                { icon: "📚", title: "내 단어장", desc: "내가 모은 단어로 자유롭게 복습할 수 있어요" },
+                { icon: "📝", title: "단어 숙제", desc: "선생님이 내준 단어를 게임으로 외워요" },
+                { icon: "🎮", title: "게임", desc: "단어 맞추기, 스펠링, 스피드 퀴즈, 플래시카드 등 다양한 게임" },
+                { icon: "🎤", title: "발음 연습", desc: "이번 주 발음 연습 단어로 큰 소리로 따라 말해요" },
+                { icon: "🏅", title: "내 뱃지", desc: "꾸준히 학습하면 뱃지를 받을 수 있어요" },
+                { icon: "🔥", title: "콤보", desc: "연속으로 맞추면 더 큰 점수와 뱃지를 받아요" },
+                { icon: "⚙️", title: "설정", desc: "사운드, 화면 모드, 비밀번호 변경 등 설정 가능" },
+              ].map((h, i) => (
+                <div key={i} style={{
+                  display: "flex", gap: 12, padding: "10px 0",
+                  borderBottom: i < 7 ? `1px solid ${T.border}` : "none"
+                }}>
+                  <span style={{ fontSize: 24, lineHeight: 1 }}>{h.icon}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 800, color: T.text, marginBottom: 2 }}>{h.title}</div>
+                    <div style={{ fontSize: 11, color: T.textMid, lineHeight: 1.5 }}>{h.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => setShowHelp(false)} style={{
+              width: "100%", marginTop: 16, padding: 12,
+              background: T.accent, color: "white", border: "none", borderRadius: 10,
+              fontSize: 13, fontWeight: 800, cursor: "pointer"
+            }}>닫기</button>
+          </div>
+        </div>
+      )}
+
+      {/* 🎓 첫 로그인 투어 */}
+      {showTour && (() => {
+        const TOUR = [
+          { icon: "👋", title: `${name}님, 환영해요!`, desc: "Angela's English Academy에 오신 걸 환영합니다. 함께 영어를 즐겁게 배워봐요!" },
+          { icon: "🔔", title: "오늘의 복습부터", desc: "복습 카드가 있으면 먼저 풀어보세요. 잊기 전에 다시 보면 오래 기억돼요." },
+          { icon: "🎮", title: "다양한 게임", desc: "단어 맞추기, 스펠링, 스피드 퀴즈 등 여러 게임으로 즐겁게 배워요." },
+          { icon: "🔥", title: "콤보를 쌓아요", desc: "연속으로 정답을 맞추면 콤보! 화려한 효과와 함께 점수가 올라가요." },
+          { icon: "⚙️", title: "설정과 도움말", desc: "우측 상단 ⚙️ 버튼을 누르면 사운드, 비밀번호, 도움말 등을 볼 수 있어요." },
+        ];
+        const total = TOUR.length;
+        const current = TOUR[tourStep];
+        const close = () => {
+          setShowTour(false);
+          try { window.localStorage.setItem("angela_tour_seen_" + name, "1"); } catch {}
+        };
+        return (
+          <div style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)",
+            zIndex: 250, display: "flex", alignItems: "center", justifyContent: "center", padding: 16
+          }}>
+            <div style={{
+              background: T.card, borderRadius: 18, padding: 28,
+              maxWidth: 360, width: "100%", textAlign: "center",
+              boxShadow: "0 16px 48px rgba(0,0,0,0.3)"
+            }}>
+              <div style={{ fontSize: 56, marginBottom: 12 }}>{current.icon}</div>
+              <div style={{ fontSize: 16, fontWeight: 900, color: T.text, marginBottom: 8 }}>
+                {current.title}
+              </div>
+              <div style={{ fontSize: 12, color: T.textMid, lineHeight: 1.7, marginBottom: 18 }}>
+                {current.desc}
+              </div>
+
+              {/* 진행 점들 */}
+              <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 18 }}>
+                {TOUR.map((_, i) => (
+                  <div key={i} style={{
+                    width: i === tourStep ? 18 : 6,
+                    height: 6, borderRadius: 3,
+                    background: i === tourStep ? T.accent : T.border,
+                    transition: "all 0.2s"
+                  }} />
+                ))}
+              </div>
+
+              {/* 버튼들 */}
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={close} style={{
+                  flex: 1, padding: 12, background: "transparent",
+                  color: T.textMid, border: `1px solid ${T.border}`,
+                  borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer"
+                }}>
+                  안 보고 시작
+                </button>
+                {tourStep < total - 1 ? (
+                  <button onClick={() => { playClick(); setTourStep(s => s + 1); }} style={{
+                    flex: 2, padding: 12, background: T.accent,
+                    color: "white", border: "none", borderRadius: 10,
+                    fontSize: 13, fontWeight: 800, cursor: "pointer"
+                  }}>
+                    다음 ({tourStep + 1}/{total})
+                  </button>
+                ) : (
+                  <button onClick={() => { playClick(); close(); }} style={{
+                    flex: 2, padding: 12, background: T.green,
+                    color: "white", border: "none", borderRadius: 10,
+                    fontSize: 13, fontWeight: 800, cursor: "pointer"
+                  }}>
+                    시작하기 ✨
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* 상단 헤더 — 항상 표시 */}
       <div className="topbar" style={{ background: T.card, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 50 }}>
        <div className="top-bar-inner">
@@ -363,12 +677,9 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
           <div style={{ fontSize: 13, fontWeight: 900, color: T.text }}>{name}님</div>
           <div style={{ fontSize: 10, color: T.textDim }}>⭐ {points}p</div>
         </div>
-        <button onClick={() => setDarkMode && setDarkMode(d => !d)} title={darkMode?"라이트":"다크"} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, padding:"4px 6px", borderRadius:8 }}>
-          {darkMode ? "☀️" : "🌙"}
-        </button>
-        <button onClick={() => setShowPasswordChange(true)} title="비밀번호 변경"
-          style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, padding: "4px 6px", borderRadius: 8 }}>
-          🔑
+        <button onClick={() => { playClick(); setShowSettings(true); }} title="설정"
+          style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, padding: "4px 8px", borderRadius: 8 }}>
+          ⚙️
         </button>
         <Btn v="ghost" size="sm" onClick={onLogout} style={{ fontSize: 11 }}>로그아웃</Btn>
        </div>

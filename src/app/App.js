@@ -301,12 +301,16 @@ function StudentLogin({ onSuccess, onBack, students }) {
             </div>
             {isDefaultPin && (
               <div style={{
-                marginTop: 10, padding: "6px 10px",
+                marginTop: 12, padding: "10px 14px",
                 background: T.yellowLight, color: T.orange,
-                fontSize: 10, fontWeight: 700, borderRadius: 8,
-                display: "inline-block"
+                fontSize: 11, fontWeight: 700, borderRadius: 10,
+                lineHeight: 1.6, textAlign: "left",
+                border: `1px solid ${T.orange}33`
               }}>
-                💡 처음이라면 0000 을 입력해보세요
+                💡 <strong>처음 로그인이라면 0000 을 입력하세요.</strong><br/>
+                <span style={{ fontSize: 10, color: T.text, opacity: 0.85 }}>
+                  로그인 후 🔑 버튼을 눌러 본인 비밀번호로 변경할 수 있어요.
+                </span>
               </div>
             )}
           </div>

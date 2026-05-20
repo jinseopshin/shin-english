@@ -261,54 +261,84 @@ export function playWrong() {
   }, 300);
 }
 
-// 🎵 콤보 (3,5,10) — 게임 레벨업 사운드 (드럼+칩튠+벨)
+// 🎵 콤보 사운드 — 단계별로 화려해짐 (3/5/7/10/15)
 export function playCombo(count) {
-  if (count >= 10) {
-    // 🔥🔥🔥 10콤보: 보스 클리어급 사운드
-    // 드럼 더블킥
+  if (count >= 15) {
+    // 👑 15콤보: 전설급 (LEGENDARY) - 모든 악기 총동원
+    // 드럼 트리플킥 + 스네어
+    playKick(0.35);
+    setTimeout(() => playKick(0.35), 80);
+    setTimeout(() => playKick(0.35), 160);
+    setTimeout(() => playSnare(0.25), 200);
+    // 칩튠 6음 상승 (옥타브 두 개)
+    [392, 523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((freq, i) => {
+      setTimeout(() => playChiptune(freq, 0.1, 0.22), 250 + i * 50);
+    });
+    // 벨 화음 5개 (대박)
+    setTimeout(() => {
+      playBell(523.25, 1.2, 0.2);
+      playBell(659.25, 1.2, 0.18);
+      playBell(783.99, 1.2, 0.16);
+      playBell(1046.5, 1.2, 0.18);
+      playBell(1318.5, 1.2, 0.16);
+    }, 600);
+    // 신디 베이스 2개 (두께)
+    setTimeout(() => {
+      playSynthBass(98, 1.0, 0.2);    // G2 (저음)
+      playSynthBass(196, 1.0, 0.16);  // G3
+    }, 620);
+    // 반짝 폭발 ×5
+    [650, 800, 950, 1100, 1250].forEach(t => setTimeout(() => playSparkle(), t));
+  } else if (count >= 10) {
+    // 🔥🔥🔥 10콤보: 보스 클리어급
     playKick(0.3);
     setTimeout(() => playKick(0.3), 80);
     setTimeout(() => playSnare(0.2), 160);
-    // 칩튠 상승 아르페지오 (포켓몬 레벨업 스타일)
     [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((freq, i) => {
       setTimeout(() => playChiptune(freq, 0.1, 0.2), 200 + i * 60);
     });
-    // 벨 화음 폭발 (영광스러운 마무리)
     setTimeout(() => {
       playBell(523.25, 0.8, 0.18);
       playBell(659.25, 0.8, 0.15);
       playBell(783.99, 0.8, 0.13);
       playBell(1046.5, 0.8, 0.15);
     }, 550);
-    // 신디 베이스 (두께 추가)
     setTimeout(() => playSynthBass(130.81, 0.7, 0.18), 580);
-    // 반짝 ×3
     setTimeout(() => playSparkle(), 600);
     setTimeout(() => playSparkle(), 800);
     setTimeout(() => playSparkle(), 1000);
+  } else if (count >= 7) {
+    // 🔥🔥 7콤보: 강화된 콤보 (10콤보 직전)
+    playKick(0.28);
+    setTimeout(() => playSnare(0.18), 100);
+    [523.25, 659.25, 783.99, 880, 1046.5].forEach((freq, i) => {
+      setTimeout(() => playChiptune(freq, 0.09, 0.19), 150 + i * 60);
+    });
+    setTimeout(() => {
+      playBell(659.25, 0.7, 0.16);
+      playBell(987.77, 0.7, 0.14);
+      playBell(1318.5, 0.7, 0.12);
+    }, 450);
+    setTimeout(() => playSynthBass(165, 0.5, 0.15), 470);
+    setTimeout(() => playSparkle(), 500);
+    setTimeout(() => playSparkle(), 700);
   } else if (count >= 5) {
     // 🔥🔥 5콤보: 레벨업 느낌
     playKick(0.25);
-    // 칩튠 4음 상승
     [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
       setTimeout(() => playChiptune(freq, 0.09, 0.18), 80 + i * 70);
     });
-    // 벨 화음
     setTimeout(() => {
       playBell(783.99, 0.6, 0.15);
       playBell(987.77, 0.6, 0.13);
     }, 380);
-    // 반짝
     setTimeout(() => playSparkle(), 450);
   } else if (count >= 3) {
-    // 🔥 3콤보: 가벼운 콤보 (좋아요! 느낌)
-    // 가벼운 킥
+    // 🔥 3콤보: 가벼운 콤보
     playKick(0.2);
-    // 칩튠 3음 상승
     [587.33, 698.46, 880].forEach((freq, i) => {
       setTimeout(() => playChiptune(freq, 0.08, 0.16), 60 + i * 55);
     });
-    // 미니 벨
     setTimeout(() => playBell(880, 0.4, 0.13), 250);
   }
 }
@@ -448,43 +478,128 @@ export function burstStars(x = null, y = null) {
   setTimeout(() => container.remove(), 800);
 }
 
-// 🔥 콤보 표시 (화면 중앙 큰 텍스트)
+// 🔥 콤보 표시 (화면 중앙 큰 텍스트) — 단계별 차등 화려함
 export function showCombo(count) {
   if (typeof document === "undefined") return;
   if (count < 3) return;
 
-  const emoji = count >= 10 ? "🔥🔥🔥" : count >= 5 ? "🔥🔥" : "🔥";
-  const color = count >= 10 ? "#ef4444" : count >= 5 ? "#f59e0b" : "#22c55e";
+  let emoji, color, gradient, label, fontSize;
+  if (count >= 15) {
+    emoji = "👑✨";
+    color = "#fbbf24";
+    gradient = "linear-gradient(135deg, #fbbf24, #ef4444, #ec4899, #a855f7)";
+    label = "LEGENDARY!";
+    fontSize = 72;
+  } else if (count >= 10) {
+    emoji = "🔥🔥🔥";
+    color = "#ef4444";
+    gradient = "linear-gradient(135deg, #ef4444, #f97316)";
+    label = `${count} COMBO!`;
+    fontSize = 64;
+  } else if (count >= 7) {
+    emoji = "🔥🔥";
+    color = "#f97316";
+    gradient = "linear-gradient(135deg, #f97316, #f59e0b)";
+    label = `${count} COMBO!`;
+    fontSize = 58;
+  } else if (count >= 5) {
+    emoji = "🔥🔥";
+    color = "#f59e0b";
+    gradient = "linear-gradient(135deg, #f59e0b, #fbbf24)";
+    label = `${count} COMBO!`;
+    fontSize = 52;
+  } else {
+    emoji = "🔥";
+    color = "#22c55e";
+    gradient = "linear-gradient(135deg, #22c55e, #84cc16)";
+    label = `${count} COMBO!`;
+    fontSize = 46;
+  }
 
+  // 메인 콤보 텍스트
   const banner = document.createElement("div");
+  banner.className = "combo-banner-active";
   banner.style.cssText = `
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    font-size: 56px;
+    transform: translate(-50%, -50%) scale(0) rotate(-10deg);
+    font-size: ${fontSize}px;
     font-weight: 900;
-    color: ${color};
-    text-shadow: 0 4px 24px rgba(0,0,0,0.3), 0 0 20px ${color}66;
+    background: ${gradient};
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.3), 0 0 30px ${color}66;
     pointer-events: none;
     z-index: 9998;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     white-space: nowrap;
     text-align: center;
     line-height: 1.1;
+    filter: drop-shadow(0 0 20px ${color}88);
   `;
-  banner.innerHTML = `${emoji}<br/><span style="font-size: 36px;">${count} COMBO!</span>`;
+  banner.innerHTML = `${emoji}<br/><span style="font-size: ${fontSize * 0.7}px;">${label}</span>`;
   document.body.appendChild(banner);
 
+  // 배경 광선 효과 (5콤보 이상)
+  if (count >= 5) {
+    const rays = document.createElement("div");
+    rays.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      height: 300px;
+      pointer-events: none;
+      z-index: 9997;
+      background: radial-gradient(circle, ${color}33 0%, transparent 70%);
+      animation: combo-pulse 0.8s ease-out;
+    `;
+    document.body.appendChild(rays);
+    setTimeout(() => rays.remove(), 800);
+  }
+
+  // 무지개 효과 (15콤보)
+  if (count >= 15) {
+    const rainbow = document.createElement("div");
+    rainbow.style.cssText = `
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9996;
+      background: linear-gradient(45deg,
+        rgba(239,68,68,0.15),
+        rgba(245,158,11,0.15),
+        rgba(34,197,94,0.15),
+        rgba(79,142,247,0.15),
+        rgba(168,85,247,0.15));
+      opacity: 0;
+      transition: opacity 0.3s;
+    `;
+    document.body.appendChild(rainbow);
+    requestAnimationFrame(() => rainbow.style.opacity = "1");
+    setTimeout(() => { rainbow.style.opacity = "0"; }, 600);
+    setTimeout(() => rainbow.remove(), 900);
+  }
+
+  // 메인 텍스트 애니메이션
   requestAnimationFrame(() => {
-    banner.style.transform = "translate(-50%, -50%) scale(1)";
+    banner.style.transform = "translate(-50%, -50%) scale(1) rotate(0deg)";
   });
 
   setTimeout(() => {
-    banner.style.transform = "translate(-50%, -120%) scale(0.7)";
+    banner.style.transform = "translate(-50%, -120%) scale(0.7) rotate(5deg)";
     banner.style.opacity = "0";
     setTimeout(() => banner.remove(), 400);
-  }, 800);
+  }, count >= 10 ? 1200 : 900);
+
+  // 사이드 별 폭발 (7콤보 이상)
+  if (count >= 7) {
+    setTimeout(() => burstStars(window.innerWidth * 0.2, window.innerHeight * 0.5), 200);
+    setTimeout(() => burstStars(window.innerWidth * 0.8, window.innerHeight * 0.5), 200);
+  }
 }
 
 // 🎊 꽃가루 효과 (게임 종료 시 우수 점수)

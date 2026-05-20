@@ -31,6 +31,15 @@ import { getTodayReviewWords } from "./studentWords";
 // ══════════════════════════════════════════════════════════════════════════
 
 export function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, setDarkMode }) {
+  // ── 게임/화면 state (먼저 선언) ──
+  const [screen, setScreen] = useState("home");
+  const [quizSet, setQuizSet] = useState(null);
+  const [pendingGame, setPendingGame] = useState(null);
+  const [selectedLevel, setSelectedLevel] = useState("all");
+  const [reviewWords, setReviewWords] = useState(null);
+  const [newBadges, setNewBadges] = useState([]);
+  const [tab, setTab] = useState("game");
+
   // ── 복원: 환영 토스트 / PIN 변경 / 복습 카운트 / 자유풀기 접기 ──
   const [welcomeToast, setWelcomeToast] = useState({ show: false, message: "", icon: "" });
   const [showPasswordChange, setShowPasswordChange] = useState(false);
@@ -42,6 +51,9 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
     try { return window.localStorage.getItem("angela_free_quiz_open_" + name) === "true"; }
     catch { return false; }
   });
+
+  const me = students[name] || {};
+  const points = me.points || 0;
 
   // 자유풀기 펼침 상태 저장
   useEffect(() => {
@@ -84,17 +96,6 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
     return () => { cancelled = true; clearTimeout(timer); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
-  const [screen, setScreen] = useState("home");
-  const [quizSet, setQuizSet] = useState(null);
-  const [pendingGame, setPendingGame] = useState(null);
-  const [selectedLevel, setSelectedLevel] = useState("all");
-  const [reviewWords, setReviewWords] = useState(null);
-  const [newBadges, setNewBadges] = useState([]);
-  const [tab, setTab] = useState("game");
-
-  const me = students[name] || {};
-  const points = me.points || 0;
 
   // SSR 안전: useEffect 내에서 읽거나 isBrowser 체크
   const notices   = useMemo(()=>{ if (typeof window==="undefined") return []; try { return JSON.parse(localStorage.getItem("angela_notices")||"[]"); } catch { return []; } },[screen]);

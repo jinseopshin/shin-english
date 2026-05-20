@@ -19,6 +19,7 @@ import {
   PictureWordGame, WordMatchLines, WordSearchGame, DictationGame
 } from "./games";
 import { MyWordbook } from "./MyWordbook";
+import { PhonicsMenu } from "./PhonicsGames";
 import { PronunciationGame } from "./PronunciationGame";
 import { PronunciationWidget } from "./PronunciationWidget";
 import { getTodayReviewWords } from "./studentWords";
@@ -322,6 +323,7 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
   if (screen === "game-speed")    return <SpeedQuiz     name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
   if (screen === "game-flash")    return <FlashCard     name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
   if (screen === "wordbook") return <MyWordbook studentName={name} onExit={exitGame} />;
+  if (screen === "phonics") return <PhonicsMenu studentName={name} onExit={exitGame} />;
   if (screen === "custom-exam-play") return <CustomExamPlay student={me} name={name} setStudents={setStudents} onExit={() => setScreen("home")} />;
   if (screen === "game-sentence") return <SentenceGame  name={name} setStudents={setStudents} onExit={exitGame} />;
   // 신규 8개 게임
@@ -711,6 +713,28 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
       <div className="app-container">
         {/* 🎤 이번 주 발음 위젯 (Phase 3) */}
         <PronunciationWidget studentName={name} onStart={() => setScreen("game-pronunciation")} />
+
+        {/* 🔤 파닉스 학습 카드 — 유치부/초급 학생용 */}
+        <Card onClick={() => setScreen("phonics")} style={{
+          padding: "16px",
+          background: `linear-gradient(135deg, #fbbf24, #ec4899, #a855f7)`,
+          color: "white", cursor: "pointer", border: "none",
+          display: "flex", alignItems: "center", gap: 14,
+          marginBottom: 14, position: "relative", overflow: "hidden"
+        }}>
+          <div style={{
+            position: "absolute", right: -20, top: -10,
+            fontSize: 100, opacity: 0.15, transform: "rotate(15deg)"
+          }}>🔤</div>
+          <div style={{ fontSize: 42, position: "relative", zIndex: 1 }}>🔤</div>
+          <div style={{ flex: 1, position: "relative", zIndex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 900 }}>파닉스 학습</div>
+            <div style={{ fontSize: 11, opacity: 0.95, marginTop: 3 }}>
+              알파벳부터 차근차근! 5단계 · 5게임
+            </div>
+          </div>
+          <div style={{ fontSize: 20, opacity: 0.7, position: "relative", zIndex: 1 }}>›</div>
+        </Card>
 
        {/* 📚 복습 + 단어장 2-column 그리드 */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>

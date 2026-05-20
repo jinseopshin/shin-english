@@ -241,7 +241,7 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
       wrongCountRef.current++;
       setFeedback("wrong");
       onWrong();
-      if (Math.random() < 0.5) setTimeout(() => angela.show("wrong"), 200);
+      setTimeout(() => angela.show("wrong"), 200);
       if (levelId === "homework") updateWordMastery(setStudents, name, q.en, false);
     }
     setTimeout(() => { setFeedback(null); setRound(round + 1); }, 1000);
@@ -479,7 +479,7 @@ export function SpellingGame({ name, setStudents, student, onExit, levelId = "al
       wrongCountRef.current++;
       setFeedback("wrong");
       onWrong();
-      if (Math.random() < 0.5) setTimeout(() => angela.show("wrong"), 200);
+      setTimeout(() => angela.show("wrong"), 200);
     }
     if (levelId === "homework") updateWordMastery(setStudents, name, q.en, isCorrect);
     setTimeout(() => { setFeedback(null); setInput(""); setRound(round + 1); }, 1200);
@@ -704,7 +704,7 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
       setCombo(0);
       wrongCountRef.current++;
       onWrong();
-      if (Math.random() < 0.5) angela.show("wrong");
+      angela.show("wrong");
     }
 
     if (levelId === "homework") updateWordMastery(setStudents, name, q.en, isCorrect);

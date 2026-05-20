@@ -1,104 +1,101 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import Lottie from "lottie-react";
 
 // ══════════════════════════════════════════════════════════════════════════
-//   🦊 Angela Mascot — 학습 도우미 마스코트
-//   - 상황별로 등장해서 격려/축하/위로 메시지 표시
-//   - 화면 우측 하단에서 슬라이드 인 / 사라짐
-//   - useAngela 훅으로 어디서든 호출 가능
+//   🦊 Angela Mascot v2 — Lottie 애니메이션 기반
+//   - 진짜 움직이는 동물 캐릭터로 격려
+//   - 상황별로 다른 애니메이션 자동 선택
+//   - public 폴더의 JSON 파일을 동적으로 로드
 // ══════════════════════════════════════════════════════════════════════════
 
-// 마스코트 표정 라이브러리 (상황 → 이모지 + 메시지)
+// Lottie JSON 캐싱 (한 번 로드되면 메모리에 저장)
+const lottieCache = {};
+
+async function loadLottie(path) {
+  if (lottieCache[path]) return lottieCache[path];
+  try {
+    const res = await fetch(path);
+    if (!res.ok) throw new Error(`Lottie 로드 실패: ${path}`);
+    const data = await res.json();
+    lottieCache[path] = data;
+    return data;
+  } catch (e) {
+    console.warn("Lottie 로드 에러:", e);
+    return null;
+  }
+}
+
+// 반응 → Lottie 파일 매핑
+const REACTION_TO_LOTTIE = {
+  // 정답/일상 격려
+  correct: "/angela-happy.json",
+  firstCorrect: "/angela-happy.json",
+  start: "/angela-happy.json",
+  recovery: "/angela-happy.json",
+  // 오답 위로
+  wrong: "/angela-sad.json",
+  // 콤보 (3 이하)
+  combo3: "/angela-celebrate.json",
+  // 콤보 (5~7) - 더 화려한 축하
+  combo5: "/angela-celebrate.json",
+  combo7: "/angela-celebrate.json",
+  // 콤보 (10+) - 트로피급
+  combo10: "/angela-trophy.json",
+  combo15: "/angela-trophy.json",
+  // 게임 종료
+  perfect: "/angela-trophy.json",
+  great: "/angela-celebrate.json",
+  good: "/angela-happy.json",
+  encourage: "/angela-happy.json",
+};
+
+// 마스코트 메시지 라이브러리 (상황 → 메시지 배열)
 export const ANGELA_REACTIONS = {
-  // 게임 시작
   start: [
-    { emoji: "👋", msg: "Let's go!" },
-    { emoji: "🎯", msg: "Ready!" },
-    { emoji: "💪", msg: "You got this!" },
+    { msg: "Let's go!" }, { msg: "Ready!" }, { msg: "You got this!" },
   ],
-  // 첫 정답
   firstCorrect: [
-    { emoji: "😊", msg: "Good start!" },
-    { emoji: "👍", msg: "Nice one!" },
-    { emoji: "✨", msg: "Off to a great start!" },
+    { msg: "Good start!" }, { msg: "Nice one!" }, { msg: "Great start!" },
   ],
-  // 일반 정답
   correct: [
-    { emoji: "😊", msg: "Good!" },
-    { emoji: "👍", msg: "Nice!" },
-    { emoji: "✨", msg: "Excellent!" },
-    { emoji: "🎯", msg: "Bullseye!" },
+    { msg: "Good!" }, { msg: "Nice!" }, { msg: "Excellent!" }, { msg: "Bullseye!" },
   ],
-  // 오답
   wrong: [
-    { emoji: "🤔", msg: "Almost!" },
-    { emoji: "💪", msg: "Try again!" },
-    { emoji: "🌱", msg: "Keep going!" },
-    { emoji: "😌", msg: "It's okay!" },
+    { msg: "Almost!" }, { msg: "Try again!" }, { msg: "Keep going!" }, { msg: "It's okay!" },
   ],
-  // 오답 후 다시 정답 (멋진 회복)
   recovery: [
-    { emoji: "💪", msg: "Great recovery!" },
-    { emoji: "🔥", msg: "You bounced back!" },
-    { emoji: "👏", msg: "Way to come back!" },
+    { msg: "Great recovery!" }, { msg: "You bounced back!" }, { msg: "Way to come back!" },
   ],
-  // 3 콤보
   combo3: [
-    { emoji: "🔥", msg: "On fire!" },
-    { emoji: "⚡", msg: "Hot streak!" },
-    { emoji: "🎉", msg: "Combo!" },
+    { msg: "On fire!" }, { msg: "Hot streak!" }, { msg: "Combo!" },
   ],
-  // 5 콤보
   combo5: [
-    { emoji: "🌟", msg: "Amazing!" },
-    { emoji: "💥", msg: "Awesome!" },
-    { emoji: "🚀", msg: "You're flying!" },
+    { msg: "Amazing!" }, { msg: "Awesome!" }, { msg: "You're flying!" },
   ],
-  // 7 콤보
   combo7: [
-    { emoji: "💪", msg: "Incredible!" },
-    { emoji: "⭐", msg: "Super star!" },
-    { emoji: "🏆", msg: "Champion!" },
+    { msg: "Incredible!" }, { msg: "Super star!" }, { msg: "Champion!" },
   ],
-  // 10 콤보
   combo10: [
-    { emoji: "👑", msg: "Unstoppable!" },
-    { emoji: "💎", msg: "Diamond level!" },
-    { emoji: "🎆", msg: "MEGA COMBO!" },
+    { msg: "Unstoppable!" }, { msg: "Diamond level!" }, { msg: "MEGA COMBO!" },
   ],
-  // 15 콤보 (전설)
   combo15: [
-    { emoji: "👑✨", msg: "LEGENDARY!" },
-    { emoji: "🌈", msg: "MYTHIC!" },
-    { emoji: "🎇", msg: "GODLIKE!" },
+    { msg: "LEGENDARY!" }, { msg: "MYTHIC!" }, { msg: "GODLIKE!" },
   ],
-  // 게임 완료 - 만점
   perfect: [
-    { emoji: "🏆", msg: "Perfect score!" },
-    { emoji: "💯", msg: "100% AMAZING!" },
-    { emoji: "👑", msg: "You're a CHAMPION!" },
+    { msg: "Perfect score!" }, { msg: "100% AMAZING!" }, { msg: "You're a CHAMPION!" },
   ],
-  // 게임 완료 - 좋음 (80%+)
   great: [
-    { emoji: "🎉", msg: "Well done!" },
-    { emoji: "🌟", msg: "Great job!" },
-    { emoji: "👏", msg: "Excellent work!" },
+    { msg: "Well done!" }, { msg: "Great job!" }, { msg: "Excellent work!" },
   ],
-  // 게임 완료 - 보통 (50-80%)
   good: [
-    { emoji: "👍", msg: "Good effort!" },
-    { emoji: "💪", msg: "Keep practicing!" },
-    { emoji: "🌱", msg: "Growing strong!" },
+    { msg: "Good effort!" }, { msg: "Keep practicing!" }, { msg: "Growing strong!" },
   ],
-  // 게임 완료 - 격려 (50% 미만)
   encourage: [
-    { emoji: "🌱", msg: "Keep going!" },
-    { emoji: "💪", msg: "Don't give up!" },
-    { emoji: "🌟", msg: "You'll get it!" },
+    { msg: "Keep going!" }, { msg: "Don't give up!" }, { msg: "You'll get it!" },
   ],
 };
 
-// 무작위 메시지 선택
 function pickReaction(type) {
   const reactions = ANGELA_REACTIONS[type] || ANGELA_REACTIONS.correct;
   return reactions[Math.floor(Math.random() * reactions.length)];
@@ -106,28 +103,31 @@ function pickReaction(type) {
 
 // ══════════════════════════════════════════════════════════════════════════
 //   AngelaMascot 컴포넌트
-//   - position: "right" (기본) | "left" | "top-center"
-//   - reaction: ANGELA_REACTIONS의 key
-//   - trigger: 변경되면 마스코트 표시 (number, e.g., Date.now())
-//   - duration: 표시 시간 ms (기본 2000)
 // ══════════════════════════════════════════════════════════════════════════
 export function AngelaMascot({
   reaction = "correct",
   trigger = 0,
   position = "right",
   duration = 2000,
-  size = "md",  // sm | md | lg
+  size = "md",
 }) {
   const [visible, setVisible] = useState(false);
   const [current, setCurrent] = useState(null);
+  const [lottieData, setLottieData] = useState(null);
   const timeoutRef = useRef(null);
 
   useEffect(() => {
     if (trigger === 0) return;
-    // 새 메시지 선택
     const r = pickReaction(reaction);
     setCurrent(r);
     setVisible(true);
+
+    // Lottie 애니메이션 로드
+    const lottiePath = REACTION_TO_LOTTIE[reaction] || REACTION_TO_LOTTIE.correct;
+    loadLottie(lottiePath).then(data => {
+      if (data) setLottieData(data);
+    });
+
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => setVisible(false), duration);
     return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
@@ -142,20 +142,20 @@ export function AngelaMascot({
     "top-center": { left: "50%", top: 80, transform: visible ? "translate(-50%, 0) scale(1)" : "translate(-50%, -120%) scale(0.5)" },
   };
 
-  // 크기 설정
+  // 크기 (Lottie는 이모지보다 더 크게 표시)
   const sizes = {
-    sm: { mascotSize: 40, fontSize: 20, msgSize: 11, padding: "6px 10px" },
-    md: { mascotSize: 56, fontSize: 30, msgSize: 13, padding: "8px 14px" },
-    lg: { mascotSize: 72, fontSize: 40, msgSize: 15, padding: "10px 18px" },
+    sm: { mascotSize: 64, msgSize: 11, padding: "6px 10px" },
+    md: { mascotSize: 84, msgSize: 13, padding: "8px 14px" },
+    lg: { mascotSize: 110, msgSize: 15, padding: "10px 18px" },
   };
 
   const sz = sizes[size] || sizes.md;
   const pos = positions[position] || positions.right;
 
-  // 콤보 등급에 따라 색상 변경
+  // 콤보 등급 색상
   const isHighCombo = reaction === "combo10" || reaction === "combo15" || reaction === "perfect";
   const isMedCombo = reaction === "combo5" || reaction === "combo7" || reaction === "great";
-  const bg = isHighCombo
+  const borderGradient = isHighCombo
     ? "linear-gradient(135deg, #fbbf24, #ef4444)"
     : isMedCombo
     ? "linear-gradient(135deg, #f59e0b, #ec4899)"
@@ -173,20 +173,35 @@ export function AngelaMascot({
       alignItems: "center",
       gap: 8,
     }}>
-      {/* 마스코트 캐릭터 */}
+      {/* Lottie 캐릭터 */}
       <div style={{
         width: sz.mascotSize,
         height: sz.mascotSize,
         borderRadius: "50%",
-        background: bg,
+        background: "white",
+        padding: 4,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: sz.fontSize,
-        boxShadow: "0 4px 20px rgba(0,0,0,0.2), 0 0 0 3px rgba(255,255,255,0.5)",
+        boxShadow: `0 4px 20px rgba(0,0,0,0.2), 0 0 0 3px transparent`,
+        backgroundImage: `linear-gradient(white, white), ${borderGradient}`,
+        backgroundOrigin: "border-box",
+        backgroundClip: "padding-box, border-box",
+        border: "3px solid transparent",
         animation: visible ? "angela-bounce 0.6s ease-out" : "none",
+        overflow: "hidden",
       }}>
-        {current.emoji}
+        {lottieData ? (
+          <Lottie
+            animationData={lottieData}
+            loop={true}
+            autoplay={true}
+            style={{ width: "100%", height: "100%" }}
+          />
+        ) : (
+          // 로딩 중 백업 이모지
+          <div style={{ fontSize: sz.mascotSize * 0.5 }}>🦊</div>
+        )}
       </div>
 
       {/* 말풍선 */}
@@ -201,7 +216,6 @@ export function AngelaMascot({
         whiteSpace: "nowrap",
         position: "relative",
       }}>
-        {/* 말풍선 꼬리 (왼쪽 방향) */}
         <div style={{
           position: "absolute",
           left: -6,
@@ -220,10 +234,7 @@ export function AngelaMascot({
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//   useAngela 훅 — 간편 사용
-//   const angela = useAngela();
-//   angela.show("correct");  // 정답 반응
-//   angela.show("combo5");   // 5콤보 반응
+//   useAngela 훅
 // ══════════════════════════════════════════════════════════════════════════
 export function useAngela() {
   const [trigger, setTrigger] = useState(0);
@@ -248,9 +259,7 @@ export function useAngela() {
   };
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-//   콤보 횟수 → 적절한 reaction 자동 선택 헬퍼
-// ══════════════════════════════════════════════════════════════════════════
+// 콤보 횟수 → 적절한 reaction 자동 선택 헬퍼
 export function getComboReaction(comboCount) {
   if (comboCount >= 15) return "combo15";
   if (comboCount >= 10) return "combo10";
@@ -268,4 +277,69 @@ export function getFinishReaction(score, total) {
   if (ratio >= 0.8) return "great";
   if (ratio >= 0.5) return "good";
   return "encourage";
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//   FullScreenConfetti — 화면 가득 꽃가루 (Lottie)
+//   게임 종료 시 화면 전체에 표시
+// ══════════════════════════════════════════════════════════════════════════
+export function FullScreenConfetti({ trigger = 0, duration = 3000 }) {
+  const [visible, setVisible] = useState(false);
+  const [lottieData, setLottieData] = useState(null);
+
+  useEffect(() => {
+    if (trigger === 0) return;
+    setVisible(true);
+    loadLottie("/confetti.json").then(data => {
+      if (data) setLottieData(data);
+    });
+    const timer = setTimeout(() => setVisible(false), duration);
+    return () => clearTimeout(timer);
+  }, [trigger, duration]);
+
+  if (!visible || !lottieData) return null;
+
+  return (
+    <div style={{
+      position: "fixed",
+      inset: 0,
+      pointerEvents: "none",
+      zIndex: 9995,
+    }}>
+      <Lottie
+        animationData={lottieData}
+        loop={false}
+        autoplay={true}
+        style={{ width: "100%", height: "100%" }}
+      />
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//   ComboFireEffect — 콤보 옆에 불꽃 효과 (Lottie)
+//   콤보 카운터 옆에 작은 불꽃이 일렁임
+// ══════════════════════════════════════════════════════════════════════════
+export function ComboFireEffect({ active = false, size = 32 }) {
+  const [lottieData, setLottieData] = useState(null);
+
+  useEffect(() => {
+    if (!active) return;
+    loadLottie("/fire.json").then(data => {
+      if (data) setLottieData(data);
+    });
+  }, [active]);
+
+  if (!active || !lottieData) return null;
+
+  return (
+    <div style={{ width: size, height: size, display: "inline-block", verticalAlign: "middle" }}>
+      <Lottie
+        animationData={lottieData}
+        loop={true}
+        autoplay={true}
+        style={{ width: "100%", height: "100%" }}
+      />
+    </div>
+  );
 }

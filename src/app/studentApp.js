@@ -22,6 +22,7 @@ import { MyWordbook } from "./MyWordbook";
 import { ReviewCard } from "./ReviewCard";
 import { PronunciationGame } from "./PronunciationGame";
 import { PronunciationWidget } from "./PronunciationWidget";
+import { getTodayReviewWords } from "./studentWords";
 
 // ══════════════════════════════════════════════════════════════════════════
 //   🧒 STUDENT APP — 학생 모드 화면
@@ -312,6 +313,17 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
 
   return (
     <>
+    <style>{`
+      @keyframes slideDownFade {
+        from { transform: translateY(-20px); opacity: 0; }
+        to   { transform: translateY(0); opacity: 1; }
+      }
+      @keyframes shake {
+        0%,100% { transform: translateX(0); }
+        25% { transform: translateX(-6px); }
+        75% { transform: translateX(6px); }
+      }
+    `}</style>
     <div style={{ minHeight: "100vh", background: T.bg, paddingBottom: 40 }}>
 {/* 환영 토스트 (3초 후 자동 사라짐) */}
       {welcomeToast.show && (
@@ -350,11 +362,12 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
           <div style={{ fontSize: 13, fontWeight: 900, color: T.text }}>{name}님</div>
           <div style={{ fontSize: 10, color: T.textDim }}>⭐ {points}p</div>
         </div>
-        <button onClick={() => setDarkMode && setDarkMode(d => !d)} <button onClick={() => setShowPasswordChange(true)} title="비밀번호 변경"
+        <button onClick={() => setDarkMode && setDarkMode(d => !d)} title={darkMode?"라이트":"다크"} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, padding:"4px 6px", borderRadius:8 }}>
+          {darkMode ? "☀️" : "🌙"}
+        </button>
+        <button onClick={() => setShowPasswordChange(true)} title="비밀번호 변경"
           style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, padding: "4px 6px", borderRadius: 8 }}>
           🔑
-        </button>title={darkMode?"라이트":"다크"} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, padding:"4px 6px", borderRadius:8 }}>
-          {darkMode ? "☀️" : "🌙"}
         </button>
         <Btn v="ghost" size="sm" onClick={onLogout} style={{ fontSize: 11 }}>로그아웃</Btn>
        </div>
@@ -387,12 +400,68 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
         {/* 🎤 이번 주 발음 위젯 (Phase 3) */}
         <PronunciationWidget studentName={name} onStart={() => setScreen("game-pronunciation")} />
 
-       {/* 🔔 오늘의 복습 (Phase 2: 망각 곡선) */}
-        <ReviewCard studentName={name} onStartReview={(words) => {
-          setReviewWords(words);
-          setSelectedLevel("review");
-          setScreen("game-match");
-        }} />
+       {/* 📚 복습 + 단어장 2-column 그리드 */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+          {/* 🔔 오늘의 복습 카드 */}
+          {reviewCount > 0 ? (
+            <Card
+              onClick={async () => {
+                const words = await getTodayReviewWords(name, 20);
+                if (words && words.length > 0) {
+                  setReviewWords(words);
+                  setSelectedLevel("review");
+                  setScreen("game-match");
+                }
+              }}
+              style={{
+                padding: "16px 12px",
+                background: `linear-gradient(135deg, ${T.orange}, ${T.red})`,
+                color: "white", cursor: "pointer", border: "none",
+                textAlign: "center",
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                minHeight: 110, position: "relative"
+              }}>
+              <div style={{
+                position: "absolute", top: 6, right: 6,
+                background: "white", color: T.red,
+                fontSize: 10, fontWeight: 900,
+                padding: "2px 7px", borderRadius: 8,
+                boxShadow: "0 2px 4px rgba(0,0,0,0.15)"
+              }}>{reviewCount}</div>
+              <div style={{ fontSize: 30, marginBottom: 4 }}>🔔</div>
+              <div style={{ fontSize: 13, fontWeight: 900 }}>오늘의 복습</div>
+              <div style={{ fontSize: 10, opacity: 0.95, marginTop: 3 }}>잊기 전에 다시 봐요!</div>
+            </Card>
+          ) : (
+            <Card style={{
+              padding: "16px 12px",
+              background: T.greenLight,
+              border: `1.5px solid ${T.green}33`,
+              textAlign: "center",
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+              minHeight: 110,
+              cursor: "default"
+            }}>
+              <div style={{ fontSize: 30, marginBottom: 4 }}>✅</div>
+              <div style={{ fontSize: 13, fontWeight: 900, color: T.green }}>복습 완료!</div>
+              <div style={{ fontSize: 10, color: T.textMid, marginTop: 3 }}>오늘 복습할 단어가 없어요</div>
+            </Card>
+          )}
+
+          {/* 📚 내 단어장 카드 */}
+          <Card onClick={() => setScreen("wordbook")} style={{
+            padding: "16px 12px",
+            background: `linear-gradient(135deg, ${T.purple}, ${T.accent})`,
+            color: "white", cursor: "pointer", border: "none",
+            textAlign: "center",
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            minHeight: 110
+          }}>
+            <div style={{ fontSize: 30, marginBottom: 4 }}>📚</div>
+            <div style={{ fontSize: 13, fontWeight: 900 }}>내 단어장</div>
+            <div style={{ fontSize: 10, opacity: 0.95, marginTop: 3 }}>⭐ 모은 단어로 복습</div>
+          </Card>
+        </div>
 
         {/* 단어 숙제 배너 — 진행 중인 숙제가 있으면 최상단에 표시 */}
         <WordHomeworkBanner student={me} onStart={() => {
@@ -444,22 +513,56 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
                 </>
               )}
 
+              {/* 📚 자유 풀기 (접힘/펼침) */}
               {otherSets.length > 0 && (
-                <>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: T.textMid, marginBottom: 8, letterSpacing: 0.5 }}>📚 자유 풀기</div>
-                  <div style={{ marginBottom: 18 }}>
-                    {otherSets.map(s => (
-                      <Card key={s.id} onClick={() => { setQuizSet(s); setScreen("quiz"); }} style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 12 }}>
-                        <div style={{ width: 42, height: 42, background: T.pinkLight, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>📝</div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>{s.title}</div>
-                          <div style={{ fontSize: 11, color: T.textMid }}>{s.grade} · {s.questions.length}문항</div>
+                <div style={{ marginBottom: 18 }}>
+                  <button
+                    onClick={() => setShowFreeQuiz(s => !s)}
+                    style={{
+                      width: "100%",
+                      background: T.card,
+                      border: `1px solid ${T.border}`,
+                      borderRadius: 12,
+                      padding: "12px 14px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginBottom: showFreeQuiz ? 8 : 0,
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 20 }}>📝</span>
+                      <div style={{ textAlign: "left" }}>
+                        <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>자유 풀기</div>
+                        <div style={{ fontSize: 11, color: T.textMid, marginTop: 2 }}>
+                          {otherSets.length}개 문제집 · 원할 때 풀어보세요
                         </div>
-                        <div style={{ fontSize: 18, color: T.textDim }}>›</div>
-                      </Card>
-                    ))}
-                  </div>
-                </>
+                      </div>
+                    </div>
+                    <div style={{
+                      fontSize: 14, color: T.textMid, fontWeight: 800,
+                      transition: "transform 0.2s",
+                      transform: showFreeQuiz ? "rotate(180deg)" : "rotate(0deg)",
+                    }}>▼</div>
+                  </button>
+
+                  {showFreeQuiz && (
+                    <div>
+                      {otherSets.map(s => (
+                        <Card key={s.id} onClick={() => { setQuizSet(s); setScreen("quiz"); }} style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 12 }}>
+                          <div style={{ width: 42, height: 42, background: T.pinkLight, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>📝</div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>{s.title}</div>
+                            <div style={{ fontSize: 11, color: T.textMid }}>{s.grade} · {s.questions.length}문항</div>
+                          </div>
+                          <div style={{ fontSize: 18, color: T.textDim }}>›</div>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
               )}
             </>
           );
@@ -479,20 +582,6 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
 
         {tab === "game" && (
           <>
-          {/* 📚 내 단어장 빠른 진입 */}
-            <Card onClick={() => setScreen("wordbook")} style={{
-              marginBottom: 14, padding: "14px 16px",
-              background: `linear-gradient(135deg, ${T.purple}, ${T.accent})`,
-              color: "white", cursor: "pointer", border: "none",
-              display: "flex", alignItems: "center", gap: 12,
-            }}>
-              <div style={{ fontSize: 32 }}>📚</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 900 }}>내 단어장</div>
-                <div style={{ fontSize: 11, opacity: 0.9, marginTop: 2 }}>⭐ 모은 단어로 복습하기</div>
-              </div>
-              <div style={{ fontSize: 20, opacity: 0.7 }}>›</div>
-            </Card>
             {/* 목표 위젯 */}
             <StudentGoalWidget studentName={name} goals={goals} />
 

@@ -3,12 +3,14 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { T, Btn, Card } from "./theme";
 import {
   ALPHABET_DATA, CVC_DATA, MAGIC_E_DATA, BLENDS_DATA, SIGHT_WORDS,
-  PHONICS_LEVELS, getPhonicsWords, getFirstLetter, makeCVCBlank, makeAlphabetChoices
+  PHONICS_LEVELS, getPhonicsWords, getFirstLetter, makeCVCBlank, makeAlphabetChoices,
+  getStudentAssignedSets, getPublicSets, getCustomSet
 } from "./phonicsData";
 import {
   onCorrect, onWrong, onFinish, playClick, isSoundEnabled
 } from "./soundEffects";
 import { useAngela, getComboReaction, getFinishReaction, FullScreenConfetti } from "./AngelaMascot";
+import { PhonicsClassMode } from "./PhonicsClassMode";
 
 // ══════════════════════════════════════════════════════════════════════════
 //   🔤 PhonicsGames.js — 유치부 파닉스 게임 5종
@@ -91,7 +93,27 @@ function shuffle(arr) {
 // ══════════════════════════════════════════════════════════════════════════
 export function PhonicsMenu({ studentName, onExit }) {
   const [selectedLevel, setSelectedLevel] = useState(null);
+  const [selectedCustomSet, setSelectedCustomSet] = useState(null);
   const progress = useMemo(() => getProgress(studentName), [studentName]);
+
+  // 학생에게 배정된 단어집 + 공개 단어집
+  const myAssignedSets = useMemo(() => getStudentAssignedSets(studentName), [studentName]);
+  const publicSets = useMemo(() => {
+    // 배정된 것과 중복 제거
+    const assignedIds = new Set(myAssignedSets.map(s => s.id));
+    return getPublicSets().filter(s => !assignedIds.has(s.id));
+  }, [myAssignedSets]);
+
+  if (selectedCustomSet) {
+    return (
+      <CustomSetMenu
+        studentName={studentName}
+        customSet={selectedCustomSet}
+        onBack={() => setSelectedCustomSet(null)}
+        onExit={onExit}
+      />
+    );
+  }
 
   if (selectedLevel) {
     return (
@@ -117,7 +139,103 @@ export function PhonicsMenu({ studentName, onExit }) {
         </div>
       </div>
 
-      <div style={{ display: "grid", gap: 12 }}>
+      {/* 📦 내 단어집 (선생님이 배정한 것) */}
+      {myAssignedSets.length > 0 && (
+        <div style={{ marginBottom: 18 }}>
+          <div style={{
+            fontSize: 13, fontWeight: 800, color: T.text,
+            marginBottom: 8, display: "flex", alignItems: "center", gap: 6
+          }}>
+            <span style={{ fontSize: 16 }}>⭐</span>
+            선생님이 내준 단어집
+            <span style={{
+              fontSize: 10, background: T.accent, color: "white",
+              padding: "2px 8px", borderRadius: 8, marginLeft: 4
+            }}>{myAssignedSets.length}</span>
+          </div>
+          <div style={{ display: "grid", gap: 8 }}>
+            {myAssignedSets.map(set => {
+              const level = PHONICS_LEVELS.find(l => l.id === set.levelId);
+              return (
+                <Card key={set.id} onClick={() => { playClick(); setSelectedCustomSet(set); }}
+                  style={{
+                    padding: 12, cursor: "pointer",
+                    background: `linear-gradient(135deg, ${T.accent}, ${T.purple})`,
+                    color: "white", border: "none",
+                    display: "flex", alignItems: "center", gap: 12
+                  }}>
+                  <div style={{
+                    width: 40, height: 40, background: "rgba(255,255,255,0.25)",
+                    borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 22
+                  }}>{level?.icon || "📚"}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 900 }}>{set.name}</div>
+                    <div style={{ fontSize: 10, opacity: 0.95, marginTop: 2 }}>
+                      {level?.label} · {set.words?.length || 0}개 단어
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 20, opacity: 0.8 }}>›</div>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 🌐 공개 단어집 (누구나 풀 수 있음) */}
+      {publicSets.length > 0 && (
+        <div style={{ marginBottom: 18 }}>
+          <div style={{
+            fontSize: 13, fontWeight: 800, color: T.text,
+            marginBottom: 8, display: "flex", alignItems: "center", gap: 6
+          }}>
+            <span style={{ fontSize: 16 }}>🌐</span>
+            누구나 풀 수 있는 단어집
+            <span style={{
+              fontSize: 10, background: T.green, color: "white",
+              padding: "2px 8px", borderRadius: 8, marginLeft: 4
+            }}>{publicSets.length}</span>
+          </div>
+          <div style={{ display: "grid", gap: 8 }}>
+            {publicSets.map(set => {
+              const level = PHONICS_LEVELS.find(l => l.id === set.levelId);
+              return (
+                <Card key={set.id} onClick={() => { playClick(); setSelectedCustomSet(set); }}
+                  style={{
+                    padding: 12, cursor: "pointer",
+                    background: T.card,
+                    border: `2px solid ${level?.color || T.green}`,
+                    display: "flex", alignItems: "center", gap: 12
+                  }}>
+                  <div style={{
+                    width: 40, height: 40, background: level?.bg || T.bg,
+                    borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 22
+                  }}>{level?.icon || "📚"}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 900, color: T.text }}>{set.name}</div>
+                    <div style={{ fontSize: 10, color: T.textMid, marginTop: 2 }}>
+                      {level?.label} · {set.words?.length || 0}개 단어
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 20, color: T.textDim }}>›</div>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 📚 기본 단계 */}
+      <div style={{
+        fontSize: 13, fontWeight: 800, color: T.text,
+        marginBottom: 8, display: "flex", alignItems: "center", gap: 6
+      }}>
+        <span style={{ fontSize: 16 }}>📚</span>
+        기본 단계
+      </div>
+      <div style={{ display: "grid", gap: 10 }}>
         {PHONICS_LEVELS.map((lv, idx) => {
           // 이 단계에서 가장 잘 한 게임의 별 수
           const stars = Math.max(
@@ -127,29 +245,29 @@ export function PhonicsMenu({ studentName, onExit }) {
           return (
             <Card key={lv.id} onClick={() => { playClick(); setSelectedLevel(lv.id); }}
               style={{
-                padding: 16,
+                padding: 14,
                 background: `linear-gradient(135deg, ${lv.bg}, white)`,
                 borderLeft: `5px solid ${lv.color}`,
                 cursor: "pointer",
                 display: "flex", alignItems: "center", gap: 14
               }}>
-              <div style={{ fontSize: 40 }}>{lv.icon}</div>
+              <div style={{ fontSize: 36 }}>{lv.icon}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                  <span style={{ fontSize: 11, color: T.textMid, fontWeight: 700 }}>STEP {idx+1}</span>
-                  <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>{lv.label}</span>
+                  <span style={{ fontSize: 10, color: T.textMid, fontWeight: 700 }}>STEP {idx+1}</span>
+                  <span style={{ fontSize: 14, fontWeight: 900, color: T.text }}>{lv.label}</span>
                 </div>
-                <div style={{ fontSize: 11, color: T.textMid, marginBottom: 4 }}>{lv.desc}</div>
+                <div style={{ fontSize: 10, color: T.textMid, marginBottom: 4 }}>{lv.desc}</div>
                 <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
                   {[1, 2, 3].map(i => (
-                    <span key={i} style={{ fontSize: 14, opacity: stars >= i ? 1 : 0.25 }}>⭐</span>
+                    <span key={i} style={{ fontSize: 13, opacity: stars >= i ? 1 : 0.25 }}>⭐</span>
                   ))}
                   <span style={{ fontSize: 10, color: T.textDim, marginLeft: 4 }}>
                     · {lv.count}개 단어
                   </span>
                 </div>
               </div>
-              <div style={{ fontSize: 22, color: T.textDim }}>›</div>
+              <div style={{ fontSize: 20, color: T.textDim }}>›</div>
             </Card>
           );
         })}
@@ -159,10 +277,128 @@ export function PhonicsMenu({ studentName, onExit }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
+//   📦 커스텀 단어집 메뉴 — 수업모드 + 게임 선택
+// ══════════════════════════════════════════════════════════════════════════
+function CustomSetMenu({ studentName, customSet, onBack, onExit }) {
+  const [mode, setMode] = useState(null); // "class" | game-id
+  const level = PHONICS_LEVELS.find(l => l.id === customSet.levelId);
+
+  // 수업 모드
+  if (mode === "class") {
+    return (
+      <PhonicsClassMode
+        words={customSet.words}
+        title={customSet.name}
+        levelId={customSet.levelId}
+        onExit={() => setMode(null)}
+      />
+    );
+  }
+
+  // 게임 모드 (커스텀 단어집 사용)
+  if (mode) {
+    return (
+      <CustomSetGameRunner
+        studentName={studentName}
+        customSet={customSet}
+        gameId={mode}
+        onBack={() => setMode(null)}
+        onExit={onExit}
+      />
+    );
+  }
+
+  // 메뉴 화면
+  const availableGames = [
+    { id: "class", icon: "📖", label: "수업 모드", desc: "선생님과 같이 보며 천천히 익혀요", featured: true },
+    { id: "first-sound", icon: "🎵", label: "첫소리 맞추기", desc: "단어 듣고 첫글자 고르기" },
+    { id: "picture-letter", icon: "🖼️", label: "그림 보고 첫글자", desc: "이모지 보고 알파벳 고르기" },
+    { id: "build-word", icon: "🧩", label: "단어 만들기", desc: "소리 듣고 순서대로 클릭" },
+  ];
+
+  return (
+    <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+        <button onClick={onBack} style={{
+          background: T.card, border: `1px solid ${T.border}`, borderRadius: 10,
+          padding: "8px 12px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid
+        }}>← 뒤로</button>
+        <div>
+          <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>
+            {level?.icon} {customSet.name}
+          </div>
+          <div style={{ fontSize: 11, color: T.textMid, marginTop: 2 }}>
+            {level?.label} · {customSet.words?.length || 0}개 단어
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gap: 10 }}>
+        {availableGames.map(g => (
+          <Card key={g.id} onClick={() => { playClick(); setMode(g.id); }}
+            style={{
+              padding: 14, display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
+              background: g.featured
+                ? `linear-gradient(135deg, ${T.green}, ${T.accent})`
+                : T.card,
+              color: g.featured ? "white" : T.text,
+              border: g.featured ? "none" : `2px solid ${T.border}`,
+            }}>
+            <div style={{
+              width: 48, height: 48,
+              background: g.featured ? "rgba(255,255,255,0.25)" : (level?.bg || T.bg),
+              borderRadius: 12,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 24
+            }}>{g.icon}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 800 }}>{g.label}</div>
+              <div style={{
+                fontSize: 10,
+                color: g.featured ? "rgba(255,255,255,0.95)" : T.textMid,
+                marginTop: 2
+              }}>{g.desc}</div>
+            </div>
+            <div style={{ fontSize: 18, opacity: g.featured ? 0.85 : 0.5 }}>›</div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//   🎮 커스텀 단어집 게임 실행기
+// ══════════════════════════════════════════════════════════════════════════
+function CustomSetGameRunner({ studentName, customSet, gameId, onBack, onExit }) {
+  const customWords = customSet.words;
+  const levelId = customSet.levelId || "cvc"; // 기본값
+  const props = { studentName, levelId, gameId: `custom_${customSet.id}_${gameId}`, onBack, onExit, customWords };
+
+  switch (gameId) {
+    case "first-sound":     return <FirstSoundGame {...props} />;
+    case "picture-letter":  return <PictureLetterGame {...props} />;
+    case "build-word":      return <BuildWordGame {...props} />;
+    default:
+      return (
+        <div style={{ padding: 20, textAlign: "center" }}>
+          <div style={{ fontSize: 14, color: T.red, marginBottom: 12 }}>지원하지 않는 게임</div>
+          <button onClick={onBack} style={{
+            padding: "10px 20px", background: T.accent,
+            color: "white", border: "none", borderRadius: 10,
+            fontSize: 13, fontWeight: 800, cursor: "pointer"
+          }}>← 뒤로</button>
+        </div>
+      );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
 //   📂 단계별 게임 선택 메뉴
 // ══════════════════════════════════════════════════════════════════════════
 function PhonicsGameMenu({ studentName, levelId, onBack, onExit }) {
   const [selectedGame, setSelectedGame] = useState(null);
+  const [showClassMode, setShowClassMode] = useState(false);
   const level = PHONICS_LEVELS.find(l => l.id === levelId);
   const progress = useMemo(() => getProgress(studentName), [studentName, selectedGame]);
 
@@ -177,6 +413,20 @@ function PhonicsGameMenu({ studentName, levelId, onBack, onExit }) {
     ];
     return all.filter(g => g.levels.includes(levelId));
   }, [levelId]);
+
+  // 수업 모드용 단어 (현재 단계의 모든 단어)
+  const classWords = useMemo(() => getPhonicsWords(levelId), [levelId]);
+
+  if (showClassMode) {
+    return (
+      <PhonicsClassMode
+        words={classWords}
+        title={level?.label}
+        levelId={levelId}
+        onExit={() => setShowClassMode(false)}
+      />
+    );
+  }
 
   if (selectedGame) {
     return (
@@ -206,6 +456,28 @@ function PhonicsGameMenu({ studentName, levelId, onBack, onExit }) {
       </div>
 
       <div style={{ display: "grid", gap: 10 }}>
+        {/* 📖 수업 모드 (눈에 띄게 - 첫 번째) */}
+        <Card onClick={() => { playClick(); setShowClassMode(true); }}
+          style={{
+            padding: 14, display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
+            background: `linear-gradient(135deg, ${T.green}, ${T.accent})`,
+            color: "white", border: "none"
+          }}>
+          <div style={{
+            width: 48, height: 48, background: "rgba(255,255,255,0.25)",
+            borderRadius: 12,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 24
+          }}>📖</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 900 }}>수업 모드</div>
+            <div style={{ fontSize: 10, opacity: 0.95, marginTop: 2 }}>
+              선생님과 같이 보며 천천히 익혀요
+            </div>
+          </div>
+          <div style={{ fontSize: 18, opacity: 0.85 }}>›</div>
+        </Card>
+
         {games.map(g => {
           const rec = progress[`${levelId}_${g.id}`];
           const stars = rec?.bestStars || 0;
@@ -366,9 +638,9 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
 //   GAME 2: 🎵 첫소리 맞추기
 //   - 단어 듣기 + 그림 → 첫글자 4지선다
 // ══════════════════════════════════════════════════════════════════════════
-function FirstSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
+function FirstSoundGame({ studentName, levelId, gameId, onBack, onExit, customWords }) {
   const [rounds] = useState(() => {
-    const all = getPhonicsWords(levelId);
+    const all = customWords || getPhonicsWords(levelId);
     return shuffle(all).slice(0, Math.min(10, all.length));
   });
   const [idx, setIdx] = useState(0);
@@ -644,9 +916,9 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
 //   GAME 4: 🖼️ 그림 보고 첫글자 고르기
 //   - 첫소리 맞추기와 비슷하지만 소리 없이 그림만 보고 푸는 시각적 게임
 // ══════════════════════════════════════════════════════════════════════════
-function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit }) {
+function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, customWords }) {
   const [rounds] = useState(() => {
-    const all = getPhonicsWords(levelId);
+    const all = customWords || getPhonicsWords(levelId);
     return shuffle(all).slice(0, Math.min(10, all.length));
   });
   const [idx, setIdx] = useState(0);
@@ -778,10 +1050,11 @@ function EmptyPoolMessage({ onBack, message }) {
   );
 }
 
-function BuildWordGame({ studentName, levelId, gameId, onBack, onExit }) {
+function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWords }) {
   const [rounds] = useState(() => {
     // 단어 만들기는 3~5글자 단어만 사용 (UI 그리드 깨짐 방지)
-    const all = getPhonicsWords(levelId).filter(w => w.word && w.word.length >= 3 && w.word.length <= 5);
+    const source = customWords || getPhonicsWords(levelId);
+    const all = source.filter(w => w.word && w.word.length >= 3 && w.word.length <= 5);
     return shuffle(all).slice(0, 10);
   });
   const [idx, setIdx] = useState(0);

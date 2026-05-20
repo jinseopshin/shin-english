@@ -318,3 +318,169 @@ export function makeAlphabetChoices(correctLetter) {
   }
   return choices;
 }
+
+// ══════════════════════════════════════════════════════════════════════════
+//   📦 선생님 커스텀 단어집 관리 (localStorage 기반)
+// ══════════════════════════════════════════════════════════════════════════
+
+const CUSTOM_SETS_KEY = "phonics_custom_sets";
+const CUSTOM_ASSIGN_KEY = "phonics_custom_assign";
+
+// 모든 커스텀 단어집 조회
+export function getAllCustomSets() {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(window.localStorage.getItem(CUSTOM_SETS_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+// 단일 단어집 조회
+export function getCustomSet(setId) {
+  return getAllCustomSets().find(s => s.id === setId);
+}
+
+// 단어집 생성/수정 (id가 있으면 수정, 없으면 새로 생성)
+export function saveCustomSet(set) {
+  if (typeof window === "undefined") return null;
+  try {
+    const sets = getAllCustomSets();
+    let id = set.id;
+    if (!id) {
+      id = "set_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+    }
+    const next = { ...set, id, updatedAt: new Date().toISOString() };
+    const idx = sets.findIndex(s => s.id === id);
+    if (idx >= 0) {
+      sets[idx] = next;
+    } else {
+      next.createdAt = new Date().toISOString();
+      sets.push(next);
+    }
+    window.localStorage.setItem(CUSTOM_SETS_KEY, JSON.stringify(sets));
+    return next;
+  } catch {
+    return null;
+  }
+}
+
+// 단어집 삭제 (관련 배정도 함께 삭제)
+export function deleteCustomSet(setId) {
+  if (typeof window === "undefined") return;
+  try {
+    const sets = getAllCustomSets().filter(s => s.id !== setId);
+    window.localStorage.setItem(CUSTOM_SETS_KEY, JSON.stringify(sets));
+    const assigns = getAllAssignments().filter(a => a.setId !== setId);
+    window.localStorage.setItem(CUSTOM_ASSIGN_KEY, JSON.stringify(assigns));
+  } catch {}
+}
+
+// 배정 정보
+// { id, setId, studentName, assignedAt }
+export function getAllAssignments() {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(window.localStorage.getItem(CUSTOM_ASSIGN_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+// 학생에게 단어집 배정
+export function assignSetToStudent(setId, studentName) {
+  if (typeof window === "undefined") return;
+  try {
+    const assigns = getAllAssignments();
+    // 중복 체크
+    if (assigns.some(a => a.setId === setId && a.studentName === studentName)) return;
+    assigns.push({
+      id: "assign_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+      setId, studentName,
+      assignedAt: new Date().toISOString(),
+    });
+    window.localStorage.setItem(CUSTOM_ASSIGN_KEY, JSON.stringify(assigns));
+  } catch {}
+}
+
+// 배정 해제
+export function unassignSetFromStudent(setId, studentName) {
+  if (typeof window === "undefined") return;
+  try {
+    const assigns = getAllAssignments().filter(
+      a => !(a.setId === setId && a.studentName === studentName)
+    );
+    window.localStorage.setItem(CUSTOM_ASSIGN_KEY, JSON.stringify(assigns));
+  } catch {}
+}
+
+// 학생에게 배정된 단어집 목록
+export function getStudentAssignedSets(studentName) {
+  const assigns = getAllAssignments().filter(a => a.studentName === studentName);
+  const sets = getAllCustomSets();
+  return assigns
+    .map(a => ({ ...sets.find(s => s.id === a.setId), assignedAt: a.assignedAt }))
+    .filter(s => s && s.id);
+}
+
+// 공개 단어집 (배정 무관 자유 풀기 가능)
+export function getPublicSets() {
+  return getAllCustomSets().filter(s => s.isPublic);
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//   📌 자주 쓰는 이모지 추천 (단어 입력 시 빠른 선택용)
+// ══════════════════════════════════════════════════════════════════════════
+export const COMMON_EMOJIS = [
+  // 동물
+  "🐶", "🐱", "🐭", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁",
+  "🐮", "🐷", "🐸", "🐵", "🐔", "🐧", "🐦", "🐤", "🦆", "🦉",
+  "🐺", "🦄", "🐝", "🦋", "🐌", "🐞", "🐢", "🐍", "🦎", "🐙",
+  "🐠", "🐟", "🐬", "🐳", "🦈", "🦓", "🐘", "🦒", "🦘", "🦔",
+  // 음식
+  "🍎", "🍌", "🍇", "🍓", "🍊", "🍋", "🍉", "🍑", "🍒", "🥝",
+  "🍞", "🥐", "🥯", "🥞", "🧀", "🍔", "🍟", "🍕", "🌭", "🥪",
+  "🍰", "🎂", "🍪", "🍫", "🍩", "🍮", "🍿", "🥛", "🧃", "☕",
+  // 자연
+  "☀️", "🌙", "⭐", "🌈", "☁️", "❄️", "🌸", "🌺", "🌻", "🌹",
+  "🌳", "🌲", "🌴", "🌵", "🍀", "🍁", "🌊", "🏔️", "🪨", "🔥",
+  // 사물
+  "👜", "🎒", "👟", "🧢", "🎩", "👑", "💎", "🔑", "🔒", "🔔",
+  "📚", "📖", "✏️", "🖊️", "📐", "📏", "✂️", "🎨", "🖼️", "📷",
+  "⚽", "🏀", "⚾", "🎾", "🏐", "🏈", "🎱", "🏓", "🎲", "🎮",
+  "🚗", "🚕", "🚌", "🚜", "🚲", "🛴", "🚁", "🚂", "🚢", "✈️",
+  "🛏️", "🪑", "🪟", "🚪", "💡", "🔦", "🕯️", "📦", "🎁", "🎈",
+  // 사람/표정
+  "😀", "😍", "🥰", "😎", "🤔", "😴", "👶", "🧒", "👦", "👧",
+  "👨", "👩", "👴", "👵", "👶", "🙋", "🙆", "🙅", "💪", "👋",
+  // 기타
+  "❤️", "💛", "💚", "💙", "💜", "🖤", "❌", "✅", "✨", "💯",
+  "🔴", "🟠", "🟡", "🟢", "🔵", "🟣", "⚫", "⚪", "🟥", "🟦",
+  "0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟",
+];
+
+// 영어 단어 → 추천 이모지 자동 매핑 (기본 단어들)
+export const WORD_TO_EMOJI_MAP = {
+  cat: "🐱", dog: "🐶", bird: "🐦", fish: "🐟", lion: "🦁",
+  tiger: "🐯", bear: "🐻", rabbit: "🐰", pig: "🐷", cow: "🐮",
+  horse: "🐴", sheep: "🐑", duck: "🦆", chicken: "🐔", frog: "🐸",
+  monkey: "🐵", elephant: "🐘", giraffe: "🦒", zebra: "🦓",
+  apple: "🍎", banana: "🍌", orange: "🍊", grape: "🍇", strawberry: "🍓",
+  bread: "🍞", milk: "🥛", cake: "🍰", pizza: "🍕", cookie: "🍪",
+  sun: "☀️", moon: "🌙", star: "⭐", cloud: "☁️", rain: "🌧️",
+  flower: "🌸", tree: "🌳", grass: "🌿", leaf: "🍃", rock: "🪨",
+  car: "🚗", bus: "🚌", train: "🚂", plane: "✈️", boat: "⛵", ship: "🚢", bike: "🚲",
+  ball: "⚽", book: "📚", pen: "🖊️", bag: "👜", hat: "🎩",
+  shoe: "👟", clock: "⏰", watch: "⌚", key: "🔑", lock: "🔒",
+  bed: "🛏️", chair: "🪑", door: "🚪", window: "🪟", lamp: "💡",
+  red: "🟥", blue: "🔵", green: "🟢", yellow: "💛", black: "⚫",
+  white: "⚪", pink: "🌸", purple: "🟣", orange_color: "🟠",
+  one: "1️⃣", two: "2️⃣", three: "3️⃣", four: "4️⃣", five: "5️⃣",
+  six: "6️⃣", seven: "7️⃣", eight: "8️⃣", nine: "9️⃣", ten: "🔟",
+};
+
+export function guessEmoji(word) {
+  if (!word) return "📝";
+  const lower = word.toLowerCase().trim();
+  return WORD_TO_EMOJI_MAP[lower] || "📝";
+}

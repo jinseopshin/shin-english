@@ -28,6 +28,7 @@ import { StudentWordStatsCard } from "./StudentWordStatsCard";
 import { PronunciationGame } from "./PronunciationGame";
 import { PronunciationWidget } from "./PronunciationWidget";
 import WordLearningDashboard from "./WordLearningDashboard";
+import { PhonicsTeacherMenu } from "./PhonicsTeacher";
 import { recordWordEncounter, getTodayReviewWords } from "./studentWords";
 import { addToWordbook, removeFromWordbook, isInWordbook } from "./studentWords";
 import {
@@ -2147,6 +2148,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
     "word-homework": { title:"📚 단어 숙제 관리", back: "dashboard" },
     "custom-exam":   { title:"📝 맞춤 시험지", back: "dashboard" },
     "word-stats":    { title:"📖 단어 학습 현황", back: "more" },
+    "phonics":       { title:"🔤 파닉스 단어집", back: "more" },
     "student-report": { title:"학생 상세 리포트", back: "students" },
   };
 
@@ -2225,6 +2227,9 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
             onStudentClick={(s) => { setReportStudent(s); onNav("student-report"); }}
           />
         )}
+        {screen === "phonics" && (
+          <PhonicsTeacherMenu students={students} onExit={() => onNav("more")} />
+        )}
         {screen === "student-report"  && reportStudent && (
           <>
             <StudentWordStatsCard studentName={reportStudent.name} />
@@ -2243,6 +2248,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
                 { id:"bank",         icon:"📚", label:"문제 은행",        desc:"문제 추가 / 편집" },
                 { id:"exam-builder", icon:"✏️", label:"시험지 만들기",    desc:"새 시험지 생성" },
                 { id:"exams",        icon:"📋", label:"시험지 목록",      desc:"만든 시험지 보기 / 인쇄" },
+                { id:"phonics",      icon:"🔤", label:"파닉스 단어집",    desc:"유치부 파닉스 단어집 관리" },
                 { id:"students",     icon:"📈", label:"학생 통계",        desc:"전체 학습 현황 분석" },
                 { id:"word-stats",   icon:"📖", label:"단어 학습 현황",  desc:"전체 학생 단어 진도 통계" },
               ].map(m => (

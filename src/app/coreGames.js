@@ -7,20 +7,32 @@ import {
   T, MARKS, uid, shuffle, speak,
   Btn, Tag, Card, Input, saveStudentRecord
 } from "./theme";
+import { onCorrect, onWrong, onFinish, playCombo, playClick } from "./soundEffects";
+import { useAngela, getComboReaction, getFinishReaction, FullScreenConfetti, ComboFireEffect } from "./AngelaMascot";
 
 // ══════════════════════════════════════════════════════════════════════════
-//   🎮 CORE GAMES — 4개 핵심 학습 게임
-//   - WordMatchGame: 단어 맞추기 (한↔영)
-//   - SpellingGame:  스펠링 입력
-//   - SpeedQuiz:     10초 스피드 퀴즈
-//   - FlashCard:     플래시카드 (발음 자동)
-//   - LevelSelect:   게임 시작 전 레벨 선택 화면
+//   🎮 CORE GAMES — 4개 핵심 학습 게임 (콤보 + Angela 마스코트 + 사운드)
 // ══════════════════════════════════════════════════════════════════════════
 
-// 게임에서 사용할 단어 풀 결정:
-//  - levelId === "homework"이면 학생의 활성 단어 숙제(미마스터 단어) 사용
-//  - levelId === "review"이면 망각 곡선 복습 단어
-//  - 그 외엔 기존처럼 levelId로 단어 가져오기
+// 콤보 보너스 포인트 계산
+function getComboBonus(combo) {
+  if (combo >= 15) return 100;
+  if (combo >= 10) return 50;
+  if (combo >= 7) return 30;
+  if (combo >= 5) return 15;
+  if (combo >= 3) return 5;
+  return 0;
+}
+
+// 콤보 카운터 배경 색상
+function getComboStyle(combo) {
+  if (combo >= 10) return { bg: "linear-gradient(135deg, #ef4444, #f97316)", shadow: "0 0 12px #ef444466" };
+  if (combo >= 5)  return { bg: "linear-gradient(135deg, #f59e0b, #fbbf24)", shadow: "0 0 12px #f59e0b66" };
+  if (combo >= 3)  return { bg: "linear-gradient(135deg, #22c55e, #84cc16)", shadow: "none" };
+  return { bg: "#94a3b8", shadow: "none" };
+}
+
+// 게임에서 사용할 단어 풀 결정
 export function getGameWordPool(levelId, student) {
   if (levelId === "homework") {
     const hw = student?.wordHomework;
@@ -36,12 +48,12 @@ export function getGameWordPool(levelId, student) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// 게임 1: 단어 맞추기 (방향 선택 가능)
+// 게임 1: 단어 맞추기 (콤보 + Angela + 사운드)
 // ──────────────────────────────────────────────────────────────────────────
 const MATCH_MODES = [
-  { id: "ko2en", label: "한글 → 영어", desc: "한글 보고 영단어 고르기", icon: "🇰🇷→🇺🇸", question: "ko", answer: "en" },
-  { id: "en2ko", label: "영어 → 한글", desc: "영단어 보고 뜻 고르기",   icon: "🇺🇸→🇰🇷", question: "en", answer: "ko" },
-  { id: "mixed", label: "랜덤 섞기",   desc: "두 방향이 랜덤으로 섞여요", icon: "🔀",      question: "mixed", answer: "mixed" },
+  { id: "ko2en", label: "한글 → 영어", desc: "한글 보고 영단어 고르기", icon: "🇰🇷→🇺🇸" },
+  { id: "en2ko", label: "영어 → 한글", desc: "영단어 보고 뜻 고르기",   icon: "🇺🇸→🇰🇷" },
+  { id: "mixed", label: "랜덤 섞기",   desc: "두 방향이 랜덤으로 섞여요", icon: "🔀" },
 ];
 
 export function WordMatchGame({ name, setStudents, student, onExit, levelId = "all" }) {
@@ -49,38 +61,38 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState(null);
-  const [wrongWord, setWrongWord] = useState(null);
   const [isFav, setIsFav] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
   const awardedRef = useRef(false);
+
+  // 🔥 콤보 시스템
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
+  const [bonusPoints, setBonusPoints] = useState(0);
+  const [comboAnimating, setComboAnimating] = useState(false);
+  const [confettiTrigger, setConfettiTrigger] = useState(0);
+  const wrongCountRef = useRef(0);
+  const angela = useAngela();
 
   const questions = useMemo(() => {
     if (!mode) return [];
     const pool = getGameWordPool(levelId, student);
     const picked = shuffle(pool).slice(0, 10);
     return picked.map(w => {
-      const dir = mode.id === "mixed"
-        ? (Math.random() < 0.5 ? "ko2en" : "en2ko")
-        : mode.id;
+      const dir = mode.id === "mixed" ? (Math.random() < 0.5 ? "ko2en" : "en2ko") : mode.id;
       const qField = dir === "ko2en" ? "ko" : "en";
       const aField = dir === "ko2en" ? "en" : "ko";
       const wrongs = shuffle(pool.filter(x => x.en !== w.en)).slice(0, 3);
       const opts = shuffle([w, ...wrongs]);
-      return {
-        ...w, dir, qField, aField,
-        opts, ansIdx: opts.findIndex(o => o.en === w.en)
-      };
+      return { ...w, dir, qField, aField, opts, ansIdx: opts.findIndex(o => o.en === w.en) };
     });
   }, [mode, levelId, student?.wordHomework]);
 
-  // ⭐ 단어장 등록 여부 — 문제가 바뀔 때마다 자동 체크
   useEffect(() => {
     const q = questions[round];
     if (!q) { setIsFav(false); return; }
     let cancelled = false;
-    isInWordbook(name, q.en).then(result => {
-      if (!cancelled) setIsFav(result);
-    });
+    isInWordbook(name, q.en).then(result => { if (!cancelled) setIsFav(result); });
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [round, questions]);
@@ -89,31 +101,30 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
     const q = questions[round];
     if (favLoading || !q) return;
     setFavLoading(true);
-    if (isFav) {
-      await removeFromWordbook(name, q.en);
-      setIsFav(false);
-    } else {
-      await addToWordbook(name, q);
-      setIsFav(true);
-    }
+    if (isFav) { await removeFromWordbook(name, q.en); setIsFav(false); }
+    else { await addToWordbook(name, q); setIsFav(true); }
     setFavLoading(false);
   };
 
-  // 게임 종료 시 점수 저장
+  // 게임 종료 시 점수 저장 + 축하 효과
   useEffect(() => {
     if (!mode || awardedRef.current) return;
     if (questions.length === 0 || round < questions.length) return;
     awardedRef.current = true;
+    const total = questions.length;
     saveStudentRecord(setStudents, name, {
       type: "game", gameType: `단어맞추기(${mode.label})`,
-      score, total: questions.length,
+      score, total,
       category: questions[0]?.cat || "기타",
-      points: score * 10
+      points: score * 10 + bonusPoints,
+      maxCombo
     });
+    onFinish(score, total);
+    if (score / total >= 0.8) setConfettiTrigger(Date.now());
+    setTimeout(() => angela.show(getFinishReaction(score, total)), 800);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, round, questions.length]);
 
-  // 방향 선택 화면
   if (!mode) {
     return (
       <div style={{ minHeight: "100vh", background: T.bg, padding: 16 }}>
@@ -127,7 +138,7 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 400, margin: "0 auto" }}>
           {MATCH_MODES.map(m => (
-            <Card key={m.id} onClick={() => setMode(m)} style={{
+            <Card key={m.id} onClick={() => { playClick(); setMode(m); angela.show("start"); }} style={{
               padding: 20, display: "flex", alignItems: "center", gap: 16,
               border: `2px solid ${T.border}`, cursor: "pointer"
             }}>
@@ -145,31 +156,49 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
             </Card>
           ))}
         </div>
+        <angela.AngelaComponent />
       </div>
     );
   }
 
-  // 게임 종료
+  // 게임 종료 화면
   if (round >= questions.length) {
+    const total = questions.length;
+    const percent = Math.round((score / total) * 100);
     return (
+      <>
       <div style={{ minHeight: "100vh", background: T.bg, padding: "60px 20px", textAlign: "center" }}>
-        <div style={{ fontSize: 64, marginBottom: 14 }}>{score >= 8 ? "🎉" : score >= 5 ? "👏" : "💪"}</div>
-        <div style={{ fontSize: 22, fontWeight: 900, color: T.text, marginBottom: 6 }}>{score} / {questions.length}</div>
-        <div style={{ fontSize: 14, color: T.textMid, marginBottom: 6 }}>
-          {score >= 8 ? "정말 잘했어요!" : score >= 5 ? "좋아요!" : "다시 도전해봐요!"}
+        <div style={{ fontSize: 64, marginBottom: 14 }}>{score === total ? "🏆" : score >= 8 ? "🎉" : score >= 5 ? "👏" : "💪"}</div>
+        <div style={{ fontSize: 22, fontWeight: 900, color: T.text, marginBottom: 6 }}>{score} / {total}</div>
+        <div style={{ fontSize: 14, color: T.textMid, marginBottom: 20 }}>
+          {percent}% · 최고 콤보 🔥 {maxCombo}
         </div>
-        <div style={{ fontSize: 12, color: T.textMid, marginBottom: 20 }}>모드: {mode.label}</div>
-        <Card style={{ maxWidth: 320, margin: "0 auto 14px", background: T.yellowLight }}>
-          <div style={{ fontSize: 32 }}>⭐</div>
-          <div style={{ fontSize: 14, fontWeight: 800, color: T.text }}>+{score * 10} 포인트 획득!</div>
+
+        <Card style={{ maxWidth: 320, margin: "0 auto 8px", background: T.yellowLight }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: T.text }}>⭐ 기본 +{score * 10} 포인트</div>
         </Card>
-        <div style={{ display: "flex", gap: 10, maxWidth: 320, margin: "0 auto" }}>
-          <Btn v="secondary" size="lg" onClick={() => { setMode(null); setRound(0); setScore(0); awardedRef.current = false; }} style={{ flex: 1 }}>
-            🔄 다시하기
-          </Btn>
+        {bonusPoints > 0 && (
+          <Card style={{ maxWidth: 320, margin: "0 auto 8px", background: "linear-gradient(135deg, #fef3c7, #fed7aa)" }}>
+            <div style={{ fontSize: 14, fontWeight: 900, color: "#dc2626" }}>🔥 콤보 보너스 +{bonusPoints} 포인트!</div>
+          </Card>
+        )}
+        {maxCombo >= 5 && (
+          <Card style={{ maxWidth: 320, margin: "0 auto 14px", background: T.purpleLight }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: T.purple }}>🏅 최고 {maxCombo}연속 정답!</div>
+          </Card>
+        )}
+
+        <div style={{ display: "flex", gap: 10, maxWidth: 320, margin: "20px auto 0" }}>
+          <Btn v="secondary" size="lg" onClick={() => {
+            setMode(null); setRound(0); setScore(0); awardedRef.current = false;
+            setCombo(0); setMaxCombo(0); setBonusPoints(0); wrongCountRef.current = 0;
+          }} style={{ flex: 1 }}>🔄 다시하기</Btn>
           <Btn v="primary" size="lg" onClick={onExit} style={{ flex: 1 }}>홈으로</Btn>
         </div>
       </div>
+      <angela.AngelaComponent />
+      <FullScreenConfetti trigger={confettiTrigger} />
+      </>
     );
   }
 
@@ -179,27 +208,55 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
     if (feedback) return;
     const isCorrect = idx === q.ansIdx;
     recordWordEncounter(name, q, isCorrect);
+
     if (isCorrect) {
-      setScore(score + 1);
+      const newCombo = combo + 1;
+      setCombo(newCombo);
+      setMaxCombo(m => Math.max(m, newCombo));
+      setScore(s => s + 1);
       setFeedback("correct");
-      setWrongWord(null);
+      onCorrect();
+
+      // 콤보 보너스
+      const bonus = getComboBonus(newCombo);
+      if (bonus > 0 && newCombo >= 3 && [3, 5, 7, 10, 15].includes(newCombo)) {
+        setBonusPoints(p => p + bonus);
+        playCombo();
+        setComboAnimating(true);
+        setTimeout(() => setComboAnimating(false), 500);
+        // 콤보 마스코트
+        setTimeout(() => angela.show(getComboReaction(newCombo)), 200);
+      } else if (wrongCountRef.current > 0 && Math.random() < 0.4) {
+        // 오답 후 회복
+        setTimeout(() => angela.show("recovery"), 200);
+        wrongCountRef.current = 0;
+      } else if (Math.random() < 0.25) {
+        // 일반 정답 시 30% 확률 마스코트
+        setTimeout(() => angela.show(round === 0 ? "firstCorrect" : "correct"), 200);
+      }
+
       if (levelId === "homework") updateWordMastery(setStudents, name, q.en, true);
     } else {
+      setCombo(0);
+      wrongCountRef.current++;
       setFeedback("wrong");
-      setWrongWord(q);
+      onWrong();
+      if (Math.random() < 0.5) setTimeout(() => angela.show("wrong"), 200);
       if (levelId === "homework") updateWordMastery(setStudents, name, q.en, false);
     }
-    setTimeout(() => { setFeedback(null); setWrongWord(null); setRound(round + 1); }, 1000);
+    setTimeout(() => { setFeedback(null); setRound(round + 1); }, 1000);
   };
 
   const questionText = q[q.qField];
   const isKo2En = q.dir === "ko2en";
-  const cardBg  = isKo2En ? T.accentLight : T.greenLight;
+  const cardBg = isKo2En ? T.accentLight : T.greenLight;
   const cardColor = isKo2En ? T.accent : T.green;
   const hint = isKo2En ? "다음 뜻의 영어 단어는?" : "이 영어 단어의 뜻은?";
   const dirTag = isKo2En ? "🇰🇷→🇺🇸" : "🇺🇸→🇰🇷";
+  const comboStyle = getComboStyle(combo);
 
   return (
+    <>
     <div style={{ minHeight: "100vh", background: T.bg, padding: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, alignItems: "center" }}>
         <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
@@ -207,7 +264,23 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
           <Tag color={isKo2En ? "blue" : "green"}>{dirTag}</Tag>
           <Tag color="blue">{round + 1} / {questions.length}</Tag>
         </div>
-        <Tag color="yellow">⭐ {score}</Tag>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          {combo >= 1 && (
+            <div className={comboAnimating ? "combo-pulse" : ""} style={{
+              background: comboStyle.bg,
+              color: "white",
+              boxShadow: comboStyle.shadow,
+              fontSize: 12, fontWeight: 900,
+              padding: "4px 10px", borderRadius: 10,
+              display: "inline-flex", alignItems: "center", gap: 4,
+              transition: "all 0.2s",
+            }}>
+              {combo >= 3 ? <ComboFireEffect active={true} size={16} /> : "🔥"}
+              <span>{combo}</span>
+            </div>
+          )}
+          <Tag color="yellow">⭐ {score}</Tag>
+        </div>
       </div>
 
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}>
@@ -238,17 +311,12 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
           onClick={() => !isKo2En && speak(q.en)}
           style={{
             fontSize: isKo2En ? 40 : 36, fontWeight: 900, color: cardColor, lineHeight: 1.2,
-            cursor: !isKo2En ? "pointer" : "default",
-            userSelect: "none",
-            transition: "transform 0.1s",
-            display: "inline-block",
+            cursor: !isKo2En ? "pointer" : "default", userSelect: "none",
+            transition: "transform 0.1s", display: "inline-block",
           }}
           onMouseDown={e => !isKo2En && (e.currentTarget.style.transform = "scale(0.94)")}
           onMouseUp={e => !isKo2En && (e.currentTarget.style.transform = "scale(1)")}
           onMouseLeave={e => !isKo2En && (e.currentTarget.style.transform = "scale(1)")}
-          onTouchStart={e => !isKo2En && (e.currentTarget.style.transform = "scale(0.94)")}
-          onTouchEnd={e => !isKo2En && (e.currentTarget.style.transform = "scale(1)")}
-          title={!isKo2En ? "탭하면 발음을 들을 수 있어요" : ""}
         >
           {questionText}
         </div>
@@ -265,11 +333,11 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         {q.opts.map((o, idx) => {
-          const isCorrect = idx === q.ansIdx;
+          const isCorrectOpt = idx === q.ansIdx;
           let bg = T.card, color = T.text, borderColor = T.border;
-          if (feedback === "correct" && isCorrect) { bg = T.green; color = "white"; borderColor = T.green; }
-          else if (feedback === "wrong" && isCorrect) { bg = T.green; color = "white"; borderColor = T.green; }
-          else if (feedback === "wrong" && !isCorrect) { bg = T.card; color = T.textDim; }
+          if (feedback === "correct" && isCorrectOpt) { bg = T.green; color = "white"; borderColor = T.green; }
+          else if (feedback === "wrong" && isCorrectOpt) { bg = T.green; color = "white"; borderColor = T.green; }
+          else if (feedback === "wrong" && !isCorrectOpt) { bg = T.card; color = T.textDim; }
           return (
             <button key={idx} onClick={() => pick(idx)} disabled={!!feedback} style={{
               padding: "18px 12px", borderRadius: 14,
@@ -299,11 +367,13 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
         </div>
       )}
     </div>
+    <angela.AngelaComponent />
+    </>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// 게임 2: 스펠링
+// 게임 2: 스펠링 (콤보 + Angela + 사운드)
 // ──────────────────────────────────────────────────────────────────────────
 export function SpellingGame({ name, setStudents, student, onExit, levelId = "all" }) {
   const [round, setRound] = useState(0);
@@ -312,36 +382,67 @@ export function SpellingGame({ name, setStudents, student, onExit, levelId = "al
   const [feedback, setFeedback] = useState(null);
   const awardedRef = useRef(false);
 
+  // 🔥 콤보 시스템
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
+  const [bonusPoints, setBonusPoints] = useState(0);
+  const [comboAnimating, setComboAnimating] = useState(false);
+  const [confettiTrigger, setConfettiTrigger] = useState(0);
+  const wrongCountRef = useRef(0);
+  const angela = useAngela();
+
   const questions = useMemo(() => shuffle(getGameWordPool(levelId, student)).slice(0, 8), [levelId, student?.wordHomework]);
 
   useEffect(() => {
     if (awardedRef.current) return;
     if (questions.length === 0 || round < questions.length) return;
     awardedRef.current = true;
+    const total = questions.length;
     saveStudentRecord(setStudents, name, {
       type: "game", gameType: "스펠링",
-      score, total: questions.length,
+      score, total,
       category: questions[0]?.cat || "기타",
-      points: score * 15
+      points: score * 15 + bonusPoints,
+      maxCombo
     });
+    onFinish(score, total);
+    if (score / total >= 0.8) setConfettiTrigger(Date.now());
+    setTimeout(() => angela.show(getFinishReaction(score, total)), 800);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [round, questions.length]);
 
   if (round >= questions.length) {
+    const total = questions.length;
+    const percent = Math.round((score / total) * 100);
     return (
+      <>
       <div style={{ minHeight: "100vh", background: T.bg, padding: "60px 20px", textAlign: "center" }}>
-        <div style={{ fontSize: 64, marginBottom: 14 }}>🔤</div>
-        <div style={{ fontSize: 22, fontWeight: 900, color: T.text }}>{score} / {questions.length}</div>
-        <Card style={{ maxWidth: 320, margin: "20px auto 14px", background: T.yellowLight }}>
-          <div style={{ fontSize: 14, fontWeight: 800 }}>⭐ +{score * 15} 포인트</div>
+        <div style={{ fontSize: 64, marginBottom: 14 }}>{score === total ? "🏆" : "🔤"}</div>
+        <div style={{ fontSize: 22, fontWeight: 900, color: T.text }}>{score} / {total}</div>
+        <div style={{ fontSize: 14, color: T.textMid, marginTop: 4, marginBottom: 20 }}>
+          {percent}% · 최고 콤보 🔥 {maxCombo}
+        </div>
+
+        <Card style={{ maxWidth: 320, margin: "0 auto 8px", background: T.yellowLight }}>
+          <div style={{ fontSize: 14, fontWeight: 800 }}>⭐ 기본 +{score * 15} 포인트</div>
         </Card>
-        <div style={{ display: "flex", gap: 10, maxWidth: 320, margin: "0 auto" }}>
-          <Btn v="secondary" size="lg" onClick={() => { setRound(0); setScore(0); setInput(""); setFeedback(null); awardedRef.current = false; }} style={{ flex: 1 }}>
-            🔄 다시하기
-          </Btn>
+        {bonusPoints > 0 && (
+          <Card style={{ maxWidth: 320, margin: "0 auto 8px", background: "linear-gradient(135deg, #fef3c7, #fed7aa)" }}>
+            <div style={{ fontSize: 14, fontWeight: 900, color: "#dc2626" }}>🔥 콤보 보너스 +{bonusPoints} 포인트!</div>
+          </Card>
+        )}
+
+        <div style={{ display: "flex", gap: 10, maxWidth: 320, margin: "20px auto 0" }}>
+          <Btn v="secondary" size="lg" onClick={() => {
+            setRound(0); setScore(0); setInput(""); setFeedback(null); awardedRef.current = false;
+            setCombo(0); setMaxCombo(0); setBonusPoints(0); wrongCountRef.current = 0;
+          }} style={{ flex: 1 }}>🔄 다시하기</Btn>
           <Btn v="primary" size="lg" onClick={onExit} style={{ flex: 1 }}>홈으로</Btn>
         </div>
       </div>
+      <angela.AngelaComponent />
+      <FullScreenConfetti trigger={confettiTrigger} />
+      </>
     );
   }
 
@@ -351,19 +452,62 @@ export function SpellingGame({ name, setStudents, student, onExit, levelId = "al
     if (feedback) return;
     const isCorrect = input.trim().toLowerCase() === q.en.toLowerCase();
     recordWordEncounter(name, q, isCorrect);
+
     if (isCorrect) {
-      setScore(score + 1); setFeedback("correct");
-    } else setFeedback("wrong");
+      const newCombo = combo + 1;
+      setCombo(newCombo);
+      setMaxCombo(m => Math.max(m, newCombo));
+      setScore(s => s + 1);
+      setFeedback("correct");
+      onCorrect();
+
+      const bonus = getComboBonus(newCombo);
+      if (bonus > 0 && newCombo >= 3 && [3, 5, 7, 10, 15].includes(newCombo)) {
+        setBonusPoints(p => p + bonus);
+        playCombo();
+        setComboAnimating(true);
+        setTimeout(() => setComboAnimating(false), 500);
+        setTimeout(() => angela.show(getComboReaction(newCombo)), 200);
+      } else if (wrongCountRef.current > 0 && Math.random() < 0.4) {
+        setTimeout(() => angela.show("recovery"), 200);
+        wrongCountRef.current = 0;
+      } else if (Math.random() < 0.25) {
+        setTimeout(() => angela.show(round === 0 ? "firstCorrect" : "correct"), 200);
+      }
+    } else {
+      setCombo(0);
+      wrongCountRef.current++;
+      setFeedback("wrong");
+      onWrong();
+      if (Math.random() < 0.5) setTimeout(() => angela.show("wrong"), 200);
+    }
     if (levelId === "homework") updateWordMastery(setStudents, name, q.en, isCorrect);
     setTimeout(() => { setFeedback(null); setInput(""); setRound(round + 1); }, 1200);
   };
 
+  const comboStyle = getComboStyle(combo);
+
   return (
+    <>
     <div style={{ minHeight: "100vh", background: T.bg, padding: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16, alignItems: "center" }}>
         <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
         <Tag color="blue">{round + 1} / {questions.length}</Tag>
-        <Tag color="yellow">⭐ {score}</Tag>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          {combo >= 1 && (
+            <div className={comboAnimating ? "combo-pulse" : ""} style={{
+              background: comboStyle.bg, color: "white",
+              boxShadow: comboStyle.shadow,
+              fontSize: 12, fontWeight: 900,
+              padding: "4px 10px", borderRadius: 10,
+              display: "inline-flex", alignItems: "center", gap: 4,
+            }}>
+              {combo >= 3 ? <ComboFireEffect active={true} size={16} /> : "🔥"}
+              <span>{combo}</span>
+            </div>
+          )}
+          <Tag color="yellow">⭐ {score}</Tag>
+        </div>
       </div>
 
       <Card style={{ marginBottom: 16, textAlign: "center", padding: 28, background: T.greenLight }}>
@@ -382,11 +526,13 @@ export function SpellingGame({ name, setStudents, student, onExit, levelId = "al
         </div>
       )}
     </div>
+    <angela.AngelaComponent />
+    </>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// 게임 3: 스피드 퀴즈 (10초 + 방향 선택)
+// 게임 3: 스피드 퀴즈 (콤보 + Angela + 사운드)
 // ──────────────────────────────────────────────────────────────────────────
 export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" }) {
   const [mode, setMode] = useState(null);
@@ -394,6 +540,15 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(10);
   const awardedRef = useRef(false);
+
+  // 🔥 콤보 시스템
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
+  const [bonusPoints, setBonusPoints] = useState(0);
+  const [comboAnimating, setComboAnimating] = useState(false);
+  const [confettiTrigger, setConfettiTrigger] = useState(0);
+  const wrongCountRef = useRef(0);
+  const angela = useAngela();
 
   const questions = useMemo(() => {
     if (!mode) return [];
@@ -414,7 +569,15 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
     setTime(10);
     const interval = setInterval(() => {
       setTime(t => {
-        if (t <= 1) { clearInterval(interval); setRound(r => r + 1); return 0; }
+        if (t <= 1) {
+          clearInterval(interval);
+          // 시간 초과 = 오답 처리
+          setCombo(0);
+          wrongCountRef.current++;
+          onWrong();
+          setRound(r => r + 1);
+          return 0;
+        }
         return t - 1;
       });
     }, 1000);
@@ -425,12 +588,17 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
     if (!mode || awardedRef.current) return;
     if (questions.length === 0 || round < questions.length) return;
     awardedRef.current = true;
+    const total = questions.length;
     saveStudentRecord(setStudents, name, {
       type: "game", gameType: "스피드 퀴즈",
-      score, total: questions.length,
+      score, total,
       category: questions[0]?.cat || "기타",
-      points: score * 12
+      points: score * 12 + bonusPoints,
+      maxCombo
     });
+    onFinish(score, total);
+    if (score / total >= 0.8) setConfettiTrigger(Date.now());
+    setTimeout(() => angela.show(getFinishReaction(score, total)), 800);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, round, questions.length]);
 
@@ -451,7 +619,7 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
             { id: "en2ko", label: "영어 → 한글", icon: "🇺🇸→🇰🇷", bg: T.greenLight, color: T.green },
             { id: "mixed", label: "랜덤 섞기",   icon: "🔀",      bg: T.yellowLight, color: T.yellow },
           ].map(m => (
-            <Card key={m.id} onClick={() => setMode(m.id)} style={{
+            <Card key={m.id} onClick={() => { playClick(); setMode(m.id); angela.show("start"); }} style={{
               padding: 18, display: "flex", alignItems: "center", gap: 14, cursor: "pointer"
             }}>
               <div style={{
@@ -464,43 +632,106 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
             </Card>
           ))}
         </div>
+        <angela.AngelaComponent />
       </div>
     );
   }
 
   if (round >= questions.length) {
+    const total = questions.length;
+    const percent = Math.round((score / total) * 100);
     return (
+      <>
       <div style={{ minHeight: "100vh", background: T.bg, padding: "60px 20px", textAlign: "center" }}>
-        <div style={{ fontSize: 64, marginBottom: 14 }}>⚡</div>
-        <div style={{ fontSize: 22, fontWeight: 900 }}>{score} / {questions.length}</div>
-        <Card style={{ maxWidth: 320, margin: "20px auto 14px", background: T.yellowLight }}>
-          <div style={{ fontSize: 14, fontWeight: 800 }}>⭐ +{score * 12} 포인트</div>
+        <div style={{ fontSize: 64, marginBottom: 14 }}>{score === total ? "🏆" : "⚡"}</div>
+        <div style={{ fontSize: 22, fontWeight: 900 }}>{score} / {total}</div>
+        <div style={{ fontSize: 14, color: T.textMid, marginTop: 4, marginBottom: 20 }}>
+          {percent}% · 최고 콤보 🔥 {maxCombo}
+        </div>
+
+        <Card style={{ maxWidth: 320, margin: "0 auto 8px", background: T.yellowLight }}>
+          <div style={{ fontSize: 14, fontWeight: 800 }}>⭐ 기본 +{score * 12} 포인트</div>
         </Card>
-        <div style={{ display: "flex", gap: 10, maxWidth: 320, margin: "0 auto" }}>
-          <Btn v="secondary" size="lg" onClick={() => { setMode(null); setRound(0); setScore(0); awardedRef.current = false; }} style={{ flex: 1 }}>🔄</Btn>
+        {bonusPoints > 0 && (
+          <Card style={{ maxWidth: 320, margin: "0 auto 8px", background: "linear-gradient(135deg, #fef3c7, #fed7aa)" }}>
+            <div style={{ fontSize: 14, fontWeight: 900, color: "#dc2626" }}>🔥 콤보 보너스 +{bonusPoints} 포인트!</div>
+          </Card>
+        )}
+
+        <div style={{ display: "flex", gap: 10, maxWidth: 320, margin: "20px auto 0" }}>
+          <Btn v="secondary" size="lg" onClick={() => {
+            setMode(null); setRound(0); setScore(0); awardedRef.current = false;
+            setCombo(0); setMaxCombo(0); setBonusPoints(0); wrongCountRef.current = 0;
+          }} style={{ flex: 1 }}>🔄 다시하기</Btn>
           <Btn v="primary" size="lg" onClick={onExit} style={{ flex: 1 }}>홈으로</Btn>
         </div>
       </div>
+      <angela.AngelaComponent />
+      <FullScreenConfetti trigger={confettiTrigger} />
+      </>
     );
   }
 
   const q = questions[round];
   const isKo2En = q.dir === "ko2en";
+  const comboStyle = getComboStyle(combo);
 
   const pick = (idx) => {
     const isCorrect = idx === q.ansIdx;
     recordWordEncounter(name, q, isCorrect);
-    if (isCorrect) setScore(score + 1);
+
+    if (isCorrect) {
+      const newCombo = combo + 1;
+      setCombo(newCombo);
+      setMaxCombo(m => Math.max(m, newCombo));
+      setScore(s => s + 1);
+      onCorrect();
+
+      const bonus = getComboBonus(newCombo);
+      if (bonus > 0 && newCombo >= 3 && [3, 5, 7, 10, 15].includes(newCombo)) {
+        setBonusPoints(p => p + bonus);
+        playCombo();
+        setComboAnimating(true);
+        setTimeout(() => setComboAnimating(false), 500);
+        angela.show(getComboReaction(newCombo));
+      } else if (wrongCountRef.current > 0 && Math.random() < 0.4) {
+        angela.show("recovery");
+        wrongCountRef.current = 0;
+      } else if (Math.random() < 0.2) {
+        angela.show("correct");
+      }
+    } else {
+      setCombo(0);
+      wrongCountRef.current++;
+      onWrong();
+      if (Math.random() < 0.5) angela.show("wrong");
+    }
+
     if (levelId === "homework") updateWordMastery(setStudents, name, q.en, isCorrect);
     setRound(round + 1);
   };
 
   return (
+    <>
     <div style={{ minHeight: "100vh", background: T.bg, padding: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, alignItems: "center" }}>
         <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
         <Tag color={time <= 3 ? "red" : "yellow"}>⏱️ {time}초</Tag>
-        <Tag color="yellow">⭐ {score}</Tag>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          {combo >= 1 && (
+            <div className={comboAnimating ? "combo-pulse" : ""} style={{
+              background: comboStyle.bg, color: "white",
+              boxShadow: comboStyle.shadow,
+              fontSize: 12, fontWeight: 900,
+              padding: "4px 10px", borderRadius: 10,
+              display: "inline-flex", alignItems: "center", gap: 4,
+            }}>
+              {combo >= 3 ? <ComboFireEffect active={true} size={16} /> : "🔥"}
+              <span>{combo}</span>
+            </div>
+          )}
+          <Tag color="yellow">⭐ {score}</Tag>
+        </div>
       </div>
 
       <div style={{ height: 6, background: T.border, borderRadius: 3, marginBottom: 14, overflow: "hidden" }}>
@@ -516,17 +747,9 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
           onClick={() => !isKo2En && speak(q.en)}
           style={{
             fontSize: 36, fontWeight: 900, color: T.yellow, marginBottom: 8,
-            cursor: !isKo2En ? "pointer" : "default",
-            userSelect: "none",
-            transition: "transform 0.1s",
-            display: "inline-block",
+            cursor: !isKo2En ? "pointer" : "default", userSelect: "none",
+            transition: "transform 0.1s", display: "inline-block",
           }}
-          onMouseDown={e => !isKo2En && (e.currentTarget.style.transform = "scale(0.94)")}
-          onMouseUp={e => !isKo2En && (e.currentTarget.style.transform = "scale(1)")}
-          onMouseLeave={e => !isKo2En && (e.currentTarget.style.transform = "scale(1)")}
-          onTouchStart={e => !isKo2En && (e.currentTarget.style.transform = "scale(0.94)")}
-          onTouchEnd={e => !isKo2En && (e.currentTarget.style.transform = "scale(1)")}
-          title={!isKo2En ? "탭하면 발음을 들을 수 있어요" : ""}
         >{q[q.qField]}</div>
         {!isKo2En && (
           <div>
@@ -548,11 +771,13 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
         ))}
       </div>
     </div>
+    <angela.AngelaComponent />
+    </>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// 게임 4: 플래시카드 (발음 자동)
+// 게임 4: 플래시카드 (Angela 격려 — 콤보 X)
 // ──────────────────────────────────────────────────────────────────────────
 export function FlashCard({ name, setStudents, student, onExit, levelId = "all" }) {
   const [idx, setIdx] = useState(0);
@@ -561,21 +786,24 @@ export function FlashCard({ name, setStudents, student, onExit, levelId = "all" 
   const [isFav, setIsFav] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
   const [studied, setStudied] = useState(0);
+  const angela = useAngela();
 
   useEffect(() => {
     if (cards[idx]) {
       speak(cards[idx].en);
       recordWordEncounter(name, cards[idx], true);
     }
+    // 첫 카드에 환영 메시지
+    if (idx === 0) angela.show("start");
+    // 중간에 격려 (40%에 도달했을 때)
+    else if (idx === Math.floor(cards.length * 0.4)) angela.show("correct");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx]);
 
   useEffect(() => {
     if (!cards[idx]) return;
     let cancelled = false;
-    isInWordbook(name, cards[idx].en).then(result => {
-      if (!cancelled) setIsFav(result);
-    });
+    isInWordbook(name, cards[idx].en).then(result => { if (!cancelled) setIsFav(result); });
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx]);
@@ -583,40 +811,40 @@ export function FlashCard({ name, setStudents, student, onExit, levelId = "all" 
   const toggleFav = async () => {
     if (favLoading || !cards[idx]) return;
     setFavLoading(true);
-    if (isFav) {
-      await removeFromWordbook(name, cards[idx].en);
-      setIsFav(false);
-    } else {
-      await addToWordbook(name, cards[idx]);
-      setIsFav(true);
-    }
+    if (isFav) { await removeFromWordbook(name, cards[idx].en); setIsFav(false); }
+    else { await addToWordbook(name, cards[idx]); setIsFav(true); }
     setFavLoading(false);
   };
 
   const next = () => {
-    if (idx < cards.length - 1) { setIdx(idx + 1); setFlipped(false); setStudied(studied + 1); }
-    else {
+    if (idx < cards.length - 1) {
+      setIdx(idx + 1); setFlipped(false); setStudied(studied + 1);
+      playClick();
+    } else {
       saveStudentRecord(setStudents, name, {
         type: "game", gameType: "플래시카드",
         score: studied + 1, total: cards.length,
         category: cards[0]?.cat || "기타",
         points: cards.length * 5
       });
-      onExit();
+      onFinish(cards.length, cards.length);
+      angela.show("perfect");
+      setTimeout(onExit, 1500);
     }
   };
 
-  const prev = () => { if (idx > 0) { setIdx(idx - 1); setFlipped(false); } };
+  const prev = () => { if (idx > 0) { setIdx(idx - 1); setFlipped(false); playClick(); } };
   const c = cards[idx];
 
   return (
+    <>
     <div style={{ minHeight: "100vh", background: T.bg, padding: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
         <Btn v="ghost" size="sm" onClick={onExit}>← 종료</Btn>
         <Tag color="purple">{idx + 1} / {cards.length}</Tag>
       </div>
 
-      <div onClick={() => setFlipped(!flipped)} style={{
+      <div onClick={() => { setFlipped(!flipped); playClick(); }} style={{
         background: flipped ? T.purple : T.card, borderRadius: 20, padding: "60px 20px",
         textAlign: "center", color: flipped ? "white" : T.text, marginBottom: 12,
         cursor: "pointer", boxShadow: T.shadowLg, minHeight: 220, display: "flex",
@@ -650,11 +878,13 @@ export function FlashCard({ name, setStudents, student, onExit, levelId = "all" 
         <Btn v="primary" size="lg" onClick={next} style={{ flex: 1 }}>{idx === cards.length - 1 ? "완료" : "다음 →"}</Btn>
       </div>
     </div>
+    <angela.AngelaComponent />
+    </>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// 레벨 선택 화면 (게임 시작 전)
+// 레벨 선택 화면
 // ──────────────────────────────────────────────────────────────────────────
 export function LevelSelect({ gameInfo, onSelect, onCancel }) {
   return (
@@ -676,7 +906,7 @@ export function LevelSelect({ gameInfo, onSelect, onCancel }) {
         {Object.values(WORD_LEVELS).map(lv => {
           const count = getWordsByLevel(lv.id).length;
           return (
-            <Card key={lv.id} onClick={() => onSelect(lv.id)} style={{
+            <Card key={lv.id} onClick={() => { playClick(); onSelect(lv.id); }} style={{
               padding: 16, display: "flex", alignItems: "center", gap: 14,
               background: lv.color, border: `2px solid ${lv.accent}33`
             }}>

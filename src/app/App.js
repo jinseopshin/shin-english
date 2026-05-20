@@ -27,6 +27,7 @@ import { ReviewCard } from "./ReviewCard";
 import { StudentWordStatsCard } from "./StudentWordStatsCard";
 import { PronunciationGame } from "./PronunciationGame";
 import { PronunciationWidget } from "./PronunciationWidget";
+import WordLearningDashboard from "./WordLearningDashboard";
 import { recordWordEncounter, getTodayReviewWords } from "./studentWords";
 import { addToWordbook, removeFromWordbook, isInWordbook } from "./studentWords";
 import {
@@ -755,7 +756,7 @@ function StudentManager({ students, setStudents }) {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("name");
 
-  const [form, setForm] = useState({ name: "", grade: "초등5", avatar: "🦊", memo: "" });
+  const [form, setForm] = useState({ name: "", grade: "초등5", avatar: "🦊", memo: "", password: "0000" });
   const [formErr, setFormErr] = useState("");
 
   const [csvText, setCsvText] = useState("");
@@ -875,13 +876,13 @@ function StudentManager({ students, setStudents }) {
     });
 
   const openAdd = () => {
-    setForm({ name: "", grade: "초등5", avatar: "🦊", memo: "" });
+    setForm({ name: "", grade: "초등5", avatar: "🦊", memo: "", password: "0000" });
     setFormErr("");
     setMode("add");
   };
 
   const openEdit = (s) => {
-    setForm({ name: s.name, grade: s.grade || "초등5", avatar: s.avatar || "🦊", memo: s.memo || "" });
+    setForm({ name: s.name, grade: s.grade || "초등5", avatar: s.avatar || "🦊", memo: s.memo || "", password: s.password || "0000" });
     setEditTarget(s.name);
     setFormErr("");
     setMode("edit");
@@ -892,6 +893,8 @@ function StudentManager({ students, setStudents }) {
     if (!n) { setFormErr("이름을 입력해주세요"); return; }
     if (n.length < 2) { setFormErr("이름은 2자 이상이어야 해요"); return; }
     if (students[n]) { setFormErr("이미 같은 이름의 학생이 있어요"); return; }
+    // PIN 4자리 검증 및 0 패딩
+    const pin = (form.password || "0000").padStart(4, "0").slice(0, 4);
     setStudents(prev => ({
       ...prev,
       [n]: {
@@ -899,6 +902,7 @@ function StudentManager({ students, setStudents }) {
         grade: form.grade,
         avatar: form.avatar,
         memo: form.memo,
+        password: pin,
         joinDate: new Date().toISOString().slice(0, 10),
         points: 0,
         records: []
@@ -910,9 +914,11 @@ function StudentManager({ students, setStudents }) {
   const saveEdit = () => {
     const n = form.name.trim();
     if (!n) { setFormErr("이름을 입력해주세요"); return; }
+    // PIN 4자리 검증 및 0 패딩
+    const pin = (form.password || "0000").padStart(4, "0").slice(0, 4);
     setStudents(prev => {
       const old = prev[editTarget];
-      const updated = { ...old, grade: form.grade, avatar: form.avatar, memo: form.memo };
+      const updated = { ...old, grade: form.grade, avatar: form.avatar, memo: form.memo, password: pin };
       if (n !== editTarget) {
         if (prev[n]) { setFormErr("이미 같은 이름의 학생이 있어요"); return prev; }
         updated.name = n;
@@ -1104,6 +1110,30 @@ function StudentManager({ students, setStudents }) {
               <option key={g} value={g}>{g}</option>
             ))}
           </select>
+
+          {/* PIN 비밀번호 */}
+          <div style={{ fontSize: 12, fontWeight: 800, color: T.text, marginBottom: 6 }}>
+            🔑 비밀번호 (4자리 숫자)
+            {form.password === "0000" && (
+              <span style={{ marginLeft: 6, fontSize: 10, color: T.orange, fontWeight: 700 }}>* 기본값 사용 중</span>
+            )}
+          </div>
+          <Input
+            value={form.password || "0000"}
+            onChange={e => {
+              const v = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
+              setForm(f => ({ ...f, password: v }));
+              setFormErr("");
+            }}
+            placeholder="0000"
+            maxLength={4}
+            inputMode="numeric"
+            style={{ marginBottom: 6, fontSize: 16, letterSpacing: 4, textAlign: "center", fontWeight: 800 }}
+          />
+          <div style={{ fontSize: 10, color: T.textMid, marginBottom: 12, lineHeight: 1.4 }}>
+            💡 학생이 로그인할 때 입력하는 4자리 숫자예요.<br/>
+            학생이 잊으면 여기서 다시 0000으로 초기화할 수 있어요.
+          </div>
 
           <div style={{ fontSize: 12, fontWeight: 800, color: T.text, marginBottom: 6 }}>메모 (선택)</div>
           <textarea
@@ -2112,6 +2142,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
     attendance:   { title:"출석 기록",         back: "more" },
     "word-homework": { title:"📚 단어 숙제 관리", back: "dashboard" },
     "custom-exam":   { title:"📝 맞춤 시험지", back: "dashboard" },
+    "word-stats":    { title:"📖 단어 학습 현황", back: "more" },
     "student-report": { title:"학생 상세 리포트", back: "students" },
   };
 
@@ -2180,6 +2211,16 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
         {screen === "attendance"      && <AttendanceManager students={students} attendance={attendance} setAttendance={setAttendance} />}
         {screen === "word-homework"   && <WordHomeworkManager students={students} setStudents={setStudents} onNav={onNav} />}
         {screen === "custom-exam"     && <CustomExamManager students={students} setStudents={setStudents} bank={bank} onNav={onNav} />}
+        {screen === "word-stats" && (
+          <WordLearningDashboard
+            students={students}
+            T={T}
+            Card={Card}
+            Btn={Btn}
+            Tag={Tag}
+            onStudentClick={(s) => { setReportStudent(s); onNav("student-report"); }}
+          />
+        )}
         {screen === "student-report"  && reportStudent && (
           <>
             <StudentWordStatsCard studentName={reportStudent.name} />
@@ -2199,6 +2240,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
                 { id:"exam-builder", icon:"✏️", label:"시험지 만들기",    desc:"새 시험지 생성" },
                 { id:"exams",        icon:"📋", label:"시험지 목록",      desc:"만든 시험지 보기 / 인쇄" },
                 { id:"students",     icon:"📈", label:"학생 통계",        desc:"전체 학습 현황 분석" },
+                { id:"word-stats",   icon:"📖", label:"단어 학습 현황",  desc:"전체 학생 단어 진도 통계" },
               ].map(m => (
                 <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 14, textAlign: "center" }}>
                   <div style={{ fontSize: 28, marginBottom: 8 }}>{m.icon}</div>

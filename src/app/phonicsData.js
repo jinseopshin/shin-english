@@ -269,7 +269,11 @@ export function getPhonicsWords(levelId) {
         words.map(w => ({ ...w, vowel }))
       );
     case "magic-e":
-      return MAGIC_E_DATA;
+      // Magic E는 short/long 쌍이지만, 게임에서는 일반 단어 형식으로 풀어서 반환
+      return MAGIC_E_DATA.flatMap(m => [
+        { word: m.short, ko: m.shortKo, emoji: m.emoji, pair: m.long, pairKo: m.longKo, type: "short" },
+        { word: m.long,  ko: m.longKo,  emoji: m.emoji, pair: m.short, pairKo: m.shortKo, type: "long" },
+      ]);
     case "blends":
       return Object.entries(BLENDS_DATA).flatMap(([blend, words]) =>
         words.map(w => ({ ...w, blend }))

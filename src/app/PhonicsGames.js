@@ -305,6 +305,10 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
     );
   }
 
+  if (!current) {
+    return <EmptyPoolMessage onBack={onBack} />;
+  }
+
   return (
     <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
       <FullScreenConfetti trigger={confettiTrigger} />
@@ -421,6 +425,10 @@ function FirstSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
 
   if (done) {
     return <FinishScreen score={score} total={rounds.length} levelId={levelId} onBack={onBack} onExit={onExit} />;
+  }
+
+  if (!current) {
+    return <EmptyPoolMessage onBack={onBack} />;
   }
 
   return (
@@ -553,6 +561,10 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
 
   if (done) {
     return <FinishScreen score={score} total={rounds.length} levelId={levelId} onBack={onBack} onExit={onExit} />;
+  }
+
+  if (!current) {
+    return <EmptyPoolMessage onBack={onBack} />;
   }
 
   return (
@@ -688,6 +700,10 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit }) {
     return <FinishScreen score={score} total={rounds.length} levelId={levelId} onBack={onBack} onExit={onExit} />;
   }
 
+  if (!current) {
+    return <EmptyPoolMessage onBack={onBack} />;
+  }
+
   return (
     <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
       <FullScreenConfetti trigger={confettiTrigger} />
@@ -745,9 +761,27 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit }) {
 // ══════════════════════════════════════════════════════════════════════════
 //   GAME 5: 🧩 소리 듣고 단어 만들기 (c-a-t 순서대로)
 // ══════════════════════════════════════════════════════════════════════════
+// ── 공통: 단어 풀이 비어있을 때 안내 ──
+function EmptyPoolMessage({ onBack, message }) {
+  return (
+    <div style={{ padding: 20, maxWidth: 480, margin: "40px auto 0", textAlign: "center" }}>
+      <div style={{ fontSize: 60, marginBottom: 12 }}>📭</div>
+      <div style={{ fontSize: 16, fontWeight: 800, color: T.text, marginBottom: 8 }}>
+        {message || "이 단계엔 풀 단어가 없어요"}
+      </div>
+      <button onClick={onBack} style={{
+        marginTop: 16, padding: "12px 24px", background: T.accent,
+        color: "white", border: "none", borderRadius: 12,
+        fontSize: 13, fontWeight: 800, cursor: "pointer"
+      }}>← 뒤로</button>
+    </div>
+  );
+}
+
 function BuildWordGame({ studentName, levelId, gameId, onBack, onExit }) {
   const [rounds] = useState(() => {
-    const all = getPhonicsWords(levelId).filter(w => w.word && w.word.length >= 3 && w.word.length <= 6);
+    // 단어 만들기는 3~5글자 단어만 사용 (UI 그리드 깨짐 방지)
+    const all = getPhonicsWords(levelId).filter(w => w.word && w.word.length >= 3 && w.word.length <= 5);
     return shuffle(all).slice(0, 10);
   });
   const [idx, setIdx] = useState(0);
@@ -762,16 +796,25 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit }) {
   const current = rounds[idx];
   const targetWord = current?.word.toLowerCase() || "";
 
-  // 단어의 글자를 섞은 보기 (오답 글자 추가)
+  // 단어의 글자를 객체 배열로 (중복 글자도 별개 entry로 다룸)
+  // 예: "egg" → [{id:0, letter:"e"}, {id:1, letter:"g"}, {id:2, letter:"g"}]
   const letterChoices = useMemo(() => {
-    if (!current) return [];
-    const wordLetters = targetWord.split("");
-    // 단어 글자 + 오답 2-3개
+    if (!current || !targetWord) return [];
+    // 단어 글자 (중복 포함)
+    const wordEntries = targetWord.split("").map((letter, i) => ({
+      id: `w${i}`, letter
+    }));
+    // 단어에 없는 글자 중 오답 2개 추가 (단어가 짧으면 늘림)
     const allLetters = "abcdefghijklmnopqrstuvwxyz".split("");
-    const wrongs = allLetters.filter(l => !wordLetters.includes(l));
-    const wrongPicks = shuffle(wrongs).slice(0, Math.min(2, wrongs.length));
-    return shuffle([...wordLetters, ...wrongPicks]);
-  }, [current]);
+    const inWord = new Set(targetWord);
+    const wrongs = allLetters.filter(l => !inWord.has(l));
+    const wrongCount = Math.max(2, Math.min(3, 7 - targetWord.length));
+    const wrongPicks = shuffle(wrongs).slice(0, wrongCount);
+    const wrongEntries = wrongPicks.map((letter, i) => ({
+      id: `x${i}`, letter
+    }));
+    return shuffle([...wordEntries, ...wrongEntries]);
+  }, [current, targetWord]);
 
   useEffect(() => {
     if (current && !feedback) {
@@ -781,9 +824,9 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit }) {
     }
   }, [idx, feedback]);
 
-  const handleLetterClick = (letter, choiceIdx) => {
+  const handleLetterClick = (entry) => {
     if (feedback) return;
-    const nextLetters = [...builtLetters, { letter, choiceIdx }];
+    const nextLetters = [...builtLetters, entry];
     setBuiltLetters(nextLetters);
     playClick();
 
@@ -820,7 +863,7 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit }) {
           setTimeout(() => angela.show(getFinishReaction(final, rounds.length)), 500);
           if (final / rounds.length >= 0.8) setConfettiTrigger(t => t + 1);
         }
-      }, 1500);
+      }, 1800);
     }
   };
 
@@ -830,9 +873,17 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit }) {
     setBuiltLetters(prev => prev.slice(0, -1));
   };
 
+  // rounds가 비어있으면 — 단어가 없는 경우
+  if (!current) {
+    return <EmptyPoolMessage onBack={onBack} message="이 단계엔 단어 만들기를 할 단어가 없어요 (3-5글자 단어만 지원)" />;
+  }
+
   if (done) {
     return <FinishScreen score={score} total={rounds.length} levelId={levelId} onBack={onBack} onExit={onExit} />;
   }
+
+  // 글자 보기 동적 그리드 (5개 이하면 한 줄, 6개 이상이면 두 줄)
+  const cols = Math.min(5, letterChoices.length);
 
   return (
     <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
@@ -865,20 +916,27 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit }) {
 
         {/* 만들고 있는 단어 */}
         <div style={{
-          display: "flex", gap: 6, justifyContent: "center", marginBottom: 8
+          display: "flex", gap: 6, justifyContent: "center", marginBottom: 8, flexWrap: "wrap"
         }}>
           {Array.from({ length: targetWord.length }).map((_, i) => {
             const built = builtLetters[i];
-            const correct = feedback === "correct";
+            const isCorrect = feedback === "correct";
+            const isWrong = feedback === "wrong";
             return (
               <div key={i} style={{
                 width: 48, height: 56,
-                background: built ? (correct ? T.green : T.accentLight) : T.bg,
-                border: `2px solid ${built ? (correct ? T.green : T.accent) : T.border}`,
+                background: built
+                  ? (isCorrect ? T.green : isWrong ? "#fecaca" : T.accentLight)
+                  : T.bg,
+                border: `2px solid ${built
+                  ? (isCorrect ? T.green : isWrong ? T.red : T.accent)
+                  : T.border}`,
                 borderRadius: 10,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 28, fontWeight: 900,
-                color: built ? (correct ? "white" : T.accent) : T.textDim,
+                color: built
+                  ? (isCorrect ? "white" : isWrong ? T.red : T.accent)
+                  : T.textDim,
                 fontFamily: "monospace"
               }}>
                 {built ? built.letter : "_"}
@@ -899,8 +957,8 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit }) {
         )}
 
         {feedback === "wrong" && (
-          <div style={{ fontSize: 12, color: T.red, fontWeight: 700, marginTop: 8 }}>
-            정답: <strong>{current.word}</strong>
+          <div style={{ fontSize: 13, color: T.red, fontWeight: 700, marginTop: 10 }}>
+            정답: <strong style={{ fontSize: 16 }}>{current.word}</strong>
           </div>
         )}
       </div>
@@ -908,13 +966,13 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit }) {
       {/* 글자 보기 */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: `repeat(${Math.min(5, letterChoices.length)}, 1fr)`,
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
         gap: 8
       }}>
-        {letterChoices.map((letter, choiceIdx) => {
-          const used = builtLetters.some(b => b.choiceIdx === choiceIdx);
+        {letterChoices.map((entry) => {
+          const used = builtLetters.some(b => b.id === entry.id);
           return (
-            <button key={choiceIdx} onClick={() => handleLetterClick(letter, choiceIdx)}
+            <button key={entry.id} onClick={() => handleLetterClick(entry)}
               disabled={used || feedback !== null}
               style={{
                 background: used ? T.border : T.card,
@@ -926,7 +984,7 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit }) {
                 opacity: used ? 0.4 : 1,
                 transition: "all 0.2s"
               }}>
-              {letter}
+              {entry.letter}
             </button>
           );
         })}

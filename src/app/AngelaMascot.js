@@ -115,17 +115,29 @@ export function AngelaMascot({
   const [current, setCurrent] = useState(null);
   const [lottieData, setLottieData] = useState(null);
   const timeoutRef = useRef(null);
+  const loadTokenRef = useRef(0);  // 로딩 토큰 (오래된 로딩 요청 무시용)
 
   useEffect(() => {
     if (trigger === 0) return;
+
+    // 새 reaction이 오면 이전 데이터 즉시 클리어 (이전 애니메이션이 잔존하지 않도록)
+    setLottieData(null);
+
     const r = pickReaction(reaction);
     setCurrent(r);
     setVisible(true);
 
-    // Lottie 애니메이션 로드
+    // 로딩 토큰 증가 — 이 useEffect 호출에 해당하는 고유 번호
+    loadTokenRef.current += 1;
+    const myToken = loadTokenRef.current;
+
+    // Lottie 애니메이션 로드 (오래된 응답은 무시)
     const lottiePath = REACTION_TO_LOTTIE[reaction] || REACTION_TO_LOTTIE.correct;
     loadLottie(lottiePath).then(data => {
-      if (data) setLottieData(data);
+      // 내가 가장 최근 요청일 때만 데이터 설정
+      if (data && loadTokenRef.current === myToken) {
+        setLottieData(data);
+      }
     });
 
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -193,6 +205,7 @@ export function AngelaMascot({
       }}>
         {lottieData ? (
           <Lottie
+            key={trigger}
             animationData={lottieData}
             loop={true}
             autoplay={true}

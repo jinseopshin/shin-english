@@ -30,6 +30,60 @@ import { PronunciationWidget } from "./PronunciationWidget";
 // ══════════════════════════════════════════════════════════════════════════
 
 export function StudentHome({ name, bank, setStudents, students, onLogout, darkMode, setDarkMode }) {
+  // ── 복원: 환영 토스트 / PIN 변경 / 복습 카운트 / 자유풀기 접기 ──
+  const [welcomeToast, setWelcomeToast] = useState({ show: false, message: "", icon: "" });
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [pinChangeStep, setPinChangeStep] = useState("new"); // "new" | "confirm" | "done"
+  const [pinChangeData, setPinChangeData] = useState({ newPin: "", confirmPin: "", error: "" });
+  const [reviewCount, setReviewCount] = useState(0);
+  const [showFreeQuiz, setShowFreeQuiz] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try { return window.localStorage.getItem("angela_free_quiz_open_" + name) === "true"; }
+    catch { return false; }
+  });
+
+  // 자유풀기 펼침 상태 저장
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try { window.localStorage.setItem("angela_free_quiz_open_" + name, String(showFreeQuiz)); } catch {}
+  }, [showFreeQuiz, name]);
+
+  // 복습 단어 수 조회
+  useEffect(() => {
+    if (!name) return;
+    let cancelled = false;
+    getTodayReviewWords(name, 50).then(words => {
+      if (!cancelled) setReviewCount(words?.length || 0);
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [name, screen]);
+
+  // 로그인 환영 메시지 (마운트 시 한 번만)
+  useEffect(() => {
+    if (!name) return;
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const words = await getTodayReviewWords(name, 100);
+        const count = words?.length || 0;
+        if (cancelled) return;
+        let icon, message;
+        if (count >= 30) { icon = "🔥"; message = `오늘 복습 ${count}개! 잊기 전에 해봐요`; }
+        else if (count >= 10) { icon = "📚"; message = `오늘 복습 ${count}개 있어요`; }
+        else if (count >= 1) { icon = "🌱"; message = `오늘 복습 ${count}개 있어요`; }
+        else { icon = "✨"; message = "오늘은 새 단어를 배워볼까요?"; }
+        setWelcomeToast({ show: true, message, icon });
+        setTimeout(() => {
+          if (!cancelled) setWelcomeToast(t => ({ ...t, show: false }));
+        }, 3000);
+      } catch (e) {
+        console.warn("환영 메시지 실패:", e);
+      }
+    }, 300);
+    return () => { cancelled = true; clearTimeout(timer); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
   const [screen, setScreen] = useState("home");
   const [quizSet, setQuizSet] = useState(null);
   const [pendingGame, setPendingGame] = useState(null);
@@ -75,7 +129,160 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
       return () => window.removeEventListener("keydown", handler);
     }
   }, []);
+// ── PIN 변경 화면 (early return) ──
+  if (showPasswordChange) {
+    const currentPin = me.password || "0000";
 
+    const handleNewPin = (digit) => {
+      if (pinChangeStep === "new") {
+        if (pinChangeData.newPin.length >= 4) return;
+        const next = pinChangeData.newPin + digit;
+        setPinChangeData(d => ({ ...d, newPin: next, error: "" }));
+        if (next.length === 4) {
+          setTimeout(() => setPinChangeStep("confirm"), 150);
+        }
+      } else if (pinChangeStep === "confirm") {
+        if (pinChangeData.confirmPin.length >= 4) return;
+        const next = pinChangeData.confirmPin + digit;
+        setPinChangeData(d => ({ ...d, confirmPin: next, error: "" }));
+        if (next.length === 4) {
+          setTimeout(() => {
+            if (next === pinChangeData.newPin) {
+              if (next === currentPin) {
+                setPinChangeData({ newPin: "", confirmPin: "", error: "현재 비밀번호와 같아요. 새 비밀번호를 입력해주세요." });
+                setPinChangeStep("new");
+                return;
+              }
+              setStudents(prev => ({
+                ...prev,
+                [name]: { ...prev[name], password: next }
+              }));
+              setPinChangeStep("done");
+              setTimeout(() => {
+                setShowPasswordChange(false);
+                setPinChangeStep("new");
+                setPinChangeData({ newPin: "", confirmPin: "", error: "" });
+              }, 1800);
+            } else {
+              setPinChangeData({ newPin: "", confirmPin: "", error: "두 비밀번호가 달라요. 다시 입력해주세요." });
+              setPinChangeStep("new");
+              if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(200);
+            }
+          }, 150);
+        }
+      }
+    };
+
+    const handleBack = () => {
+      if (pinChangeStep === "new") {
+        setPinChangeData(d => ({ ...d, newPin: d.newPin.slice(0, -1), error: "" }));
+      } else if (pinChangeStep === "confirm") {
+        setPinChangeData(d => ({ ...d, confirmPin: d.confirmPin.slice(0, -1), error: "" }));
+      }
+    };
+
+    const cancelChange = () => {
+      setShowPasswordChange(false);
+      setPinChangeStep("new");
+      setPinChangeData({ newPin: "", confirmPin: "", error: "" });
+    };
+
+    const displayedPin = pinChangeStep === "new" ? pinChangeData.newPin : pinChangeData.confirmPin;
+    const stepTitle = pinChangeStep === "new" ? "새 비밀번호 4자리" : pinChangeStep === "confirm" ? "한 번 더 입력해주세요" : "변경 완료!";
+    const stepIcon = pinChangeStep === "done" ? "✅" : pinChangeStep === "confirm" ? "🔁" : "🔑";
+
+    return (
+      <div style={{
+        minHeight: "100vh",
+        background: `linear-gradient(135deg, ${T.purple} 0%, ${T.accent} 100%)`,
+        display: "flex", alignItems: "center", justifyContent: "center", padding: 20
+      }}>
+        <Card style={{ maxWidth: 380, width: "100%", padding: 24 }}>
+          <div style={{ textAlign: "center", marginBottom: 18 }}>
+            <div style={{ fontSize: 48, marginBottom: 8 }}>{stepIcon}</div>
+            <div style={{ fontSize: 17, fontWeight: 900, color: T.text }}>비밀번호 변경</div>
+            <div style={{ fontSize: 12, color: T.textMid, marginTop: 4 }}>{stepTitle}</div>
+          </div>
+
+          {pinChangeStep === "done" ? (
+            <div style={{
+              textAlign: "center", padding: "20px 10px",
+              background: T.greenLight, borderRadius: 12, marginBottom: 12
+            }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: T.green }}>비밀번호가 변경되었어요!</div>
+              <div style={{ fontSize: 11, color: T.textMid, marginTop: 4 }}>잊지 않게 잘 기억해주세요 🤫</div>
+            </div>
+          ) : (
+            <>
+              <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 16 }}>
+                {[0, 1, 2, 3].map(i => (
+                  <div key={i} style={{
+                    width: 18, height: 18, borderRadius: "50%",
+                    background: displayedPin.length > i ? T.accent : "transparent",
+                    border: `2px solid ${displayedPin.length > i ? T.accent : T.border}`,
+                    transition: "all 0.15s",
+                  }} />
+                ))}
+              </div>
+
+              {pinChangeData.error && (
+                <div style={{
+                  textAlign: "center", color: T.red, fontSize: 12, fontWeight: 700,
+                  marginBottom: 12, padding: "8px 10px", background: T.redLight, borderRadius: 8
+                }}>
+                  ⚠️ {pinChangeData.error}
+                </div>
+              )}
+
+              <div style={{
+                display: "grid", gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 8, marginBottom: 14
+              }}>
+                {["1","2","3","4","5","6","7","8","9"].map(d => (
+                  <button key={d} onClick={() => handleNewPin(d)}
+                    style={{
+                      padding: "16px 0", borderRadius: 12,
+                      background: T.bg, border: `1.5px solid ${T.border}`,
+                      fontSize: 22, fontWeight: 800, color: T.text,
+                      cursor: "pointer", transition: "all 0.1s"
+                    }}
+                  >{d}</button>
+                ))}
+                <button onClick={handleBack}
+                  style={{
+                    padding: "16px 0", borderRadius: 12,
+                    background: T.bg, border: `1.5px solid ${T.border}`,
+                    fontSize: 18, fontWeight: 800, color: T.textMid,
+                    cursor: "pointer"
+                  }}>←</button>
+                <button onClick={() => handleNewPin("0")}
+                  style={{
+                    padding: "16px 0", borderRadius: 12,
+                    background: T.bg, border: `1.5px solid ${T.border}`,
+                    fontSize: 22, fontWeight: 800, color: T.text,
+                    cursor: "pointer"
+                  }}>0</button>
+                <button onClick={() => {
+                  if (pinChangeStep === "new") setPinChangeData(d => ({ ...d, newPin: "", error: "" }));
+                  else setPinChangeData(d => ({ ...d, confirmPin: "", error: "" }));
+                }}
+                  style={{
+                    padding: "16px 0", borderRadius: 12,
+                    background: T.bg, border: `1.5px solid ${T.border}`,
+                    fontSize: 11, fontWeight: 800, color: T.textMid,
+                    cursor: "pointer"
+                  }}>지우기</button>
+              </div>
+
+              <Btn v="ghost" size="md" onClick={cancelChange} style={{ width: "100%" }}>
+                취소
+              </Btn>
+            </>
+          )}
+        </Card>
+      </div>
+    );
+  }
   if (screen === "level-select" && pendingGame) return <LevelSelect gameInfo={pendingGame} onSelect={onLevelSelected} onCancel={exitGame} student={me} />;
   if (screen === "game-match")    return <WordMatchGame name={name} setStudents={setStudents} student={selectedLevel === "review" ? { ...me, reviewWords } : me} onExit={() => { exitGame(); setReviewWords(null); }} levelId={selectedLevel} />;
   if (screen === "game-spell")    return <SpellingGame  name={name} setStudents={setStudents} student={me} onExit={exitGame} levelId={selectedLevel} />;
@@ -106,7 +313,35 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
   return (
     <>
     <div style={{ minHeight: "100vh", background: T.bg, paddingBottom: 40 }}>
-
+{/* 환영 토스트 (3초 후 자동 사라짐) */}
+      {welcomeToast.show && (
+        <div style={{
+          position: "fixed",
+          top: 70, right: 16, left: 16,
+          maxWidth: 380, margin: "0 auto",
+          background: `linear-gradient(135deg, ${T.accent}, ${T.purple})`,
+          color: "white",
+          padding: "12px 16px",
+          borderRadius: 12,
+          boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
+          zIndex: 100,
+          display: "flex", alignItems: "center", gap: 10,
+          animation: "slideDownFade 0.4s ease-out",
+        }}>
+          <div style={{ fontSize: 24 }}>{welcomeToast.icon}</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: 900, marginBottom: 2 }}>{name}님 환영해요! 👋</div>
+            <div style={{ fontSize: 11, opacity: 0.95, lineHeight: 1.4 }}>{welcomeToast.message}</div>
+          </div>
+          <button onClick={() => setWelcomeToast(t => ({ ...t, show: false }))}
+            style={{
+              background: "rgba(255,255,255,0.2)", border: "none",
+              borderRadius: 6, color: "white", padding: "4px 8px",
+              fontSize: 14, fontWeight: 800, cursor: "pointer",
+              flexShrink: 0
+            }}>×</button>
+        </div>
+      )}
       {/* 상단 헤더 — 항상 표시 */}
       <div className="topbar" style={{ background: T.card, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 50 }}>
        <div className="top-bar-inner">
@@ -115,7 +350,10 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
           <div style={{ fontSize: 13, fontWeight: 900, color: T.text }}>{name}님</div>
           <div style={{ fontSize: 10, color: T.textDim }}>⭐ {points}p</div>
         </div>
-        <button onClick={() => setDarkMode && setDarkMode(d => !d)} title={darkMode?"라이트":"다크"} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, padding:"4px 6px", borderRadius:8 }}>
+        <button onClick={() => setDarkMode && setDarkMode(d => !d)} <button onClick={() => setShowPasswordChange(true)} title="비밀번호 변경"
+          style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, padding: "4px 6px", borderRadius: 8 }}>
+          🔑
+        </button>title={darkMode?"라이트":"다크"} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, padding:"4px 6px", borderRadius:8 }}>
           {darkMode ? "☀️" : "🌙"}
         </button>
         <Btn v="ghost" size="sm" onClick={onLogout} style={{ fontSize: 11 }}>로그아웃</Btn>

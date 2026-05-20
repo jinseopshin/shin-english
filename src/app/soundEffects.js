@@ -83,6 +83,145 @@ function playSparkle() {
   });
 }
 
+// ══════════════════════════════════════════════════════════════════════════
+//   악기 헬퍼 (게임 사운드용)
+// ══════════════════════════════════════════════════════════════════════════
+
+// 🎮 8비트 칩튠 (마리오/포켓몬 스타일) - square wave + 짧은 어택
+function playChiptune(freq, duration = 0.15, volume = 0.18) {
+  if (!isSoundEnabled()) return;
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "square";
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    // 칩튠 특유의 톡 끊는 어택
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.003);
+    gain.gain.setValueAtTime(volume, ctx.currentTime + duration * 0.6);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  } catch (e) {}
+}
+
+// 🔔 벨/실로폰 - 짧은 어택 + 긴 잔향 (젤다 비밀발견 스타일)
+function playBell(freq, duration = 0.6, volume = 0.18) {
+  if (!isSoundEnabled()) return;
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  try {
+    // 기본 톤 + 5도 위 화음 (벨 특유의 풍부함)
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc1.type = "sine";
+    osc2.type = "sine";
+    osc1.frequency.setValueAtTime(freq, ctx.currentTime);
+    osc2.frequency.setValueAtTime(freq * 2, ctx.currentTime); // 옥타브 위
+    // 벨 특유의 즉각 어택 + 느린 감쇠
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(ctx.destination);
+    osc1.start(ctx.currentTime);
+    osc2.start(ctx.currentTime);
+    osc1.stop(ctx.currentTime + duration);
+    osc2.stop(ctx.currentTime + duration);
+  } catch (e) {}
+}
+
+// 🥁 드럼 킥 (저음 펑) - 빠른 주파수 하강 + 노이즈
+function playKick(volume = 0.3) {
+  if (!isSoundEnabled()) return;
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    // 150Hz → 40Hz로 빠르게 하강 (킥드럼 특징)
+    osc.frequency.setValueAtTime(150, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.003);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.15);
+  } catch (e) {}
+}
+
+// 🥁 스네어 (탁) - 노이즈 + 짧은 톤
+function playSnare(volume = 0.15) {
+  if (!isSoundEnabled()) return;
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  try {
+    // 노이즈 버퍼 만들기
+    const bufferSize = ctx.sampleRate * 0.1;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    const noise = ctx.createBufferSource();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    noise.buffer = buffer;
+    filter.type = "highpass";
+    filter.frequency.setValueAtTime(1000, ctx.currentTime);
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.002);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    noise.start(ctx.currentTime);
+    noise.stop(ctx.currentTime + 0.1);
+  } catch (e) {}
+}
+
+// 🎸 신디 베이스 (RPG 클리어 느낌) - sawtooth + 로우패스 필터
+function playSynthBass(freq, duration = 0.4, volume = 0.2) {
+  if (!isSoundEnabled()) return;
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(800, ctx.currentTime);
+    filter.Q.setValueAtTime(5, ctx.currentTime); // 살짝 강조
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.01);
+    gain.gain.linearRampToValueAtTime(volume * 0.6, ctx.currentTime + duration * 0.5);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  } catch (e) {}
+}
+
+// 🪙 코인 사운드 (마리오 코인 스타일) - 빠른 2음 칩튠
+function playCoin() {
+  if (!isSoundEnabled()) return;
+  playChiptune(987.77, 0.06, 0.15); // B5
+  setTimeout(() => playChiptune(1318.5, 0.18, 0.2), 60); // E6 길게
+}
+
 // 여러 톤을 시간차로 재생 (멜로디)
 function playMelody(notes) {
   if (!isSoundEnabled()) return;
@@ -97,78 +236,80 @@ function playMelody(notes) {
 //   사운드 프리셋 — 듀오링고 스타일
 // ══════════════════════════════════════════════════════════════════════════
 
-// 🎵 정답 — 풍부한 화음 + 반짝이는 고음 (C major chord 상승)
+// 🎵 정답 — 마리오 코인 + 벨 + 반짝 (게임 클리어 느낌)
 export function playCorrect() {
-  // 1. 첫 음: 짧고 또렷 (C5)
-  playMelody([
-    { freq: 523.25, dur: 0.1, type: "triangle", vol: 0.25 },
-  ]);
-  // 2. 화음 폭발 (50ms 후): C-E-G 메이저 화음
+  // 1. 코인 사운드 (즉각적인 보상감)
+  playCoin();
+  // 2. 80ms 후: 벨 화음 (풍부함)
   setTimeout(() => {
-    playChord([523.25, 659.25, 783.99], 0.35, "sine", 0.18);
+    playBell(523.25, 0.5, 0.15); // C5
+    playBell(659.25, 0.5, 0.12); // E5
   }, 80);
-  // 3. 반짝이는 고음 (150ms 후): 별 떨어지는 느낌
-  setTimeout(() => playSparkle(), 150);
-  // 4. 마무리 베이스 (200ms 후): 따뜻한 저음
-  setTimeout(() => {
-    playTone(261.63, 0.25, "sine", 0.15); // C4
-  }, 200);
+  // 3. 200ms 후: 반짝
+  setTimeout(() => playSparkle(), 200);
 }
 
-// 🎵 오답 — 마림바 같은 "동-동" + 화음 (위로의 느낌)
+// 🎵 오답 — 마리오 점프 실패 스타일 (가볍게, 좌절감 없이)
 export function playWrong() {
-  // 1. 첫 음: 둥근 마림바 톤
-  playMelody([
-    { freq: 261.63, dur: 0.15, type: "triangle", vol: 0.22 },  // C4
-  ]);
-  // 2. 하강 화음 (마이너): A minor
+  // 1. 칩튠 하강 음: 오답인 듯 가볍게
+  playChiptune(440, 0.1, 0.15); // A4
+  setTimeout(() => playChiptune(370, 0.1, 0.15), 100); // F#4
+  setTimeout(() => playChiptune(330, 0.18, 0.15), 200); // E4
+  // 2. 부드러운 베이스로 마무리 (위로감)
   setTimeout(() => {
-    playChord([220, 261.63], 0.3, "triangle", 0.18);  // A3 + C4
-  }, 100);
-  // 3. 따뜻한 마무리
-  setTimeout(() => {
-    playTone(196, 0.4, "sine", 0.15, -5);  // G3, 약간 변조
-  }, 220);
+    playSynthBass(165, 0.4, 0.12); // E3
+  }, 300);
 }
 
-// 🎵 콤보 (3,5,10) — 아르페지오 + 화음 + 잔향
+// 🎵 콤보 (3,5,10) — 게임 레벨업 사운드 (드럼+칩튠+벨)
 export function playCombo(count) {
   if (count >= 10) {
-    // 10콤보: 화려한 4옥타브 아르페지오 + 빅 화음
-    playMelody([
-      { freq: 523.25, dur: 0.08, type: "triangle", vol: 0.22 },  // C5
-      { freq: 659.25, dur: 0.08, type: "triangle", vol: 0.22, delay: 50 },  // E5
-      { freq: 783.99, dur: 0.08, type: "triangle", vol: 0.22, delay: 100 },  // G5
-      { freq: 1046.5, dur: 0.08, type: "triangle", vol: 0.22, delay: 150 },  // C6
-    ]);
-    // 빅 화음 폭발
+    // 🔥🔥🔥 10콤보: 보스 클리어급 사운드
+    // 드럼 더블킥
+    playKick(0.3);
+    setTimeout(() => playKick(0.3), 80);
+    setTimeout(() => playSnare(0.2), 160);
+    // 칩튠 상승 아르페지오 (포켓몬 레벨업 스타일)
+    [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((freq, i) => {
+      setTimeout(() => playChiptune(freq, 0.1, 0.2), 200 + i * 60);
+    });
+    // 벨 화음 폭발 (영광스러운 마무리)
     setTimeout(() => {
-      playChord([523.25, 659.25, 783.99, 1046.5], 0.5, "sine", 0.18);
-    }, 200);
-    // 반짝 ×2
-    setTimeout(() => playSparkle(), 250);
-    setTimeout(() => playSparkle(), 400);
+      playBell(523.25, 0.8, 0.18);
+      playBell(659.25, 0.8, 0.15);
+      playBell(783.99, 0.8, 0.13);
+      playBell(1046.5, 0.8, 0.15);
+    }, 550);
+    // 신디 베이스 (두께 추가)
+    setTimeout(() => playSynthBass(130.81, 0.7, 0.18), 580);
+    // 반짝 ×3
+    setTimeout(() => playSparkle(), 600);
+    setTimeout(() => playSparkle(), 800);
+    setTimeout(() => playSparkle(), 1000);
   } else if (count >= 5) {
-    // 5콤보: 빠른 아르페지오 + 화음
-    playMelody([
-      { freq: 523.25, dur: 0.08, type: "triangle", vol: 0.22 },
-      { freq: 659.25, dur: 0.08, type: "triangle", vol: 0.22, delay: 60 },
-      { freq: 783.99, dur: 0.08, type: "triangle", vol: 0.22, delay: 120 },
-    ]);
+    // 🔥🔥 5콤보: 레벨업 느낌
+    playKick(0.25);
+    // 칩튠 4음 상승
+    [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+      setTimeout(() => playChiptune(freq, 0.09, 0.18), 80 + i * 70);
+    });
+    // 벨 화음
     setTimeout(() => {
-      playChord([659.25, 783.99, 987.77], 0.4, "sine", 0.18);
-    }, 160);
-    setTimeout(() => playSparkle(), 200);
+      playBell(783.99, 0.6, 0.15);
+      playBell(987.77, 0.6, 0.13);
+    }, 380);
+    // 반짝
+    setTimeout(() => playSparkle(), 450);
   } else if (count >= 3) {
-    // 3콤보: 가벼운 트리오 + 미니 화음
-    playMelody([
-      { freq: 587.33, dur: 0.08, type: "triangle", vol: 0.22 },  // D5
-      { freq: 698.46, dur: 0.08, type: "triangle", vol: 0.22, delay: 60 },  // F5
-      { freq: 880, dur: 0.12, type: "triangle", vol: 0.25, delay: 120 },  // A5
-    ]);
-    setTimeout(() => {
-      playChord([587.33, 698.46, 880], 0.3, "sine", 0.15);
-    }, 150);
+    // 🔥 3콤보: 가벼운 콤보 (좋아요! 느낌)
+    // 가벼운 킥
+    playKick(0.2);
+    // 칩튠 3음 상승
+    [587.33, 698.46, 880].forEach((freq, i) => {
+      setTimeout(() => playChiptune(freq, 0.08, 0.16), 60 + i * 55);
+    });
+    // 미니 벨
+    setTimeout(() => playBell(880, 0.4, 0.13), 250);
   }
 }
 
@@ -180,54 +321,71 @@ export function playStart() {
   ]);
 }
 
-// 🎵 게임 종료 — 점수에 따라 다른 팡파레
+// 🎵 게임 종료 — RPG 보스 클리어 / 미션 클리어 / 위로 (점수별)
 export function playFinish(score, total) {
   const ratio = total > 0 ? score / total : 0;
+
   if (ratio >= 0.8) {
-    // 우수 (80% 이상): 영화같은 팡파레
-    // Part 1: 멜로디 라인 상승
-    playMelody([
-      { freq: 523.25, dur: 0.15, type: "triangle", vol: 0.28 },  // C5
-      { freq: 659.25, dur: 0.15, type: "triangle", vol: 0.28, delay: 130 },  // E5
-      { freq: 783.99, dur: 0.15, type: "triangle", vol: 0.28, delay: 260 },  // G5
-    ]);
-    // Part 2: 빅 화음 (500ms 후)
+    // 🏆 우수 (80% 이상): RPG 보스 클리어급 팡파레
+    // Part 1: 드럼 인트로 (긴장감)
+    playKick(0.3);
+    setTimeout(() => playSnare(0.2), 150);
+    setTimeout(() => playKick(0.3), 300);
+    // Part 2: 칩튠 팡파레 멜로디 (마리오 클리어 풍)
     setTimeout(() => {
-      playChord([523.25, 659.25, 783.99, 1046.5], 0.6, "sine", 0.2);
+      [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+        setTimeout(() => playChiptune(freq, 0.12, 0.2), i * 100);
+      });
     }, 400);
-    // Part 3: 베이스 라인 (저음 동시에)
+    // Part 3: 벨 화음 폭발 (영광)
     setTimeout(() => {
-      playTone(130.81, 0.7, "sine", 0.15);  // C3
-      playTone(196, 0.7, "sine", 0.12);  // G3
-    }, 420);
-    // Part 4: 반짝 폭발
-    setTimeout(() => playSparkle(), 500);
-    setTimeout(() => playSparkle(), 700);
+      playBell(523.25, 1.2, 0.18);
+      playBell(659.25, 1.2, 0.15);
+      playBell(783.99, 1.2, 0.13);
+      playBell(1046.5, 1.2, 0.16);
+    }, 850);
+    // Part 4: 신디 베이스 (두께)
+    setTimeout(() => {
+      playSynthBass(130.81, 1.0, 0.2);  // C3
+      playSynthBass(196, 1.0, 0.15);    // G3
+    }, 880);
+    // Part 5: 반짝 폭발 ×4
     setTimeout(() => playSparkle(), 900);
-    // Part 5: 마무리 종소리 (1초 후)
+    setTimeout(() => playSparkle(), 1100);
+    setTimeout(() => playSparkle(), 1300);
+    setTimeout(() => playSparkle(), 1500);
+    // Part 6: 최종 종소리 (영광의 마무리)
     setTimeout(() => {
-      playChord([1046.5, 1318.5], 0.8, "sine", 0.15);  // C6 + E6
-    }, 1000);
+      playBell(1318.5, 1.5, 0.2);  // E6
+      playBell(1568, 1.5, 0.18);   // G6
+    }, 1700);
   } else if (ratio >= 0.5) {
-    // 보통 (50~80%): 밝은 마무리 + 잔향
-    playMelody([
-      { freq: 523.25, dur: 0.15, type: "triangle", vol: 0.25 },
-      { freq: 659.25, dur: 0.15, type: "triangle", vol: 0.25, delay: 130 },
-    ]);
+    // ⭐ 보통 (50~80%): 미션 클리어 사운드
+    playKick(0.25);
+    // 칩튠 짧은 팡파레
     setTimeout(() => {
-      playChord([523.25, 659.25, 783.99], 0.5, "sine", 0.18);
-    }, 260);
-    setTimeout(() => playSparkle(), 300);
-  } else {
-    // 아쉬움 (50% 미만): 따뜻한 위로 + 격려
-    playMelody([
-      { freq: 392, dur: 0.2, type: "triangle", vol: 0.22 },  // G4
-      { freq: 440, dur: 0.2, type: "triangle", vol: 0.22, delay: 180 },  // A4
-      { freq: 523.25, dur: 0.3, type: "triangle", vol: 0.25, delay: 360 },  // C5 (희망적)
-    ]);
+      [523.25, 659.25, 783.99].forEach((freq, i) => {
+        setTimeout(() => playChiptune(freq, 0.1, 0.18), i * 90);
+      });
+    }, 100);
+    // 벨 화음
     setTimeout(() => {
-      playChord([392, 523.25], 0.5, "sine", 0.15);
+      playBell(659.25, 0.8, 0.15);
+      playBell(783.99, 0.8, 0.13);
     }, 480);
+    setTimeout(() => playSparkle(), 550);
+  } else {
+    // 💪 아쉬움 (50% 미만): 따뜻한 격려 (다시 도전!)
+    // 부드러운 베이스 + 칩튠 상승 (희망적)
+    playSynthBass(196, 0.5, 0.15); // G3
+    setTimeout(() => playChiptune(392, 0.12, 0.18), 100); // G4
+    setTimeout(() => playChiptune(523.25, 0.12, 0.18), 250); // C5
+    setTimeout(() => playChiptune(659.25, 0.2, 0.2), 400); // E5
+    // 따뜻한 벨 마무리
+    setTimeout(() => {
+      playBell(523.25, 0.7, 0.15);
+      playBell(659.25, 0.7, 0.12);
+    }, 600);
   }
 }
 

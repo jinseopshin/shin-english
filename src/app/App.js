@@ -28,7 +28,6 @@ import { StudentWordStatsCard } from "./StudentWordStatsCard";
 import { PronunciationGame } from "./PronunciationGame";
 import { PronunciationWidget } from "./PronunciationWidget";
 import { recordWordEncounter, getTodayReviewWords } from "./studentWords";
-import WordLearningDashboard from "./WordLearningDashboard";
 import { addToWordbook, removeFromWordbook, isInWordbook } from "./studentWords";
 import {
   T, GRADES, TAGS, MARKS, AVATARS, uid, shuffle, speak,
@@ -38,14 +37,18 @@ import {
   WordMatchGame, SpellingGame, SpeedQuiz, FlashCard, LevelSelect, getGameWordPool
 } from "./coreGames";
 import { StudentHome, StudentQuiz } from "./studentApp";
-import { onCorrect, onWrong, onFinish, playStart, playClick, playCombo, showCombo } from "./soundEffects";
-import { useAngela, getComboReaction, getFinishReaction, FullScreenConfetti, ComboFireEffect } from "./AngelaMascot";
 
 // ══════════════════════════════════════════════════════════════════════════
 //   ANGELA'S ENGLISH ACADEMY - 통합 App.js
 //   ✓ 선생님 모드: 문제은행 / 출제 / 시험지 / 학생 진도·통계 대시보드
 //   ✓ 학생 모드: 과제 풀기 / 단어 게임 4종 (자동 기록 저장)
 // ══════════════════════════════════════════════════════════════════════════
+
+// ── 단어 게임용 단어 데이터 (wordData.js에서 import - 380개) ─────────────
+const WORDS = ALL_WORDS;
+
+// ── INIT 문제은행 (questionData.js에서 import - 900문제) ─────────────────
+const INIT_BANK = QUESTION_BANK;
 
 // ── 화면 크기 감지 훅 (반응형) ────────────────────────────────────────────
 // 모바일(<640) / 태블릿(640-1023) / 노트북(1024-1439) / 대형(≥1440)
@@ -77,8 +80,6 @@ function useResponsive() {
 }
 
 // localStorage 훅 — SSR/hydration 안전 버전
-// 서버와 클라이언트 첫 렌더를 항상 initial로 맞추고,
-// 마운트 후 useEffect에서 localStorage 값으로 교체
 function useStorage(key, initial) {
   const [val, setVal] = useState(initial);
   const [hydrated, setHydrated] = useState(false);
@@ -89,7 +90,6 @@ function useStorage(key, initial) {
     let cancelled = false;
     const load = async () => {
       const adapter = getAdapter(key);
-      // 1) Supabase 시도
       if (adapter && isSupabaseReady()) {
         try {
           const data = await adapter.fetch();
@@ -103,7 +103,6 @@ function useStorage(key, initial) {
           console.warn(`Supabase 읽기 실패 (${key}), localStorage 폴백:`, e.message);
         }
       }
-      // 2) localStorage 폴백
       try {
         const v = window.localStorage.getItem(key);
         if (!cancelled && v !== null) setVal(JSON.parse(v));
@@ -115,7 +114,6 @@ function useStorage(key, initial) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
-  // 값 변경 시: localStorage 즉시 저장 + Supabase는 500ms 디바운스
   useEffect(() => {
     if (!hydrated) return;
     try { window.localStorage.setItem(key, JSON.stringify(val)); } catch {}
@@ -137,12 +135,6 @@ function useStorage(key, initial) {
 
   return [val, setVal, hydrated];
 }
-
-// ── 단어 게임용 단어 데이터 (wordData.js에서 import - 380개) ─────────────
-const WORDS = ALL_WORDS;
-
-// ── INIT 문제은행 (questionData.js에서 import - 900문제) ─────────────────
-const INIT_BANK = QUESTION_BANK;
 
 // ══════════════════════════════════════════════════════════════════════════
 //   LANDING & LOGIN
@@ -226,176 +218,18 @@ function TeacherLogin({ savedPw, onSuccess, onBack }) {
     </div>
   );
 }
+
 function StudentLogin({ onSuccess, onBack, students }) {
   const [search, setSearch] = useState("");
-  const [selectedStudent, setSelectedStudent] = useState(null); // PIN 입력 대상
-  const [pinInput, setPinInput] = useState("");
-  const [pinError, setPinError] = useState("");
- 
-  const studentList = Object.values(students || {}).filter(s => s.active !== false);
+  const studentList = Object.values(students || {});
   const hasStudents = studentList.length > 0;
-  // 학생이 많을 때만 검색창 표시
+
   const showSearch = studentList.length > 8;
+
   const filtered = showSearch && search.trim()
     ? studentList.filter(s => s.name.toLowerCase().includes(search.trim().toLowerCase()))
     : studentList;
- 
-  // 학생 카드 클릭 → PIN 입력 모드로
-  const handleStudentClick = (s) => {
-    setSelectedStudent(s);
-    setPinInput("");
-    setPinError("");
-  };
- 
-  // PIN 입력 자릿수 변경
-  const handlePinKey = (digit) => {
-    if (pinInput.length >= 4) return;
-    const newPin = pinInput + digit;
-    setPinInput(newPin);
-    setPinError("");
-    // 4자리 채워지면 자동 검증
-    if (newPin.length === 4) {
-      setTimeout(() => verifyPin(newPin), 100);
-    }
-  };
- 
-  // 한 자리 지우기
-  const handlePinBack = () => {
-    setPinInput(p => p.slice(0, -1));
-    setPinError("");
-  };
- 
-  // PIN 검증
-  const verifyPin = (pin) => {
-    const correctPin = selectedStudent.password || "0000"; // 기본값 0000
-    if (pin === correctPin) {
-      // 일치 → 로그인
-      onSuccess(selectedStudent.name);
-    } else {
-      setPinError("비밀번호가 달라요!");
-      setPinInput("");
-      // 진동 효과 (모바일)
-      if (typeof navigator !== "undefined" && navigator.vibrate) {
-        navigator.vibrate(200);
-      }
-    }
-  };
- 
-  // PIN 입력 화면 취소 → 학생 선택으로 복귀
-  const cancelPin = () => {
-    setSelectedStudent(null);
-    setPinInput("");
-    setPinError("");
-  };
- 
-  // ── PIN 입력 화면 ──────────────────────────────────────────────────
-  if (selectedStudent) {
-    const isDefaultPin = !selectedStudent.password || selectedStudent.password === "0000";
-    return (
-      <div style={{
-        minHeight: "100vh",
-        background: `linear-gradient(135deg, ${T.pink} 0%, ${T.accent} 100%)`,
-        display: "flex", alignItems: "center", justifyContent: "center", padding: 20
-      }}>
-        <Card style={{ maxWidth: 380, width: "100%", padding: 24 }}>
-          {/* 학생 정보 */}
-          <div style={{ textAlign: "center", marginBottom: 18 }}>
-            <div style={{ fontSize: 56, marginBottom: 8 }}>{selectedStudent.avatar || "🙂"}</div>
-            <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{selectedStudent.name}</div>
-            <div style={{ fontSize: 12, color: T.textMid, marginTop: 4 }}>
-              🔑 비밀번호 4자리를 입력해주세요
-            </div>
-            {isDefaultPin && (
-              <div style={{
-                marginTop: 10, padding: "6px 10px",
-                background: T.yellowLight, color: T.orange,
-                fontSize: 10, fontWeight: 700, borderRadius: 8,
-                display: "inline-block"
-              }}>
-                💡 처음이라면 0000 을 입력해보세요
-              </div>
-            )}
-          </div>
- 
-          {/* PIN 표시 (4개 동그라미) */}
-          <div style={{
-            display: "flex", justifyContent: "center", gap: 12,
-            marginBottom: 16
-          }}>
-            {[0, 1, 2, 3].map(i => (
-              <div key={i} style={{
-                width: 18, height: 18, borderRadius: "50%",
-                background: pinInput.length > i ? T.accent : "transparent",
-                border: `2px solid ${pinInput.length > i ? T.accent : T.border}`,
-                transition: "all 0.15s",
-              }} />
-            ))}
-          </div>
- 
-          {/* 에러 메시지 */}
-          {pinError && (
-            <div style={{
-              textAlign: "center", color: T.red, fontSize: 12, fontWeight: 700,
-              marginBottom: 12, animation: "shake 0.3s"
-            }}>
-              ⚠️ {pinError}
-            </div>
-          )}
- 
-          {/* 숫자 키패드 */}
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 8, marginBottom: 14
-          }}>
-            {["1","2","3","4","5","6","7","8","9"].map(d => (
-              <button key={d} onClick={() => handlePinKey(d)}
-                style={{
-                  padding: "16px 0", borderRadius: 12,
-                  background: T.bg, border: `1.5px solid ${T.border}`,
-                  fontSize: 22, fontWeight: 800, color: T.text,
-                  cursor: "pointer", transition: "all 0.1s"
-                }}
-                onMouseDown={e => { e.currentTarget.style.background = T.accentLight; e.currentTarget.style.transform = "scale(0.95)"; }}
-                onMouseUp={e => { e.currentTarget.style.background = T.bg; e.currentTarget.style.transform = "scale(1)"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = T.bg; e.currentTarget.style.transform = "scale(1)"; }}
-                onTouchStart={e => { e.currentTarget.style.background = T.accentLight; }}
-                onTouchEnd={e => { e.currentTarget.style.background = T.bg; }}
-              >{d}</button>
-            ))}
-            <button onClick={handlePinBack}
-              style={{
-                padding: "16px 0", borderRadius: 12,
-                background: T.bg, border: `1.5px solid ${T.border}`,
-                fontSize: 18, fontWeight: 800, color: T.textMid,
-                cursor: "pointer"
-              }}>←</button>
-            <button onClick={() => handlePinKey("0")}
-              style={{
-                padding: "16px 0", borderRadius: 12,
-                background: T.bg, border: `1.5px solid ${T.border}`,
-                fontSize: 22, fontWeight: 800, color: T.text,
-                cursor: "pointer"
-              }}>0</button>
-            <button onClick={() => { setPinInput(""); setPinError(""); }}
-              style={{
-                padding: "16px 0", borderRadius: 12,
-                background: T.bg, border: `1.5px solid ${T.border}`,
-                fontSize: 11, fontWeight: 800, color: T.textMid,
-                cursor: "pointer"
-              }}>지우기</button>
-          </div>
- 
-          {/* 뒤로 가기 */}
-          <Btn v="ghost" size="md" onClick={cancelPin} style={{ width: "100%" }}>
-            ← 다른 학생 선택
-          </Btn>
-        </Card>
-      </div>
-    );
-  }
- 
-  // ── 학생 선택 화면 (기존과 동일하지만 클릭 핸들러만 변경) ─────────
+
   return (
     <div style={{
       minHeight: "100vh",
@@ -410,7 +244,7 @@ function StudentLogin({ onSuccess, onBack, students }) {
             {hasStudents ? "오늘도 영어 공부 화이팅!" : "아직 등록된 학생이 없어요"}
           </div>
         </div>
-        {/* 학생이 많으면 검색 표시 */}
+
         {showSearch && (
           <Input
             value={search}
@@ -419,7 +253,7 @@ function StudentLogin({ onSuccess, onBack, students }) {
             style={{ marginBottom: 12, fontSize: 13 }}
           />
         )}
-        {/* 등록된 학생 카드 목록 */}
+
         {hasStudents ? (
           <div style={{
             maxHeight: 380, overflowY: "auto", marginBottom: 16, padding: 2,
@@ -430,7 +264,7 @@ function StudentLogin({ onSuccess, onBack, students }) {
                 검색 결과가 없어요
               </div>
             ) : filtered.map(s => (
-              <button key={s.name} onClick={() => handleStudentClick(s)}
+              <button key={s.name} onClick={() => onSuccess(s.name)}
                 style={{
                   background: T.card, border: `2px solid ${T.border}`,
                   borderRadius: 14, padding: "14px 8px", cursor: "pointer",
@@ -453,27 +287,23 @@ function StudentLogin({ onSuccess, onBack, students }) {
             💡 선생님께서 [학생 관리]에서<br/>먼저 등록해주셔야 입장할 수 있어요.
           </div>
         )}
+
         <Btn v="ghost" size="md" onClick={onBack} style={{ width: "100%" }}>← 처음으로</Btn>
       </Card>
     </div>
   );
 }
- 
 
 // ══════════════════════════════════════════════════════════════════════════
-//   학생 진도 & 통계 대시보드 (선생님용)
+//   문제 은행 / 시험지 / 학생 관리 / 과제 배정 / 교사 화면
 // ══════════════════════════════════════════════════════════════════════════
 
-
-
-// ── 학생 상세 모달 ────────────────────────────────────────────────────────
 function QuestionBank({ bank, setBank }) {
   const [selId, setSelId] = useState(Object.keys(bank)[0] || null);
   const [editing, setEditing] = useState(null);
-  const [aiMode, setAiMode] = useState(false); // AI 생성 화면 토글
+  const [aiMode, setAiMode] = useState(false);
   const sel = selId ? bank[selId] : null;
 
-  // AI 생성 화면
   if (aiMode) {
     return <AIQuestionGenerator bank={bank} setBank={setBank} onBack={() => setAiMode(false)} />;
   }
@@ -515,7 +345,6 @@ function QuestionBank({ bank, setBank }) {
 
   return (
     <div>
-      {/* AI 생성 배너 */}
       <div style={{background:`linear-gradient(135deg,${T.purple},${T.accent})`,borderRadius:14,padding:"12px 14px",marginBottom:12,display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
         <div style={{color:"white"}}>
           <div style={{fontSize:13,fontWeight:900}}>🤖 AI 문제 자동 생성</div>
@@ -763,32 +592,25 @@ const TEACHER_NAV = [
 //   학생 관리 화면 (선생님용)
 // ══════════════════════════════════════════════════════════════════════════
 function StudentManager({ students, setStudents }) {
-  const [mode, setMode] = useState("list"); // list | add | edit | csv
+  const [mode, setMode] = useState("list");
   const [editTarget, setEditTarget] = useState(null);
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState("name"); // name | grade | points | recent
-  const [activeTab, setActiveTab] = useState("active"); // "active" | "inactive"
+  const [sortBy, setSortBy] = useState("name");
 
-  // 추가/편집 폼 상태
-  const [form, setForm] = useState({ name: "", grade: "초등5", avatar: "🦊", memo: "", password: "0000" });
+  const [form, setForm] = useState({ name: "", grade: "초등5", avatar: "🦊", memo: "" });
   const [formErr, setFormErr] = useState("");
 
-  // CSV 일괄 등록 상태
   const [csvText, setCsvText] = useState("");
   const [csvPreview, setCsvPreview] = useState([]);
   const [csvMsg, setCsvMsg] = useState("");
 
   const studentList = Object.values(students || {});
-  const activeCount = studentList.filter(s => s.active !== false).length;
-  const inactiveCount = studentList.filter(s => s.active === false).length;
 
-  // ── CSV 파일 업로드 ─────────────────────────────────────────
   const handleCsvFile = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      // UTF-8 BOM 제거 (엑셀 호환)
       let text = ev.target.result || "";
       if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
       setCsvText(text);
@@ -798,12 +620,10 @@ function StudentManager({ students, setStudents }) {
     e.target.value = "";
   };
 
-  // CSV 파싱 (간단 버전 — 쉼표 구분, 줄바꿈으로 행 구분)
   const parseCsv = (text) => {
     const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
     if (lines.length === 0) { setCsvPreview([]); return; }
 
-    // 첫 줄이 헤더인지 자동 감지 (이름/name 포함 여부)
     const firstLine = lines[0].toLowerCase();
     const hasHeader = firstLine.includes("이름") || firstLine.includes("name");
     const dataLines = hasHeader ? lines.slice(1) : lines;
@@ -814,7 +634,6 @@ function StudentManager({ students, setStudents }) {
         name: cols[0] || "",
         grade: cols[1] || "초등5",
         memo: cols[2] || "",
-        // 중복 체크
         duplicate: !!students[cols[0]?.trim()],
         valid: cols[0]?.trim().length >= 2,
       };
@@ -822,7 +641,6 @@ function StudentManager({ students, setStudents }) {
     setCsvPreview(rows);
   };
 
-  // CSV로 일괄 등록 실행
   const applyCsv = () => {
     const validRows = csvPreview.filter(r => r.valid && !r.duplicate);
     if (validRows.length === 0) { setCsvMsg("등록할 학생이 없어요"); return; }
@@ -847,7 +665,6 @@ function StudentManager({ students, setStudents }) {
     setTimeout(() => { setMode("list"); setCsvText(""); setCsvPreview([]); setCsvMsg(""); }, 1500);
   };
 
-  // CSV 템플릿 다운로드
   const downloadTemplate = () => {
     const csv = "이름,학년,메모\n홍길동,초등3,영어초보\n김민수,초등5,발음좋음\n이서연,중1,단어부족";
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
@@ -859,7 +676,6 @@ function StudentManager({ students, setStudents }) {
     URL.revokeObjectURL(url);
   };
 
-  // 학습 기록 CSV 내보내기 (전체 학생 또는 한 명)
   const exportStudentsCSV = () => {
     const rows = [
       ["이름","학년","가입일","총 포인트","활동수","최근 활동","평균 정답률"],
@@ -886,8 +702,7 @@ function StudentManager({ students, setStudents }) {
     URL.revokeObjectURL(url);
   };
 
-const filtered = studentList
-    .filter(s => activeTab === "active" ? s.active !== false : s.active === false)
+  const filtered = studentList
     .filter(s => !search || s.name.includes(search))
     .sort((a, b) => {
       if (sortBy === "name") return a.name.localeCompare(b.name, "ko");
@@ -902,13 +717,13 @@ const filtered = studentList
     });
 
   const openAdd = () => {
-    setForm({ name: "", grade: "초등5", avatar: "🦊", memo: "", password: "0000" });
+    setForm({ name: "", grade: "초등5", avatar: "🦊", memo: "" });
     setFormErr("");
     setMode("add");
   };
 
   const openEdit = (s) => {
-    setForm({ name: s.name, grade: s.grade || "초등5", avatar: s.avatar || "🦊", memo: s.memo || "", password: s.password || "0000" });
+    setForm({ name: s.name, grade: s.grade || "초등5", avatar: s.avatar || "🦊", memo: s.memo || "" });
     setEditTarget(s.name);
     setFormErr("");
     setMode("edit");
@@ -919,10 +734,6 @@ const filtered = studentList
     if (!n) { setFormErr("이름을 입력해주세요"); return; }
     if (n.length < 2) { setFormErr("이름은 2자 이상이어야 해요"); return; }
     if (students[n]) { setFormErr("이미 같은 이름의 학생이 있어요"); return; }
-// PIN 유효성 검사
-    const pin = (form.password || "0000").padStart(4, "0").slice(0, 4);
-    if (!/^\d{4}$/.test(pin)) { setFormErr("비밀번호는 4자리 숫자여야 해요"); return; }
-
     setStudents(prev => ({
       ...prev,
       [n]: {
@@ -930,7 +741,6 @@ const filtered = studentList
         grade: form.grade,
         avatar: form.avatar,
         memo: form.memo,
-        password: pin,
         joinDate: new Date().toISOString().slice(0, 10),
         points: 0,
         records: []
@@ -942,14 +752,9 @@ const filtered = studentList
   const saveEdit = () => {
     const n = form.name.trim();
     if (!n) { setFormErr("이름을 입력해주세요"); return; }
-// PIN 유효성 검사
-    const pin = (form.password || "0000").padStart(4, "0").slice(0, 4);
-    if (!/^\d{4}$/.test(pin)) { setFormErr("비밀번호는 4자리 숫자여야 해요"); return; }
-
     setStudents(prev => {
       const old = prev[editTarget];
-      const updated = { ...old, grade: form.grade, avatar: form.avatar, memo: form.memo, password: pin };
-      // 이름이 바뀌면 key도 교체
+      const updated = { ...old, grade: form.grade, avatar: form.avatar, memo: form.memo };
       if (n !== editTarget) {
         if (prev[n]) { setFormErr("이미 같은 이름의 학생이 있어요"); return prev; }
         updated.name = n;
@@ -980,35 +785,6 @@ const filtered = studentList
     }));
   };
 
-  const deactivateStudent = (name) => {
-    if (!confirm(`"${name}" 학생을 비활성화할까요?\n학습 기록은 보존되며, 학생 로그인 화면에서 숨겨집니다.`)) return;
-    setStudents(prev => ({
-      ...prev,
-      [name]: { ...prev[name], active: false, deactivatedAt: new Date().toISOString() }
-    }));
-  };
-
-  const reactivateStudent = (name) => {
-    if (!confirm(`"${name}" 학생을 다시 활성화할까요?`)) return;
-    setStudents(prev => {
-      const old = prev[name] || {};
-      const { deactivatedAt, ...rest } = old;
-      return { ...prev, [name]: { ...rest, active: true } };
-    });
-  };
-
-  const permanentDeleteStudent = (name) => {
-    if (!confirm(`⚠️ "${name}" 학생을 영구 삭제할까요?\n모든 학습 기록이 삭제되며 되돌릴 수 없습니다.`)) return;
-    if (!confirm(`정말로 삭제하시겠어요?\n"${name}"`)) return;
-    setStudents(prev => {
-      const next = { ...prev };
-      delete next[name];
-      return next;
-    });
-  };
-  
-  // ── 학생 추가/편집 폼 ──
-  // ── CSV 일괄 등록 화면 ────────────────────────────────
   if (mode === "csv") {
     const validCount = csvPreview.filter(r => r.valid && !r.duplicate).length;
     const dupCount = csvPreview.filter(r => r.duplicate).length;
@@ -1125,7 +901,6 @@ const filtered = studentList
         </div>
 
         <Card style={{ marginBottom: 14 }}>
-          {/* 아바타 선택 */}
           <div style={{ fontSize: 12, fontWeight: 800, color: T.text, marginBottom: 8 }}>아바타 선택</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
             {["🦊","🐰","🐻","🦁","🐼","🐨","🦝","🐯","🐶","🐱","🐵","🦄","🐸","🐧","🦋","🐬","🦉","🐺"].map(av => (
@@ -1138,7 +913,6 @@ const filtered = studentList
             ))}
           </div>
 
-          {/* 미리보기 */}
           <div style={{
             display: "flex", alignItems: "center", gap: 12, padding: "12px 14px",
             background: T.accentLight, borderRadius: 12, marginBottom: 16
@@ -1150,7 +924,6 @@ const filtered = studentList
             </div>
           </div>
 
-          {/* 이름 */}
           <div style={{ fontSize: 12, fontWeight: 800, color: T.text, marginBottom: 6 }}>학생 이름 *</div>
           <Input
             value={form.name}
@@ -1159,7 +932,6 @@ const filtered = studentList
             style={{ marginBottom: 12 }}
           />
 
-          {/* 학년 */}
           <div style={{ fontSize: 12, fontWeight: 800, color: T.text, marginBottom: 6 }}>학년</div>
           <select
             value={form.grade}
@@ -1174,30 +946,7 @@ const filtered = studentList
               <option key={g} value={g}>{g}</option>
             ))}
           </select>
-{/* PIN 비밀번호 */}
-          <div style={{ fontSize: 12, fontWeight: 800, color: T.text, marginBottom: 6 }}>
-            🔑 비밀번호 (4자리 숫자)
-            {form.password === "0000" && (
-              <span style={{ marginLeft: 6, fontSize: 10, color: T.orange, fontWeight: 700 }}>* 기본값 사용 중</span>
-            )}
-          </div>
-          <Input
-            value={form.password}
-            onChange={e => {
-              const v = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
-              setForm(f => ({ ...f, password: v }));
-              setFormErr("");
-            }}
-            placeholder="0000"
-            maxLength={4}
-            inputMode="numeric"
-            style={{ marginBottom: 6, fontSize: 16, letterSpacing: 4, textAlign: "center", fontWeight: 800 }}
-          />
-          <div style={{ fontSize: 10, color: T.textMid, marginBottom: 12, lineHeight: 1.4 }}>
-            💡 학생이 로그인할 때 입력하는 4자리 숫자예요.<br/>
-            학생이 잊으면 여기서 다시 0000으로 초기화할 수 있어요.
-          </div>
-          {/* 메모 */}
+
           <div style={{ fontSize: 12, fontWeight: 800, color: T.text, marginBottom: 6 }}>메모 (선택)</div>
           <textarea
             value={form.memo}
@@ -1233,14 +982,12 @@ const filtered = studentList
     );
   }
 
-  // ── 학생 목록 ──
   return (
     <div>
-      {/* 헤더 */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <div>
           <div style={{ fontSize: 16, fontWeight: 900, color: T.text }}>👤 학생 관리</div>
-          <div style={{ fontSize: 11, color: T.textMid, marginTop: 2 }}>✅ 활성 {activeCount}명 · 🚫 비활성 {inactiveCount}명</div>
+          <div style={{ fontSize: 11, color: T.textMid, marginTop: 2 }}>총 {studentList.length}명 등록됨</div>
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           <button onClick={() => setMode("csv")} title="CSV로 일괄 등록"
@@ -1257,29 +1004,6 @@ const filtered = studentList
         </div>
       </div>
 
-{/* 활성/비활성 탭 */}
-      <div style={{ display: "flex", gap: 6, marginBottom: 10, background: T.card, padding: 5, borderRadius: 12, boxShadow: T.shadow }}>
-        <button onClick={() => setActiveTab("active")} style={{
-          flex: 1, padding: "10px 8px", borderRadius: 8, border: "none", cursor: "pointer",
-          fontSize: 13, fontWeight: 800,
-          background: activeTab === "active" ? T.accent : "transparent",
-          color: activeTab === "active" ? "white" : T.textMid,
-          transition: "all 0.15s"
-        }}>
-          ✅ 활성 <span style={{ marginLeft: 4, opacity: 0.85 }}>({activeCount})</span>
-        </button>
-        <button onClick={() => setActiveTab("inactive")} style={{
-          flex: 1, padding: "10px 8px", borderRadius: 8, border: "none", cursor: "pointer",
-          fontSize: 13, fontWeight: 800,
-          background: activeTab === "inactive" ? T.textMid : "transparent",
-          color: activeTab === "inactive" ? "white" : T.textMid,
-          transition: "all 0.15s"
-        }}>
-          🚫 비활성 <span style={{ marginLeft: 4, opacity: 0.85 }}>({inactiveCount})</span>
-        </button>
-      </div>
-      
-      {/* 검색 */}
       <input
         value={search}
         onChange={e => setSearch(e.target.value)}
@@ -1291,7 +1015,6 @@ const filtered = studentList
         }}
       />
 
-      {/* 정렬 */}
       <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
         {[
           { id: "name", label: "이름순" },
@@ -1308,27 +1031,18 @@ const filtered = studentList
         ))}
       </div>
 
-      {/* 목록 */}
       {filtered.length === 0 ? (
         <Card style={{ padding: 48, textAlign: "center" }}>
           <div style={{ fontSize: 48, marginBottom: 12 }}>👤</div>
           <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 6 }}>
-            {activeTab === "inactive" 
-              ? (inactiveCount === 0 ? "비활성화된 학생이 없어요" : "검색 결과가 없어요")
-              : (activeCount === 0 ? "등록된 학생이 없어요" : "검색 결과가 없어요")}
+            {studentList.length === 0 ? "등록된 학생이 없어요" : "검색 결과가 없어요"}
           </div>
           <div style={{ fontSize: 12, color: T.textMid, marginBottom: 16 }}>
-{activeTab === "inactive"
-              ? "비활성화된 학생은 여기에 표시됩니다.\n학습 기록은 보존되며 언제든 재활성화 가능합니다."
-              : (activeCount === 0
-                  ? "위 [+ 학생 추가] 버튼으로 학생을 등록해주세요.\n등록된 학생만 학생 모드로 입장 가능합니다."
-                  : "다른 이름으로 검색해보세요")}{activeTab === "inactive"
-              ? "비활성화된 학생은 여기에 표시됩니다.\n학습 기록은 보존되며 언제든 재활성화 가능합니다."
-              : (activeCount === 0
-                  ? "위 [+ 학생 추가] 버튼으로 학생을 등록해주세요.\n등록된 학생만 학생 모드로 입장 가능합니다."
-                  : "다른 이름으로 검색해보세요")}
+            {studentList.length === 0
+              ? "위 [+ 학생 추가] 버튼으로 학생을 등록해주세요.\n등록된 학생만 학생 모드로 입장 가능합니다."
+              : "다른 이름으로 검색해보세요"}
           </div>
-{activeTab === "active" && activeCount === 0 && (
+          {studentList.length === 0 && (
             <Btn v="primary" size="lg" onClick={openAdd}>+ 첫 번째 학생 추가하기</Btn>
           )}
         </Card>
@@ -1349,13 +1063,11 @@ const filtered = studentList
             return (
               <Card key={s.name} style={{ padding: 14 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  {/* 아바타 */}
                   <div style={{
                     width: 50, height: 50, borderRadius: 14, background: lvl.bg, flexShrink: 0,
                     display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28
                   }}>{s.avatar || "🧑"}</div>
 
-                  {/* 정보 */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3, flexWrap: "wrap" }}>
                       <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>{s.name}</span>
@@ -1375,22 +1087,12 @@ const filtered = studentList
                     )}
                   </div>
 
-{/* 액션 버튼 — 탭에 따라 다르게 */}
                   <div style={{ display: "flex", flexDirection: "column", gap: 6, flexShrink: 0 }}>
-                    {activeTab === "active" ? (
-                      <>
-                        <Btn v="secondary" size="sm" onClick={() => openEdit(s)}>✏️ 수정</Btn>
-                        <Btn v="ghost" size="sm" onClick={() => deactivateStudent(s.name)} style={{ color: T.textMid, border: `1px solid ${T.border}` }}>🚫 비활성</Btn>
-                      </>
-                    ) : (
-                      <>
-                        <Btn v="secondary" size="sm" onClick={() => reactivateStudent(s.name)} style={{ background: T.greenLight, color: T.green, borderColor: T.green }}>♻️ 재활성화</Btn>
-                        <Btn v="danger" size="sm" onClick={() => permanentDeleteStudent(s.name)}>🗑️ 완전삭제</Btn>
-                      </>
-                    )}
+                    <Btn v="secondary" size="sm" onClick={() => openEdit(s)}>✏️ 수정</Btn>
+                    <Btn v="danger" size="sm" onClick={() => deleteStudent(s.name)}>🗑️</Btn>
                   </div>
                 </div>
-                {/* 진도바 */}
+
                 <div style={{ marginTop: 10 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: T.textMid, marginBottom: 3 }}>
                     <span>정답률</span>
@@ -1412,8 +1114,7 @@ const filtered = studentList
         </div>
       )}
 
-{/* 전체 삭제 경고 영역 — 활성 탭에서만 표시 */}
-      {activeTab === "active" && activeCount > 0 && (
+      {studentList.length > 0 && (
         <div style={{ marginTop: 20, padding: 14, background: T.redLight, borderRadius: 12, border: `1px dashed ${T.red}` }}>
           <div style={{ fontSize: 12, color: T.red, fontWeight: 700, marginBottom: 6 }}>⚠️ 전체 초기화</div>
           <div style={{ fontSize: 11, color: T.textMid, marginBottom: 10 }}>
@@ -1431,16 +1132,14 @@ const filtered = studentList
 }
 
 function TeacherHome({ bank, exams, students, onNav }) {
-  // 활성 학생만 통계에 반영
-  const studentsArr = Object.values(students || {}).filter(s => s.active !== false);
-  const studentCount = studentsArr.length;
+  const studentCount = Object.keys(students || {}).length;
   const questionCount = Object.values(bank).reduce((a, s) => a + s.questions.length, 0);
-  const todayActive = studentsArr.filter(s => {
+  const todayActive = Object.values(students || {}).filter(s => {
     const last = (s.records || []).slice(-1)[0]?.date?.slice(0, 10);
     return last === new Date().toISOString().slice(0, 10);
   }).length;
 
-  // 진행중인 단어 숙제 통계 (활성 학생만)
+  const studentsArr = Object.values(students || {});
   const activeHomeworks = studentsArr.filter(s => s.wordHomework?.active);
   const activeHwCount = activeHomeworks.length;
   const completedHwCount = activeHomeworks.filter(s => {
@@ -1448,10 +1147,10 @@ function TeacherHome({ bank, exams, students, onNav }) {
     return hw?.words?.length > 0 && hw.words.every(w => w.mastered);
   }).length;
 
-  // 진행중인 맞춤 시험 통계 (활성 학생만)
   const activeExams = studentsArr.filter(s => s.customExam?.active);
   const activeExamCount = activeExams.length;
   const completedExamCount = activeExams.filter(s => s.customExam?.completed).length;
+
   return (
     <div>
       <div style={{
@@ -1464,7 +1163,6 @@ function TeacherHome({ bank, exams, students, onNav }) {
         <div style={{ fontSize: 11, opacity: 0.85, marginTop: 6 }}>오늘도 멋진 수업 화이팅!</div>
       </div>
 
-      {/* 오늘의 현황 — 3개 통계 카드 */}
       <div className="stat-grid" style={{ marginBottom: 16 }}>
         <Card style={{ padding: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1508,7 +1206,6 @@ function TeacherHome({ bank, exams, students, onNav }) {
         </Card>
       </div>
 
-      {/* 자주 쓰는 작업 — 핵심 액션 */}
       <div style={{ fontSize: 13, fontWeight: 800, color: T.textMid, marginBottom: 10, letterSpacing: 0.5 }}>⚡ 자주 쓰는 작업</div>
       <div className="grid-2" style={{ marginBottom: 16 }}>
         {[
@@ -1530,7 +1227,6 @@ function TeacherHome({ bank, exams, students, onNav }) {
         ))}
       </div>
 
-      {/* 진행 중인 단어 숙제 — 있을 때만 표시 */}
       {activeHwCount > 0 && (
         <>
           <div style={{ fontSize: 13, fontWeight: 800, color: T.textMid, marginBottom: 10, letterSpacing: 0.5 }}>📖 진행 중인 단어 숙제</div>
@@ -1570,7 +1266,6 @@ function TeacherHome({ bank, exams, students, onNav }) {
         </>
       )}
 
-      {/* 진행 중인 맞춤 시험 — 있을 때만 표시 */}
       {activeExamCount > 0 && (
         <>
           <div style={{ fontSize: 13, fontWeight: 800, color: T.textMid, marginBottom: 10, letterSpacing: 0.5 }}>📝 진행 중인 시험</div>
@@ -1630,7 +1325,6 @@ function TeacherSettings({ savedPw, setSavedPw, darkMode, setDarkMode }) {
     setTimeout(() => setMsg(""), 2000);
   };
 
-  // ── 데이터 백업 (JSON 다운로드) ─────────────────────────────
   const exportData = () => {
     if (typeof window === "undefined") return;
     const allKeys = [
@@ -1661,7 +1355,6 @@ function TeacherSettings({ savedPw, setSavedPw, darkMode, setDarkMode }) {
     setTimeout(() => setBackupMsg(""), 3000);
   };
 
-  // ── 데이터 복원 (JSON 업로드) ─────────────────────────────
   const importData = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1692,7 +1385,6 @@ function TeacherSettings({ savedPw, setSavedPw, darkMode, setDarkMode }) {
     e.target.value = "";
   };
 
-  // 데이터 통계
   const stats = (typeof window !== "undefined") ? (() => {
     try {
       const students = JSON.parse(localStorage.getItem("angela_students") || "{}");
@@ -1709,7 +1401,6 @@ function TeacherSettings({ savedPw, setSavedPw, darkMode, setDarkMode }) {
 
   return (
     <div>
-      {/* 다크모드 토글 */}
       <Card style={{ marginBottom: 12, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div>
           <div style={{ fontSize: 14, fontWeight: 800, color: T.text }}>🌙 다크 모드</div>
@@ -1727,10 +1418,8 @@ function TeacherSettings({ savedPw, setSavedPw, darkMode, setDarkMode }) {
         </button>
       </Card>
 
-{/* Supabase 마이그레이션 */}
       <SupabaseMigration />
 
-      {/* 데이터 백업 / 복원 — 가장 중요! */}
       <Card style={{ marginBottom: 12, padding: 16, background: T.greenLight, border: `2px solid ${T.green}` }}>
         <div style={{ fontSize: 14, fontWeight: 900, color: T.text, marginBottom: 4 }}>💾 데이터 백업 & 복원</div>
         <div style={{ fontSize: 11, color: T.textMid, marginBottom: 12, lineHeight: 1.5 }}>
@@ -1781,12 +1470,10 @@ function TeacherSettings({ savedPw, setSavedPw, darkMode, setDarkMode }) {
 //   과제 배정 시스템 (선생님용)
 // ══════════════════════════════════════════════════════════════════════════
 
-// ── AI 코칭 분석 함수 ─────────────────────────────────────────────────────
 function analyzeStudent(student, assignments, bank) {
   const records = student?.records || [];
   if (records.length === 0) return null;
 
-  // 과제별 결과 분석
   const assignResults = {};
   records.filter(r => r.type === "assignment" && r.assignmentId).forEach(r => {
     if (!assignResults[r.assignmentId]) {
@@ -1797,13 +1484,11 @@ function analyzeStudent(student, assignments, bank) {
     );
   });
 
-  // 전체 정답률 트렌드
   const recentAssign = records.filter(r => r.type === "assignment").slice(-10);
   const accuracies = recentAssign.map(r => r.total > 0 ? Math.round(r.score / r.total * 100) : 0);
   const avgAcc = accuracies.length > 0
     ? Math.round(accuracies.reduce((a, b) => a + b, 0) / accuracies.length) : 0;
 
-  // 틀린 문제 패턴 (bankId별)
   const weakBanks = {};
   records.filter(r => r.type === "assignment" && r.bankId).forEach(r => {
     if (!weakBanks[r.bankId]) weakBanks[r.bankId] = { correct: 0, total: 0, title: r.setTitle };
@@ -1816,7 +1501,6 @@ function analyzeStudent(student, assignments, bank) {
     .map(b => ({ ...b, rate: Math.round(b.correct / b.total * 100) }))
     .sort((a, b) => a.rate - b.rate);
 
-  // 연속 학습일
   const dates = [...new Set(records.map(r => r.date?.slice(0, 10)))].filter(Boolean).sort().reverse();
   let streak = 0;
   const today = new Date();
@@ -1827,7 +1511,6 @@ function analyzeStudent(student, assignments, bank) {
     else break;
   }
 
-  // 추세 (최근 5회 평균 vs 이전 5회 평균)
   const recent5 = accuracies.slice(-5);
   const prev5 = accuracies.slice(-10, -5);
   const recentAvg = recent5.length > 0 ? recent5.reduce((a, b) => a + b, 0) / recent5.length : 0;
@@ -1837,9 +1520,8 @@ function analyzeStudent(student, assignments, bank) {
   return { avgAcc, weakList, streak, trend, recentAvg: Math.round(recentAvg), prevAvg: Math.round(prevAvg), totalAttempts: records.length };
 }
 
-// ── 코칭 화면 ─────────────────────────────────────────────────────────────
 function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
-  const [assignTab, setAssignTab] = useState("result"); // result | assign | history
+  const [assignTab, setAssignTab] = useState("result");
   const [selectedBanks, setSelectedBanks] = useState([]);
   const [dueDate, setDueDate] = useState("");
   const [assigning, setAssigning] = useState(false);
@@ -1878,7 +1560,6 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
 
   return (
     <div>
-      {/* 학생 헤더 */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
         <Btn v="ghost" size="sm" onClick={onBack}>← 뒤로</Btn>
         <div style={{
@@ -1891,7 +1572,6 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
         </div>
       </div>
 
-      {/* 탭 */}
       <div style={{ display: "flex", gap: 6, marginBottom: 14, background: T.card, padding: 5, borderRadius: 12, boxShadow: T.shadow }}>
         {[
           { id: "result", label: "📊 결과 분석" },
@@ -1907,7 +1587,6 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
         ))}
       </div>
 
-      {/* ── 결과 분석 탭 ── */}
       {assignTab === "result" && (
         <div>
           {!analysis ? (
@@ -1918,7 +1597,6 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
             </Card>
           ) : (
             <>
-              {/* 핵심 수치 */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 14 }}>
                 <Card style={{ padding: 12, textAlign: "center", background: T.accentLight }}>
                   <div style={{ fontSize: 20, fontWeight: 900, color: T.accent }}>{analysis.avgAcc}%</div>
@@ -1934,7 +1612,6 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
                 </Card>
               </div>
 
-              {/* 추세 */}
               <Card style={{ marginBottom: 14, padding: 14 }}>
                 <div style={{ fontSize: 13, fontWeight: 800, color: T.text, marginBottom: 10 }}>📈 학습 추세</div>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -1958,7 +1635,6 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
                 </div>
               </Card>
 
-              {/* 약점 분석 */}
               {analysis.weakList.length > 0 && (
                 <Card style={{ marginBottom: 14, padding: 14 }}>
                   <div style={{ fontSize: 13, fontWeight: 800, color: T.text, marginBottom: 10 }}>🎯 문제집별 정답률</div>
@@ -1982,7 +1658,6 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
                 </Card>
               )}
 
-              {/* 🤖 AI 코칭 멘트 */}
               <Card style={{ background: `linear-gradient(135deg, ${T.accent}15, ${T.purple}15)`, border: `1.5px solid ${T.accent}33`, padding: 16 }}>
                 <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
                   <div style={{ fontSize: 26 }}>🤖</div>
@@ -1992,7 +1667,6 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
                   </div>
                 </div>
                 <div style={{ fontSize: 13, color: T.text, lineHeight: 1.8 }}>
-                  {/* 종합 평가 */}
                   <div style={{ marginBottom: 8 }}>
                     {analysis.avgAcc >= 85
                       ? `✅ ${student.name} 학생은 전반적으로 매우 우수한 실력을 보이고 있어요! 현재 ${analysis.avgAcc}%의 높은 정답률을 유지하고 있습니다.`
@@ -2001,7 +1675,6 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
                       : `💪 ${student.name} 학생은 현재 기초를 다지는 단계예요. 정답률 ${analysis.avgAcc}%로 차근차근 반복 학습이 필요합니다.`
                     }
                   </div>
-                  {/* 추세 코멘트 */}
                   <div style={{ marginBottom: 8 }}>
                     {analysis.trend === "up"
                       ? `📈 최근 ${analysis.recentAvg}%로 이전(${analysis.prevAvg}%)보다 뚜렷하게 향상되고 있어요. 현재 학습 방법을 유지하세요!`
@@ -2010,13 +1683,11 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
                       : `➡️ 성적이 안정적으로 유지되고 있어요. 새로운 유형에 도전해보면 더 성장할 수 있습니다!`
                     }
                   </div>
-                  {/* 약점 기반 추천 */}
                   {analysis.weakList.length > 0 && analysis.weakList[0].rate < 70 && (
                     <div style={{ marginBottom: 8 }}>
                       {`🎯 "${analysis.weakList[0].title}" 문제집 정답률이 ${analysis.weakList[0].rate}%로 가장 낮아요. 이 부분을 집중적으로 복습시키는 것을 추천드려요.`}
                     </div>
                   )}
-                  {/* 연속학습 코멘트 */}
                   <div style={{ marginBottom: 8 }}>
                     {analysis.streak >= 7
                       ? `🔥 ${analysis.streak}일 연속 학습 중! 정말 대단한 꾸준함이에요. 학습 습관이 훌륭합니다.`
@@ -2025,7 +1696,6 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
                       : `📅 연속 학습일이 짧아요. 매일 조금씩이라도 접속하는 습관을 길러주세요.`
                     }
                   </div>
-                  {/* 다음 단계 추천 */}
                   <div style={{ padding: "10px 12px", background: "white", borderRadius: 10, marginTop: 6, fontSize: 12 }}>
                     <strong>📌 추천 액션:</strong>
                     {analysis.avgAcc >= 85
@@ -2042,7 +1712,6 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
         </div>
       )}
 
-      {/* ── 과제 배정 탭 ── */}
       {assignTab === "assign" && (
         <div>
           <Card style={{ marginBottom: 14, padding: 14 }}>
@@ -2097,7 +1766,6 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
         </div>
       )}
 
-      {/* ── 배정 내역 탭 ── */}
       {assignTab === "history" && (
         <div>
           {myAssignments.length === 0 ? (
@@ -2109,7 +1777,6 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {[...myAssignments].reverse().map(a => {
-                // 이 과제의 결과 기록 찾기
                 const results = (student.records || []).filter(r => r.assignmentId === a.id);
                 const lastResult = results.slice(-1)[0];
                 const avgScore = results.length > 0
@@ -2164,7 +1831,6 @@ function CoachingView({ student, assignments, bank, setAssignments, onBack }) {
   );
 }
 
-// ── 과제 배정 메인 화면 (학생 목록 → 학생 선택 → 코칭뷰) ─────────────────
 function AssignmentManager({ students, bank, assignments, setAssignments }) {
   const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState("");
@@ -2179,7 +1845,7 @@ function AssignmentManager({ students, bank, assignments, setAssignments }) {
     />;
   }
 
-  const studentList = Object.values(students || {}).filter(s => s.active !== false);
+  const studentList = Object.values(students || {});
   const filtered = search
     ? studentList.filter(s => s.name.includes(search))
     : studentList;
@@ -2253,7 +1919,6 @@ function AssignmentManager({ students, bank, assignments, setAssignments }) {
   );
 }
 
-
 function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStudents, savedPw, setSavedPw, darkMode, setDarkMode }) {
   const [screen, setScreen] = useState("dashboard");
   const [viewExamId, setViewExamId] = useState(null);
@@ -2268,19 +1933,6 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
   const onNav = (s, id) => { setScreen(s); if (id) setViewExamId(id); };
   const examView = exams.find(e => e.id === viewExamId);
 
-  // 키보드 단축키: Alt+← 뒤로가기
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.altKey && e.key === "ArrowLeft") {
-        const info = SCREEN_INFO_MAP[screen];
-        if (info?.back) onNav(info.back);
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [screen]);
-
-  // ── 화면별 정보 (제목 + 뒤로가기 대상) ──
   const SCREEN_INFO_MAP = {
     dashboard:    { title:"대시보드",         back: null },
     manage:       { title:"학생 관리",         back: "dashboard" },
@@ -2302,15 +1954,25 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
     attendance:   { title:"출석 기록",         back: "more" },
     "word-homework": { title:"📚 단어 숙제 관리", back: "dashboard" },
     "custom-exam":   { title:"📝 맞춤 시험지", back: "dashboard" },
-    "word-stats":     { title:"📖 단어 학습 현황", back: "more" },
     "student-report": { title:"학생 상세 리포트", back: "students" },
   };
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.altKey && e.key === "ArrowLeft") {
+        const info = SCREEN_INFO_MAP[screen];
+        if (info?.back) onNav(info.back);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen]);
 
   const curInfo = SCREEN_INFO_MAP[screen] || { title: screen, back: "dashboard" };
 
   return (
     <div style={{ minHeight: "100vh", background: T.bg, paddingBottom: 80 }}>
-      {/* 상단 헤더 */}
       <div className="topbar" style={{ background: T.card, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 50 }}>
        <div className="top-bar-inner">
         {curInfo.back !== null ? (
@@ -2350,42 +2012,27 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
         {screen === "exams"      && <ExamList exams={exams} setExams={setExams} onNav={onNav} />}
         {screen === "exam-view"  && examView && <ExamPrintView exam={examView} onBack={() => onNav("exams")} />}
         {screen === "settings"   && <TeacherSettings savedPw={savedPw} setSavedPw={setSavedPw} darkMode={darkMode} setDarkMode={setDarkMode} />}
-        {/* Phase 1 */}
         {screen === "groups"     && <GroupManager students={students} groups={groups} setGroups={setGroups} assignments={assignments} setAssignments={setAssignments} bank={bank} />}
         {screen === "goals"      && <GoalManager students={students} goals={goals} setGoals={setGoals} />}
         {screen === "notice"     && <NoticeManager notices={notices} setNotices={setNotices} />}
-        {/* Phase 2 */}
         {screen === "schedule"   && <ScheduleManager schedules={schedules} setSchedules={setSchedules} />}
         {screen === "league"     && <WeeklyLeague students={students} />}
         {screen === "report"     && <ReportPrint students={students} />}
         {screen === "parent"     && <ParentViewer students={students} />}
-        {/* 신규 */}
         {screen === "attendance"      && <AttendanceManager students={students} attendance={attendance} setAttendance={setAttendance} />}
         {screen === "word-homework"   && <WordHomeworkManager students={students} setStudents={setStudents} onNav={onNav} />}
         {screen === "custom-exam"     && <CustomExamManager students={students} setStudents={setStudents} bank={bank} onNav={onNav} />}
-         {screen === "word-stats" && (
-          <WordLearningDashboard
-            students={students}
-            T={T}
-            Card={Card}
-            Btn={Btn}
-            Tag={Tag}
-            onStudentClick={(s) => { setReportStudent(s); onNav("student-report"); }}
-          />
-        )}
         {screen === "student-report"  && reportStudent && (
           <>
             <StudentWordStatsCard studentName={reportStudent.name} />
             <StudentDetailReport student={reportStudent} onBack={() => onNav("students")} />
           </>
         )}
-        {/* 더보기 메뉴 */}
         {screen === "more" && (
           <div>
             <div style={{ fontSize: 16, fontWeight: 900, color: T.text, marginBottom: 4 }}>✨ 더 많은 기능</div>
             <div style={{ fontSize: 11, color: T.textMid, marginBottom: 14 }}>학습 자료 · 통계 · 관리</div>
 
-            {/* 학습 자료 그룹 */}
             <div style={{ fontSize: 11, fontWeight: 800, color: T.accent, marginBottom: 8, letterSpacing: 0.5 }}>📖 학습 자료</div>
             <div className="grid-2" style={{ marginBottom: 16 }}>
               {[
@@ -2394,7 +2041,6 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
                 { id:"exam-builder", icon:"✏️", label:"시험지 만들기",    desc:"새 시험지 생성" },
                 { id:"exams",        icon:"📋", label:"시험지 목록",      desc:"만든 시험지 보기 / 인쇄" },
                 { id:"students",     icon:"📈", label:"학생 통계",        desc:"전체 학습 현황 분석" },
-                { id:"word-stats",   icon:"📖", label:"단어 학습 현황",  desc:"전체 학생 단어 진도 통계" },
               ].map(m => (
                 <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 14, textAlign: "center" }}>
                   <div style={{ fontSize: 28, marginBottom: 8 }}>{m.icon}</div>
@@ -2404,7 +2050,6 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
               ))}
             </div>
 
-            {/* 관리 & 운영 그룹 */}
             <div style={{ fontSize: 11, fontWeight: 800, color: T.purple, marginBottom: 8, letterSpacing: 0.5 }}>🛠️ 관리 & 운영</div>
             <div className="grid-2">
               {[
@@ -2429,7 +2074,6 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
         )}
       </div>
 
-      {/* 하단 네비 */}
       <div className="no-print bottom-nav">
         {TEACHER_NAV.map(n => (
           <button key={n.id} onClick={() => onNav(n.id)} style={{ flex: 1, background: "none", border: "none", padding: "8px 2px 14px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
@@ -2444,9 +2088,6 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//   STUDENT APP - 게임 & 과제 (자동 기록 저장)
-// ══════════════════════════════════════════════════════════════════════════
-// ══════════════════════════════════════════════════════════════════════════
 //   MAIN APP
 // ══════════════════════════════════════════════════════════════════════════
 
@@ -2459,19 +2100,12 @@ export default function App() {
   const [students, setStudents] = useStorage("angela_students", {});
   const [darkMode, setDarkMode] = useStorage("angela_dark", false);
 
-  // 다크모드 적용
   useEffect(() => {
     if (typeof document === "undefined") return;
     document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
     document.body.style.background = darkMode ? "#0f172a" : "#f0f7ff";
   }, [darkMode]);
 
-  // ── 자동 마이그레이션 (localStorage 복원 완료 후 1회) ────────────────
-  // bankHydrated 가 true 가 되면 = localStorage 의 저장값이 bank 에 반영된 시점.
-  // 그 시점의 실제 저장 데이터를 기준으로 판단해야 하므로 함수형 setBank 사용.
-  // 1) 기본 세트가 50문제 미만이면 기본 3세트를 새 데이터로 교체
-  // 2) 코드에 추가된 새 기본 단원이 저장된 bank 에 없으면 그것만 병합
-  //    (사용자가 추가/수정한 세트는 항상 보존)
   useEffect(() => {
     if (!bankHydrated) return;
     setBank((prev) => {
@@ -2481,7 +2115,6 @@ export default function App() {
         (prev.mod && prev.mod.questions && prev.mod.questions.length < 50);
 
       if (needsMigration) {
-        // 사용자가 추가한 다른 세트는 보존, 기본 3세트만 새 데이터로 교체
         const userSets = {};
         Object.entries(prev).forEach(([k, v]) => {
           if (k !== "bp" && k !== "vpa" && k !== "mod") userSets[k] = v;
@@ -2491,20 +2124,17 @@ export default function App() {
 
       const missingDefaults = Object.keys(INIT_BANK).filter((k) => !prev[k]);
       if (missingDefaults.length > 0) {
-        // 기존 데이터는 그대로 두고, 빠진 기본 단원만 추가
         const merged = { ...prev };
         missingDefaults.forEach((k) => { merged[k] = INIT_BANK[k]; });
         return merged;
       }
 
-      return prev; // 변경 없음 → 불필요한 저장/리렌더 방지
+      return prev;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bankHydrated]);
 
-  // 학생 첫 입장 시 등록
   const enterAsStudent = (name) => {
-    // 등록된 학생만 입장 가능 (StudentLogin에서 이미 검증되었지만 안전장치)
     if (!students[name]) {
       alert("등록되지 않은 학생입니다. 선생님께 문의해주세요.");
       return;

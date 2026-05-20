@@ -131,3 +131,66 @@ input, textarea, select { font-family: inherit; }
     transform: translateY(0);
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════ */
+/*   사운드 & 액션 효과 애니메이션 (soundEffects.js와 함께 사용)        */
+/* ══════════════════════════════════════════════════════════════════ */
+
+/* 화면 흔들기 - soft (오답 시) */
+@keyframes shake-soft {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+/* 화면 흔들기 - hard (큰 실패 시) */
+@keyframes shake-hard {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-10px) rotate(-1deg); }
+  20% { transform: translateX(10px) rotate(1deg); }
+  30% { transform: translateX(-8px) rotate(-1deg); }
+  40% { transform: translateX(8px) rotate(1deg); }
+  50% { transform: translateX(-6px); }
+  60% { transform: translateX(6px); }
+  70% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+body.shake-active.shake-soft {
+  animation: shake-soft 0.3s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+body.shake-active.shake-hard {
+  animation: shake-hard 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* 정답 카드 뽐내기 (선택 사항 - 추후 사용) */
+@keyframes correct-bounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.08); }
+  70% { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+.correct-bounce {
+  animation: correct-bounce 0.4s ease-out;
+}
+
+/* 오답 카드 빨강 깜빡임 */
+@keyframes wrong-flash {
+  0%, 100% { background-color: inherit; }
+  50% { background-color: #fee2e2; }
+}
+
+.wrong-flash {
+  animation: wrong-flash 0.4s ease-out;
+}
+
+/* 콤보 배너 진동 (showCombo가 만든 element에 자동 적용 안 함, 추후 강화용) */
+@keyframes combo-pulse {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.1); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}

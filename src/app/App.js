@@ -2884,11 +2884,12 @@ function SpellingGame({ name, setStudents, student, onExit, levelId = "all" }) {
  
   const questions = useMemo(() => shuffle(getGameWordPool(levelId, student)).slice(0, 8), [levelId, student?.wordHomework]);
  
-  // ✅ 게임 종료 시 점수 저장 (렌더링 중이 아니라 effect에서 한 번만)
+// ✅ 게임 종료 시 점수 저장 (렌더링 중이 아니라 effect에서 한 번만)
   useEffect(() => {
     if (awardedRef.current) return;
     if (questions.length === 0 || round < questions.length) return;
     awardedRef.current = true;
+    onFinish(score, questions.length);  // 🎮 종료 사운드 + 꽃가루 (80% 이상)
     saveStudentRecord(setStudents, name, {
       type: "game", gameType: "스펠링",
       score, total: questions.length,
@@ -2918,13 +2919,17 @@ function SpellingGame({ name, setStudents, student, onExit, levelId = "all" }) {
  
   const q = questions[round];
  
-  const submit = () => {
+const submit = () => {
     if (feedback) return;
     const isCorrect = input.trim().toLowerCase() === q.en.toLowerCase();
     recordWordEncounter(name, q, isCorrect);  // ✅ 망각 곡선 자동 업데이트
     if (isCorrect) {
       setScore(score + 1); setFeedback("correct");
-    } else setFeedback("wrong");
+      onCorrect();  // 🎮 사운드 + 별 효과
+    } else {
+      setFeedback("wrong");
+      onWrong();  // 🎮 사운드 + 화면 흔들기
+    }
     if (levelId === "homework") updateWordMastery(setStudents, name, q.en, isCorrect);
     setTimeout(() => { setFeedback(null); setInput(""); setRound(round + 1); }, 1200);
   };
@@ -2992,11 +2997,12 @@ function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" }) {
     return () => clearInterval(interval);
   }, [round, mode, questions.length]);
  
-  // ✅ 게임 종료 시 점수 저장 (렌더링 중이 아니라 effect에서 한 번만)
+// ✅ 게임 종료 시 점수 저장 (렌더링 중이 아니라 effect에서 한 번만)
   useEffect(() => {
     if (!mode || awardedRef.current) return;
     if (questions.length === 0 || round < questions.length) return;
     awardedRef.current = true;
+    onFinish(score, questions.length);  // 🎮 종료 사운드 + 꽃가루 (80% 이상)
     saveStudentRecord(setStudents, name, {
       type: "game", gameType: "스피드 퀴즈",
       score, total: questions.length,
@@ -3060,10 +3066,15 @@ function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" }) {
   const q = questions[round];
   const isKo2En = q.dir === "ko2en";
  
-  const pick = (idx) => {
+const pick = (idx) => {
     const isCorrect = idx === q.ansIdx;
     recordWordEncounter(name, q, isCorrect);  // ✅ 망각 곡선 자동 업데이트
-    if (isCorrect) setScore(score + 1);
+    if (isCorrect) {
+      setScore(score + 1);
+      onCorrect();  // 🎮 사운드 + 별 효과
+    } else {
+      onWrong();  // 🎮 사운드 + 화면 흔들기
+    }
     if (levelId === "homework") updateWordMastery(setStudents, name, q.en, isCorrect);
     setRound(round + 1);
   };
@@ -3167,16 +3178,22 @@ function FlashCard({ name, setStudents, student, onExit, levelId = "all" }) {
     setFavLoading(false);
   };
 
-  const next = () => {
-    if (idx < cards.length - 1) { setIdx(idx + 1); setFlipped(false); setStudied(studied + 1); }
+const next = () => {
+    if (idx < cards.length - 1) {
+      setIdx(idx + 1);
+      setFlipped(false);
+      setStudied(studied + 1);
+      playClick();  // 🎮 가벼운 클릭 사운드
+    }
     else {
+      onFinish(cards.length, cards.length);  // 🎮 모두 학습 완료 = 만점 팡파레!
       saveStudentRecord(setStudents, name, {
         type: "game", gameType: "플래시카드",
         score: studied + 1, total: cards.length,
         category: cards[0]?.cat || "기타",
         points: cards.length * 5
       });
-      onExit();
+      setTimeout(() => onExit(), 1500);  // 팡파레 끝나고 홈으로 (1.5초 대기)
     }
   };
 

@@ -1,64 +1,50 @@
 // ══════════════════════════════════════════════════════════════════════════
-//   🖼️ pexelsImage.js — Pexels API 이미지 로딩 헬퍼
+//   🖼️ pexelsImage.js — Pexels API 이미지 로딩 헬퍼 (v2)
 //
 //   - 단어를 검색해 어린이 친화적 이미지 1장 반환
 //   - sessionStorage 캐싱으로 같은 단어 재호출 방지
 //   - 실패 시 null 반환 (호출 측에서 이모지 폴백)
 //
+//   v2 변경: 추상 단어 매핑 제거 (이제 그림 게임에서 추상 단어 자체를 제외)
 //   환경변수: NEXT_PUBLIC_PEXELS_API_KEY
-//   - Vercel: Settings > Environment Variables 에 추가
-//   - 로컬: .env.local 파일에 추가
 // ══════════════════════════════════════════════════════════════════════════
 
 const PEXELS_API = "https://api.pexels.com/v1/search";
 const CACHE_PREFIX = "pexels_img_";
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7일 캐싱
 
-// ── 단어 → Pexels 검색어 매핑 (애매한 단어는 명확하게) ──
+// ── 단어 → Pexels 검색어 매핑 (그림 가능한 구체 명사만) ──
 const SEARCH_OVERRIDES = {
-  // 동물 - 단순 단어보다 동물 키워드 추가
+  // 동물 - 명확한 키워드로
   bat:    "fruit bat animal",
-  rat:    "rat rodent",
-  hen:    "hen chicken",
+  rat:    "rat rodent cute",
+  hen:    "hen chicken farm",
   fox:    "fox animal",
-  pig:    "pig farm",
-  cat:    "cute cat",
-  dog:    "cute dog",
-  goat:   "goat animal",
+  pig:    "pig farm pink",
+  cat:    "cute cat kitten",
+  dog:    "cute dog puppy",
+  goat:   "goat farm",
   duck:   "duck pond",
-  frog:   "frog green",
-  // 사물 - 영어 동음이의어 회피
+  frog:   "green frog",
+  bug:    "ladybug insect",
+  // 사물 - 동음이의어 회피
   mat:    "yoga mat",
-  bag:    "school bag",
+  bag:    "school backpack",
   cap:    "baseball cap",
   fan:    "electric fan",
-  can:    "soda can",
+  can:    "soda can drink",
   pen:    "writing pen",
   net:    "fishing net",
-  web:    "spider web",
-  bib:    "baby bib",
+  web:    "spider web silk",
   pot:    "cooking pot",
-  top:    "spinning top toy",
-  log:    "wood log",
+  log:    "wood log forest",
   mop:    "cleaning mop",
   bus:    "yellow school bus",
   cup:    "tea cup",
-  nut:    "walnut nut",
-  bug:    "ladybug insect",
+  nut:    "walnut peanut",
   mug:    "coffee mug",
-  rock:   "rock stone",
-  drum:   "drum musical",
-  // 추상 개념 - 시각화 가능한 형태로
-  big:    "big elephant",
-  red:    "red color",
-  hot:    "hot chili pepper",
-  hit:    "boxing punch",
-  sit:    "child sitting",
-  kid:    "happy kid",
-  win:    "trophy winner",
-  pin:    "push pin",
-  wet:    "water splash",
-  run:    "running person",
+  rock:   "rock stone gray",
+  drum:   "drum musical instrument",
   // 알파벳 대표 단어
   apple:  "red apple fruit",
   ball:   "colorful ball",
@@ -70,18 +56,48 @@ const SEARCH_OVERRIDES = {
   king:   "king crown",
   lion:   "lion animal",
   moon:   "moon night",
-  nose:   "human nose",
+  nose:   "human nose face",
   octopus:"octopus sea",
   queen:  "queen crown",
   rabbit: "rabbit bunny",
-  sun:    "sun bright",
+  sun:    "sun bright sky",
   tiger:  "tiger animal",
-  umbrella: "colorful umbrella",
+  umbrella:"colorful umbrella",
   violin: "violin instrument",
   watch:  "wrist watch",
   box:    "cardboard box",
-  yellow: "yellow color",
+  yellow: "yellow color paint",
   zebra:  "zebra animal",
+  // CVC 추가
+  kid:    "happy child kid",
+  pin:    "push pin",
+  // Magic E - 구체 명사만
+  cape:   "superhero cape",
+  tape:   "tape roll",
+  kite:   "flying kite",
+  pine:   "pine tree",
+  tube:   "rubber tube",
+  // Blends - 구체 명사만
+  chair:  "chair furniture",
+  cheese: "cheese yellow",
+  chicken:"chicken bird",
+  child:  "happy child",
+  chocolate:"chocolate bar",
+  ship:   "big ship sea",
+  shoe:   "shoe pair",
+  shark:  "shark ocean",
+  sheep:  "sheep farm",
+  shell:  "sea shell",
+  thumb:  "thumb up hand",
+  three:  "number three",
+  blue:   "blue color sky",
+  black:  "black color",
+  block:  "toy blocks",
+  blanket:"blanket cozy",
+  star:   "yellow star",
+  stone:  "stone rock",
+  stairs: "stairs steps",
+  fruit:  "fresh fruit",
 };
 
 function getCachedImage(word) {
@@ -110,7 +126,6 @@ function setCachedImage(word, url) {
   } catch {}
 }
 
-// 캐시에 "없음(null)"으로 기록 — API 실패한 단어 재호출 막기
 function setCachedMiss(word) {
   setCachedImage(word, "__MISS__");
 }
@@ -120,22 +135,18 @@ export async function fetchWordImage(word) {
   if (!word) return null;
   const key = word.toLowerCase().trim();
 
-  // 1) 캐시 체크
   const cached = getCachedImage(key);
   if (cached === "__MISS__") return null;
   if (cached) return cached;
 
-  // 2) API 키 체크
   const apiKey = process.env.NEXT_PUBLIC_PEXELS_API_KEY;
   if (!apiKey) {
     console.warn("[pexelsImage] NEXT_PUBLIC_PEXELS_API_KEY 미설정");
     return null;
   }
 
-  // 3) 검색어 결정 (override 우선)
   const searchTerm = SEARCH_OVERRIDES[key] || key;
 
-  // 4) API 호출
   try {
     const url = `${PEXELS_API}?query=${encodeURIComponent(searchTerm)}&per_page=3&orientation=square`;
     const res = await fetch(url, {
@@ -152,7 +163,6 @@ export async function fetchWordImage(word) {
       setCachedMiss(key);
       return null;
     }
-    // medium 사이즈가 적당 (350px 정도)
     const imgUrl = photo.src.medium || photo.src.small || photo.src.original;
     setCachedImage(key, imgUrl);
     return imgUrl;
@@ -163,7 +173,6 @@ export async function fetchWordImage(word) {
   }
 }
 
-// ── 디버그용: 캐시 초기화 ──
 export function clearImageCache() {
   if (typeof window === "undefined") return;
   try {

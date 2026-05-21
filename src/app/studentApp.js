@@ -738,6 +738,28 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
           <div style={{ fontSize: 20, opacity: 0.7, position: "relative", zIndex: 1 }}>›</div>
         </Card>
 
+{/* 📝 문장 만들기 카드 — 파닉스 다음 단계 */}
+        <Card onClick={() => setScreen("sentence-builder")} style={{
+          padding: "16px",
+          background: `linear-gradient(135deg, #f59e0b, #f97316)`,
+          color: "white", cursor: "pointer", border: "none",
+          display: "flex", alignItems: "center", gap: 14,
+          marginBottom: 14, position: "relative", overflow: "hidden"
+        }}>
+          <div style={{
+            position: "absolute", right: -20, top: -10,
+            fontSize: 100, opacity: 0.15, transform: "rotate(15deg)"
+          }}>📝</div>
+          <div style={{ fontSize: 42, position: "relative", zIndex: 1 }}>📝</div>
+          <div style={{ flex: 1, position: "relative", zIndex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 900 }}>문장 만들기</div>
+            <div style={{ fontSize: 11, opacity: 0.95, marginTop: 3 }}>
+              섞인 단어를 순서대로 클릭해 문장을 완성해요
+            </div>
+          </div>
+          <div style={{ fontSize: 20, opacity: 0.7, position: "relative", zIndex: 1 }}>›</div>
+        </Card>
+
        {/* 📚 복습 + 단어장 2-column 그리드 */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
           {/* 🔔 오늘의 복습 카드 */}
@@ -783,21 +805,6 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
               <div style={{ fontSize: 30, marginBottom: 4 }}>✅</div>
               <div style={{ fontSize: 13, fontWeight: 900, color: T.green }}>복습 완료!</div>
               <div style={{ fontSize: 10, color: T.textMid, marginTop: 3 }}>오늘 복습할 단어가 없어요</div>
-            </Card>
-
-{/* 📝 문장 만들기 (다음 단계 학습) */}
-            <Card onClick={() => setScreen("sentence-builder")} style={{
-              marginBottom: 14, padding: "14px 16px",
-              background: `linear-gradient(135deg, #f59e0b, #f97316)`,
-              color: "white", cursor: "pointer", border: "none",
-              display: "flex", alignItems: "center", gap: 12,
-            }}>
-              <div style={{ fontSize: 32 }}>📝</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 900 }}>문장 만들기</div>
-                <div style={{ fontSize: 11, opacity: 0.9, marginTop: 2 }}>섞인 단어로 문장을 완성해요</div>
-              </div>
-              <div style={{ fontSize: 20, opacity: 0.7 }}>›</div>
             </Card>
           )}
 

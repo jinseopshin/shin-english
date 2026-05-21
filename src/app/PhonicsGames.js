@@ -11,8 +11,8 @@ import {
 } from "./soundEffects";
 import { useAngela, getComboReaction, getFinishReaction, FullScreenConfetti } from "./AngelaMascot";
 import { PhonicsClassMode } from "./PhonicsClassMode";
+// ✨ 새로 추가: Cloudinary 큐레이션 이미지
 import { getCuratedImageUrl, hasCuratedImage } from "./phonicsImages";
-import { filterPictureableWords } from "./pictureableWords";
 
 // ══════════════════════════════════════════════════════════════════════════
 //   🔤 PhonicsGames.js — 유치부 파닉스 게임 5종
@@ -32,17 +32,9 @@ function speakEN(text, rate = 0.85) {
   } catch {}
 }
 
-// ── 알파벳 한 글자만 천천히 발음 ──
-function speakLetter(letter) {
-  speakEN(letter, 0.7);
-}
+function speakLetter(letter) { speakEN(letter, 0.7); }
+function speakWord(word) { speakEN(word, 0.85); }
 
-// ── 단어 발음 ──
-function speakWord(word) {
-  speakEN(word, 0.85);
-}
-
-// ── 게임 별 ⭐ 평가 ──
 function getStars(score, total) {
   const ratio = total > 0 ? score / total : 0;
   if (ratio >= 0.9) return 3;
@@ -51,7 +43,6 @@ function getStars(score, total) {
   return 0;
 }
 
-// ── localStorage에 진도 저장 ──
 function saveProgress(studentName, gameId, levelId, score, total) {
   if (typeof window === "undefined" || !studentName) return;
   try {
@@ -80,7 +71,6 @@ function getProgress(studentName) {
   }
 }
 
-// ── Fisher-Yates 셔플 ──
 function shuffle(arr) {
   const out = [...arr];
   for (let i = out.length - 1; i > 0; i--) {
@@ -91,17 +81,15 @@ function shuffle(arr) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//   📋 메인 메뉴: 파닉스 단계 선택
+//   📋 메인 메뉴
 // ══════════════════════════════════════════════════════════════════════════
 export function PhonicsMenu({ studentName, onExit }) {
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [selectedCustomSet, setSelectedCustomSet] = useState(null);
   const progress = useMemo(() => getProgress(studentName), [studentName]);
 
-  // 학생에게 배정된 단어집 + 공개 단어집
   const myAssignedSets = useMemo(() => getStudentAssignedSets(studentName), [studentName]);
   const publicSets = useMemo(() => {
-    // 배정된 것과 중복 제거
     const assignedIds = new Set(myAssignedSets.map(s => s.id));
     return getPublicSets().filter(s => !assignedIds.has(s.id));
   }, [myAssignedSets]);
@@ -141,7 +129,6 @@ export function PhonicsMenu({ studentName, onExit }) {
         </div>
       </div>
 
-      {/* 📦 내 단어집 (선생님이 배정한 것) */}
       {myAssignedSets.length > 0 && (
         <div style={{ marginBottom: 18 }}>
           <div style={{
@@ -185,7 +172,6 @@ export function PhonicsMenu({ studentName, onExit }) {
         </div>
       )}
 
-      {/* 🌐 공개 단어집 (누구나 풀 수 있음) */}
       {publicSets.length > 0 && (
         <div style={{ marginBottom: 18 }}>
           <div style={{
@@ -229,7 +215,6 @@ export function PhonicsMenu({ studentName, onExit }) {
         </div>
       )}
 
-      {/* 📚 기본 단계 */}
       <div style={{
         fontSize: 13, fontWeight: 800, color: T.text,
         marginBottom: 8, display: "flex", alignItems: "center", gap: 6
@@ -239,7 +224,6 @@ export function PhonicsMenu({ studentName, onExit }) {
       </div>
       <div style={{ display: "grid", gap: 10 }}>
         {PHONICS_LEVELS.map((lv, idx) => {
-          // 이 단계에서 가장 잘 한 게임의 별 수
           const stars = Math.max(
             ...["alphabet-sound", "first-sound", "cvc-blank", "picture-letter", "build-word"]
               .map(g => (progress[`${lv.id}_${g}`]?.bestStars || 0))
@@ -279,13 +263,12 @@ export function PhonicsMenu({ studentName, onExit }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//   📦 커스텀 단어집 메뉴 — 수업모드 + 게임 선택
+//   📦 커스텀 단어집 메뉴
 // ══════════════════════════════════════════════════════════════════════════
 function CustomSetMenu({ studentName, customSet, onBack, onExit }) {
-  const [mode, setMode] = useState(null); // "class" | game-id
+  const [mode, setMode] = useState(null);
   const level = PHONICS_LEVELS.find(l => l.id === customSet.levelId);
 
-  // 수업 모드
   if (mode === "class") {
     return (
       <PhonicsClassMode
@@ -297,7 +280,6 @@ function CustomSetMenu({ studentName, customSet, onBack, onExit }) {
     );
   }
 
-  // 게임 모드 (커스텀 단어집 사용)
   if (mode) {
     return (
       <CustomSetGameRunner
@@ -310,11 +292,10 @@ function CustomSetMenu({ studentName, customSet, onBack, onExit }) {
     );
   }
 
-  // 메뉴 화면
   const availableGames = [
     { id: "class", icon: "📖", label: "수업 모드", desc: "선생님과 같이 보며 천천히 익혀요", featured: true },
     { id: "first-sound", icon: "🎵", label: "첫소리 맞추기", desc: "단어 듣고 첫글자 고르기" },
-    { id: "picture-letter", icon: "🖼️", label: "그림 보고 첫글자", desc: "이모지 보고 알파벳 고르기" },
+    { id: "picture-letter", icon: "🖼️", label: "그림 보고 첫글자", desc: "그림 보고 알파벳 고르기" },
     { id: "build-word", icon: "🧩", label: "단어 만들기", desc: "소리 듣고 순서대로 클릭" },
   ];
 
@@ -369,12 +350,9 @@ function CustomSetMenu({ studentName, customSet, onBack, onExit }) {
   );
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-//   🎮 커스텀 단어집 게임 실행기
-// ══════════════════════════════════════════════════════════════════════════
 function CustomSetGameRunner({ studentName, customSet, gameId, onBack, onExit }) {
   const customWords = customSet.words;
-  const levelId = customSet.levelId || "cvc"; // 기본값
+  const levelId = customSet.levelId || "cvc";
   const props = { studentName, levelId, gameId: `custom_${customSet.id}_${gameId}`, onBack, onExit, customWords };
 
   switch (gameId) {
@@ -395,28 +373,23 @@ function CustomSetGameRunner({ studentName, customSet, gameId, onBack, onExit })
   }
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-//   📂 단계별 게임 선택 메뉴
-// ══════════════════════════════════════════════════════════════════════════
 function PhonicsGameMenu({ studentName, levelId, onBack, onExit }) {
   const [selectedGame, setSelectedGame] = useState(null);
   const [showClassMode, setShowClassMode] = useState(false);
   const level = PHONICS_LEVELS.find(l => l.id === levelId);
   const progress = useMemo(() => getProgress(studentName), [studentName, selectedGame]);
 
-  // 단계별 사용 가능한 게임 목록
   const games = useMemo(() => {
     const all = [
       { id: "alphabet-sound",  icon: "🔊", label: "알파벳 소리 듣기",   desc: "글자 보고 소리 따라하기", levels: ["alphabet"] },
       { id: "first-sound",     icon: "🎵", label: "첫소리 맞추기",       desc: "단어 듣고 첫글자 고르기", levels: ["alphabet", "cvc", "blends"] },
       { id: "cvc-blank",       icon: "🔤", label: "CVC 빈칸 채우기",     desc: "c_t 보고 가운데 모음 고르기", levels: ["cvc"] },
-      { id: "picture-letter",  icon: "🖼️", label: "그림 보고 첫글자",   desc: "이모지 보고 알파벳 고르기", levels: ["alphabet", "cvc", "blends", "sight"] },
+      { id: "picture-letter",  icon: "🖼️", label: "그림 보고 첫글자",   desc: "그림 보고 알파벳 고르기", levels: ["alphabet", "cvc", "blends", "sight"] },
       { id: "build-word",      icon: "🧩", label: "단어 만들기",        desc: "소리 듣고 순서대로 클릭", levels: ["cvc", "magic-e", "blends"] },
     ];
     return all.filter(g => g.levels.includes(levelId));
   }, [levelId]);
 
-  // 수업 모드용 단어 (현재 단계의 모든 단어)
   const classWords = useMemo(() => getPhonicsWords(levelId), [levelId]);
 
   if (showClassMode) {
@@ -458,7 +431,6 @@ function PhonicsGameMenu({ studentName, levelId, onBack, onExit }) {
       </div>
 
       <div style={{ display: "grid", gap: 10 }}>
-        {/* 📖 수업 모드 (눈에 띄게 - 첫 번째) */}
         <Card onClick={() => { playClick(); setShowClassMode(true); }}
           style={{
             padding: 14, display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
@@ -516,9 +488,6 @@ function PhonicsGameMenu({ studentName, levelId, onBack, onExit }) {
   );
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-//   🎮 게임 실행기 — 게임 ID에 따라 적절한 게임 컴포넌트 실행
-// ══════════════════════════════════════════════════════════════════════════
 function PhonicsGameRunner({ studentName, levelId, gameId, onBack, onExit }) {
   const props = { studentName, levelId, gameId, onBack, onExit };
   switch (gameId) {
@@ -532,10 +501,7 @@ function PhonicsGameRunner({ studentName, levelId, gameId, onBack, onExit }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//   GAME 1: 🔊 알파벳 소리 듣고 따라하기
-//   - 알파벳 보고 클릭 → 글자/소리/대표단어/이모지 표시
-//   - "들었어요!" 버튼 누르면 다음 글자
-//   - 학습형 게임 (정/오답 없음, 완주 시 별 3개)
+//   GAME 1: 🔊 알파벳 소리 듣기
 // ══════════════════════════════════════════════════════════════════════════
 function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
   const [order] = useState(() => shuffle(ALPHABET_DATA));
@@ -547,7 +513,6 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
   const current = order[idx];
 
   useEffect(() => {
-    // 자동 발음 재생
     if (current) {
       const t = setTimeout(() => {
         speakLetter(current.letter);
@@ -598,7 +563,6 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
         borderRadius: 24, padding: "40px 24px", textAlign: "center",
         color: "white", marginBottom: 20
       }}>
-        {/* 큰 알파벳 */}
         <div style={{
           fontSize: 140, fontWeight: 900, lineHeight: 1,
           marginBottom: 8, textShadow: "0 4px 12px rgba(0,0,0,0.2)"
@@ -614,7 +578,6 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
         <div style={{ fontSize: 14, opacity: 0.85, marginTop: 4 }}>{current.ko}</div>
       </div>
 
-      {/* 다시 듣기 */}
       <button onClick={() => { speakLetter(current.letter); setTimeout(() => speakWord(current.word), 1000); }}
         style={{
           width: "100%", padding: 14, background: T.card,
@@ -624,7 +587,6 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
         🔊 다시 듣기
       </button>
 
-      {/* 다음 */}
       <button onClick={next} style={{
         width: "100%", padding: 18, background: T.green,
         color: "white", border: "none", borderRadius: 14,
@@ -638,7 +600,6 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
 
 // ══════════════════════════════════════════════════════════════════════════
 //   GAME 2: 🎵 첫소리 맞추기
-//   - 단어 듣기 + 그림 → 첫글자 4지선다
 // ══════════════════════════════════════════════════════════════════════════
 function FirstSoundGame({ studentName, levelId, gameId, onBack, onExit, customWords }) {
   const [rounds] = useState(() => {
@@ -648,7 +609,7 @@ function FirstSoundGame({ studentName, levelId, gameId, onBack, onExit, customWo
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
-  const [feedback, setFeedback] = useState(null); // "correct" | "wrong" | null
+  const [feedback, setFeedback] = useState(null);
   const [done, setDone] = useState(false);
   const angela = useAngela();
   const [confettiTrigger, setConfettiTrigger] = useState(0);
@@ -765,7 +726,7 @@ function FirstSoundGame({ studentName, levelId, gameId, onBack, onExit, customWo
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//   GAME 3: 🔤 CVC 빈칸 채우기 (c_t)
+//   GAME 3: 🔤 CVC 빈칸 채우기
 // ══════════════════════════════════════════════════════════════════════════
 function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
   const [rounds] = useState(() => {
@@ -783,7 +744,6 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
   const current = rounds[idx];
   const parts = useMemo(() => current ? makeCVCBlank(current.word) : null, [current]);
 
-  // 4지선다 모음 (정답 + 오답 3개)
   const choices = useMemo(() => {
     if (!parts) return [];
     const vowels = ["a", "e", "i", "o", "u"];
@@ -861,7 +821,6 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
         <div style={{ fontSize: 80, marginBottom: 12 }}>{current.emoji}</div>
         <div style={{ fontSize: 14, color: T.textMid, marginBottom: 4 }}>{current.ko}</div>
 
-        {/* 단어 빈칸 */}
         <div style={{
           fontSize: 72, fontWeight: 900, fontFamily: "monospace",
           marginTop: 12, marginBottom: 16, color: T.text,
@@ -915,21 +874,15 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//   GAME 4: 🖼️ 그림 보고 첫글자 고르기 (Cloudinary 큐레이션 이미지)
-//   - 큐레이션 이미지 URL 직접 사용 (API 호출 X)
-//   - 없는 단어는 자동으로 단어 풀에서 제외
-//   - 💡 힌트 버튼 유지
-//   - 이미지 로드 실패 시 이모지 폴백
+//   GAME 4: 🖼️ 그림 보고 첫글자 (✨ Cloudinary 큐레이션 이미지 + 힌트 버튼)
 // ══════════════════════════════════════════════════════════════════════════
 function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, customWords }) {
   const [rounds] = useState(() => {
     const source = customWords || getPhonicsWords(levelId);
-    // 1단계: 추상 단어 필터링 (big, hot, the, and 등 제외)
-    const pictureable = filterPictureableWords(source);
-    // 2단계: 큐레이션 이미지가 있는 단어만 사용 (커스텀 단어집은 예외)
+    // 큐레이션된 이미지가 있는 단어만 사용 (커스텀 단어집은 이모지 허용)
     const withImages = customWords
-      ? pictureable  // 커스텀 단어집은 이모지 폴백 허용
-      : pictureable.filter(w => hasCuratedImage(w.word));
+      ? source
+      : source.filter(w => hasCuratedImage(w.word));
     return shuffle(withImages).slice(0, Math.min(10, withImages.length));
   });
   const [idx, setIdx] = useState(0);
@@ -946,7 +899,6 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
   const choices = useMemo(() => current ? makeAlphabetChoices(getFirstLetter(current.word)) : [], [current]);
   const imageUrl = useMemo(() => current ? getCuratedImageUrl(current.word) : null, [current]);
 
-  // 단어 바뀔 때 힌트/에러 초기화
   useEffect(() => {
     setShowHint(false);
     setImageError(false);
@@ -1041,7 +993,7 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
           </button>
         )}
 
-        {/* 이미지 영역 */}
+        {/* 이미지 영역 (Cloudinary 큐레이션 또는 이모지 폴백) */}
         <div style={{
           width: "100%", maxWidth: 320, height: 240,
           margin: "0 auto 14px",
@@ -1061,7 +1013,6 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
               }}
             />
           ) : (
-            // 이모지 폴백 (커스텀 단어집이거나 이미지 로드 실패 시)
             <div style={{ fontSize: 130, lineHeight: 1 }}>{current.emoji}</div>
           )}
         </div>
@@ -1085,7 +1036,6 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
           </div>
         )}
 
-        {/* 정답 시: 단어 + 한글 뜻 */}
         {feedback === "correct" && (
           <div style={{ fontSize: 26, fontWeight: 900, color: T.green, marginTop: 10 }}>
             {current.word} <span style={{ fontSize: 16, opacity: 0.85 }}>({current.ko})</span>
@@ -1119,9 +1069,8 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//   GAME 5: 🧩 소리 듣고 단어 만들기 (c-a-t 순서대로)
+//   공통: 빈 풀이 메시지
 // ══════════════════════════════════════════════════════════════════════════
-// ── 공통: 단어 풀이 비어있을 때 안내 ──
 function EmptyPoolMessage({ onBack, message }) {
   return (
     <div style={{ padding: 20, maxWidth: 480, margin: "40px auto 0", textAlign: "center" }}>
@@ -1138,9 +1087,11 @@ function EmptyPoolMessage({ onBack, message }) {
   );
 }
 
+// ══════════════════════════════════════════════════════════════════════════
+//   GAME 5: 🧩 소리 듣고 단어 만들기
+// ══════════════════════════════════════════════════════════════════════════
 function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWords }) {
   const [rounds] = useState(() => {
-    // 단어 만들기는 3~5글자 단어만 사용 (UI 그리드 깨짐 방지)
     const source = customWords || getPhonicsWords(levelId);
     const all = source.filter(w => w.word && w.word.length >= 3 && w.word.length <= 5);
     return shuffle(all).slice(0, 10);
@@ -1149,7 +1100,7 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const [feedback, setFeedback] = useState(null);
-  const [builtLetters, setBuiltLetters] = useState([]); // 학생이 클릭한 순서
+  const [builtLetters, setBuiltLetters] = useState([]);
   const [done, setDone] = useState(false);
   const angela = useAngela();
   const [confettiTrigger, setConfettiTrigger] = useState(0);
@@ -1157,15 +1108,11 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
   const current = rounds[idx];
   const targetWord = current?.word.toLowerCase() || "";
 
-  // 단어의 글자를 객체 배열로 (중복 글자도 별개 entry로 다룸)
-  // 예: "egg" → [{id:0, letter:"e"}, {id:1, letter:"g"}, {id:2, letter:"g"}]
   const letterChoices = useMemo(() => {
     if (!current || !targetWord) return [];
-    // 단어 글자 (중복 포함)
     const wordEntries = targetWord.split("").map((letter, i) => ({
       id: `w${i}`, letter
     }));
-    // 단어에 없는 글자 중 오답 2개 추가 (단어가 짧으면 늘림)
     const allLetters = "abcdefghijklmnopqrstuvwxyz".split("");
     const inWord = new Set(targetWord);
     const wrongs = allLetters.filter(l => !inWord.has(l));
@@ -1191,7 +1138,6 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
     setBuiltLetters(nextLetters);
     playClick();
 
-    // 단어 완성됐는지 체크
     if (nextLetters.length === targetWord.length) {
       const built = nextLetters.map(l => l.letter).join("");
       const correct = built === targetWord;
@@ -1234,7 +1180,6 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
     setBuiltLetters(prev => prev.slice(0, -1));
   };
 
-  // rounds가 비어있으면 — 단어가 없는 경우
   if (!current) {
     return <EmptyPoolMessage onBack={onBack} message="이 단계엔 단어 만들기를 할 단어가 없어요 (3-5글자 단어만 지원)" />;
   }
@@ -1243,7 +1188,6 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
     return <FinishScreen score={score} total={rounds.length} levelId={levelId} onBack={onBack} onExit={onExit} />;
   }
 
-  // 글자 보기 동적 그리드 (5개 이하면 한 줄, 6개 이상이면 두 줄)
   const cols = Math.min(5, letterChoices.length);
 
   return (
@@ -1275,7 +1219,6 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
           🔊 다시 듣기
         </button>
 
-        {/* 만들고 있는 단어 */}
         <div style={{
           display: "flex", gap: 6, justifyContent: "center", marginBottom: 8, flexWrap: "wrap"
         }}>
@@ -1324,7 +1267,6 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
         )}
       </div>
 
-      {/* 글자 보기 */}
       <div style={{
         display: "grid",
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
@@ -1355,7 +1297,7 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//   공통: 게임 헤더 (뒤로/제목/진행률/점수/콤보)
+//   공통 컴포넌트
 // ══════════════════════════════════════════════════════════════════════════
 function GameHeader({ onBack, title, progress, total, score, combo }) {
   return (
@@ -1391,9 +1333,6 @@ function GameHeader({ onBack, title, progress, total, score, combo }) {
   );
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-//   공통: 게임 종료 화면
-// ══════════════════════════════════════════════════════════════════════════
 function FinishScreen({ score, total, levelId, onBack, onExit }) {
   const stars = getStars(score, total);
   const ratio = total > 0 ? score / total : 0;
@@ -1415,7 +1354,6 @@ function FinishScreen({ score, total, levelId, onBack, onExit }) {
           {score} / {total} 맞췄어요
         </div>
 
-        {/* 별 ⭐⭐⭐ */}
         <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 24 }}>
           {[1, 2, 3].map(i => (
             <span key={i} style={{

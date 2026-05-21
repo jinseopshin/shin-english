@@ -11,6 +11,7 @@ import {
 } from "./soundEffects";
 import { useAngela, getComboReaction, getFinishReaction, FullScreenConfetti } from "./AngelaMascot";
 import { PhonicsClassMode } from "./PhonicsClassMode";
+import { fetchWordImage } from "./pexelsImage";
 
 // ══════════════════════════════════════════════════════════════════════════
 //   🔤 PhonicsGames.js — 유치부 파닉스 게임 5종
@@ -913,8 +914,10 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//   GAME 4: 🖼️ 그림 보고 첫글자 고르기
-//   - 첫소리 맞추기와 비슷하지만 소리 없이 그림만 보고 푸는 시각적 게임
+//   GAME 4: 🖼️ 그림 보고 첫글자 고르기 (Pexels 이미지 + 힌트 버튼)
+//   - Pexels API에서 실제 사진 로드
+//   - 로드 실패/없을 때 기존 이모지 폴백
+//   - 💡 힌트 버튼: 누르면 단어 텍스트 표시
 // ══════════════════════════════════════════════════════════════════════════
 function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, customWords }) {
   const [rounds] = useState(() => {
@@ -926,11 +929,37 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
   const [combo, setCombo] = useState(0);
   const [feedback, setFeedback] = useState(null);
   const [done, setDone] = useState(false);
+  const [showHint, setShowHint] = useState(false); // 💡 힌트 표시 여부
+  const [imageUrl, setImageUrl] = useState(null);  // 현재 단어의 Pexels 이미지
+  const [imageLoading, setImageLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const angela = useAngela();
   const [confettiTrigger, setConfettiTrigger] = useState(0);
 
   const current = rounds[idx];
   const choices = useMemo(() => current ? makeAlphabetChoices(getFirstLetter(current.word)) : [], [current]);
+
+  // ── 단어가 바뀔 때마다 Pexels 이미지 로드 + 힌트 초기화 ──
+  useEffect(() => {
+    if (!current) return;
+    let cancelled = false;
+    setShowHint(false);
+    setImageUrl(null);
+    setImageError(false);
+    setImageLoading(true);
+
+    fetchWordImage(current.word).then(url => {
+      if (cancelled) return;
+      if (url) {
+        setImageUrl(url);
+      } else {
+        setImageError(true); // 이모지 폴백 트리거
+      }
+      setImageLoading(false);
+    });
+
+    return () => { cancelled = true; };
+  }, [idx]);
 
   const handleChoice = (letter) => {
     if (feedback) return;
@@ -941,7 +970,6 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
       const newCombo = combo + 1;
       setCombo(newCombo);
       setScore(s => s + 1);
-      // 정답 시 단어 발음 보너스
       setTimeout(() => speakWord(current.word), 200);
       if (newCombo >= 3) {
         setTimeout(() => angela.show(getComboReaction(newCombo)), 400);
@@ -968,6 +996,11 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
     }, 1500);
   };
 
+  const handleHint = () => {
+    playClick();
+    setShowHint(true);
+  };
+
   if (done) {
     return <FinishScreen score={score} total={rounds.length} levelId={levelId} onBack={onBack} onExit={onExit} />;
   }
@@ -975,6 +1008,10 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
   if (!current) {
     return <EmptyPoolMessage onBack={onBack} />;
   }
+
+  // 단어의 첫글자만 가리고 나머지는 보여주기 (힌트용)
+  const firstLetter = current.word.charAt(0);
+  const restOfWord = current.word.slice(1);
 
   return (
     <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
@@ -991,16 +1028,85 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
 
       <div style={{
         background: `linear-gradient(135deg, ${T.yellowLight}, ${T.pinkLight})`,
-        borderRadius: 24, padding: "40px 20px",
-        textAlign: "center", marginBottom: 16
+        borderRadius: 24, padding: "30px 20px 24px",
+        textAlign: "center", marginBottom: 16,
+        position: "relative"
       }}>
-        <div style={{ fontSize: 130, marginBottom: 8, lineHeight: 1 }}>{current.emoji}</div>
+        {/* 💡 힌트 버튼 (우측 상단) */}
+        {!showHint && feedback === null && (
+          <button
+            onClick={handleHint}
+            title="힌트 보기"
+            style={{
+              position: "absolute", top: 12, right: 12,
+              background: "rgba(255,255,255,0.85)",
+              border: `1.5px solid ${T.orange}`,
+              borderRadius: 20, padding: "6px 12px",
+              fontSize: 12, fontWeight: 800,
+              color: T.orange, cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 4,
+              boxShadow: "0 2px 6px rgba(0,0,0,0.08)"
+            }}
+          >
+            💡 힌트
+          </button>
+        )}
+
+        {/* 이미지 영역 (Pexels 또는 이모지 폴백) */}
+        <div style={{
+          width: "100%", maxWidth: 280, height: 220,
+          margin: "0 auto 14px",
+          borderRadius: 16, overflow: "hidden",
+          background: "rgba(255,255,255,0.6)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)"
+        }}>
+          {imageLoading && (
+            <div style={{ fontSize: 13, color: T.textMid, fontWeight: 700 }}>
+              <div style={{ fontSize: 40, marginBottom: 8 }}>🖼️</div>
+              그림 불러오는 중...
+            </div>
+          )}
+          {!imageLoading && imageUrl && !imageError && (
+            <img
+              src={imageUrl}
+              alt={current.word}
+              onError={() => setImageError(true)}
+              style={{
+                width: "100%", height: "100%",
+                objectFit: "cover", display: "block"
+              }}
+            />
+          )}
+          {!imageLoading && (imageError || !imageUrl) && (
+            // 이모지 폴백
+            <div style={{ fontSize: 130, lineHeight: 1 }}>{current.emoji}</div>
+          )}
+        </div>
+
         <div style={{ fontSize: 13, color: T.textMid, fontWeight: 700 }}>
           이 그림의 첫 글자는?
         </div>
+
+        {/* 💡 힌트 표시: 첫글자만 가린 단어 */}
+        {showHint && feedback === null && (
+          <div style={{
+            marginTop: 12,
+            display: "inline-flex", gap: 4,
+            background: "rgba(255,255,255,0.7)",
+            padding: "8px 16px", borderRadius: 12,
+            border: `1.5px dashed ${T.orange}`,
+            fontFamily: "monospace", letterSpacing: 2
+          }}>
+            <span style={{ fontSize: 22, fontWeight: 900, color: T.orange }}>_</span>
+            <span style={{ fontSize: 22, fontWeight: 900, color: T.text }}>{restOfWord}</span>
+          </div>
+        )}
+
+        {/* 정답 시: 전체 단어 + 한글 뜻 */}
         {feedback === "correct" && (
-          <div style={{ fontSize: 28, fontWeight: 900, color: T.green, marginTop: 8 }}>
-            {current.word} ({current.ko})
+          <div style={{ fontSize: 26, fontWeight: 900, color: T.green, marginTop: 10 }}>
+            {current.word} <span style={{ fontSize: 16, opacity: 0.85 }}>({current.ko})</span>
           </div>
         )}
       </div>
@@ -1029,6 +1135,7 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
     </div>
   );
 }
+
 
 // ══════════════════════════════════════════════════════════════════════════
 //   GAME 5: 🧩 소리 듣고 단어 만들기 (c-a-t 순서대로)

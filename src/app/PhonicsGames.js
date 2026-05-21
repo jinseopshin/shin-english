@@ -11,7 +11,7 @@ import {
 } from "./soundEffects";
 import { useAngela, getComboReaction, getFinishReaction, FullScreenConfetti } from "./AngelaMascot";
 import { PhonicsClassMode } from "./PhonicsClassMode";
-import { fetchWordImage } from "./pexelsImage";
+import { fetchWordImage } from "./pixabayImage";
 import { filterPictureableWords } from "./pictureableWords";
 
 // ══════════════════════════════════════════════════════════════════════════

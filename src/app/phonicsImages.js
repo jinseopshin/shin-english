@@ -13,7 +13,7 @@
 // ── Cloudinary base URL (사용자 ID 부분만 한 번 정의) ──
 // 예: "https://res.cloudinary.com/dXXXXXXXX/image/upload/"
 // 진섭님의 Cloudinary 계정 URL로 교체하세요
-const CLOUDINARY_BASE = "https://res.cloudinary.com/YOUR_CLOUD_NAME/image/upload/";
+const CLOUDINARY_BASE = "https://res.cloudinary.com/dfgyp3ovs/image/upload/";
 
 // ── 이미지 변환 옵션 (자동 최적화) ──
 // f_auto: 브라우저에 맞춰 WebP/AVIF 자동 변환

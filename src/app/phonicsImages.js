@@ -1,15 +1,11 @@
 // ══════════════════════════════════════════════════════════════════════════
 //   🖼️ phonicsImages.js — 단어 → Cloudinary URL 매핑
-//   v4.5 — Public ID에서 폴더 접두사 제거 (Cloudinary 실제 ID에 맞춤)
+//   v4.7 — Magic E 완전체 (정지 이미지 + 동작감 표현 강화)
 // ══════════════════════════════════════════════════════════════════════════
 
 const CLOUDINARY_BASE = "https://res.cloudinary.com/dfgyp3ovs/image/upload/";
-
-// 이미지 변환 옵션 (자동 최적화)
 const TRANSFORM = "f_auto,q_auto,w_400,h_300,c_fill/";
 
-// ── 단어 → Cloudinary public_id 매핑 ──
-// 진섭님 Cloudinary는 폴더에 있어도 Public ID에 폴더명 없이 단어만 사용
 const WORD_TO_PUBLIC_ID = {
   // ═══ Level 1: 알파벳 26개 ═══
   apple:    "apple",
@@ -40,47 +36,14 @@ const WORD_TO_PUBLIC_ID = {
   zebra:    "zebra",
 
   // ═══ Level 2: CVC 전체 ═══
-  // Short A
-  bat:      "bat",
-  rat:      "rat",
-  mat:      "mat",
-  bag:      "bag",
-  map:      "map",
-  cap:      "cap",
-  fan:      "fan",
-  can:      "can",
-  // Short E
-  bed:      "bed",
-  hen:      "hen",
-  pen:      "pen",
-  ten:      "ten",
-  red:      "red",
-  leg:      "leg",
-  net:      "net",
-  web:      "web",
-  // Short I
-  six:      "six",
-  lip:      "lip",
-  kid:      "kid",
-  pin:      "pin",
-  milk:     "milk",
-  // Short O
-  fox:      "fox",
-  pot:      "pot",
-  log:      "log",
-  mop:      "mop",
-  rock:     "rock",
-  frog:     "frog",
-  // Short U
-  bus:      "bus",
-  cup:      "cup",
-  duck:     "duck",
-  nut:      "nut",
-  bug:      "bug",
-  drum:     "drum",
-  mug:      "mug",
+  bat: "bat", rat: "rat", mat: "mat", bag: "bag", map: "map", cap: "cap", fan: "fan", can: "can",
+  bed: "bed", hen: "hen", pen: "pen", ten: "ten", red: "red", leg: "leg", net: "net", web: "web",
+  six: "six", lip: "lip", kid: "kid", pin: "pin", milk: "milk",
+  fox: "fox", pot: "pot", log: "log", mop: "mop", rock: "rock", frog: "frog",
+  bus: "bus", cup: "cup", duck: "duck", nut: "nut", bug: "bug", drum: "drum", mug: "mug",
 
-  // ═══ Level 3: Magic E 6개 ═══
+  // ═══ Level 3: Magic E 전체 30개 ═══
+  // 이미 완료한 long 단어들
   cape:     "cape",
   tape:     "tape",
   kite:     "kite",
@@ -88,8 +51,36 @@ const WORD_TO_PUBLIC_ID = {
   ride:     "ride",
   tube:     "tube",
 
+  // a_e 추가 (동작감 강화 이미지)
+  mad:      "mad",
+  made:     "made",
+  tap:      "tap",
+  rate:     "rate",
+  fad:      "fad",
+  fade:     "fade",
+
+  // i_e 추가
+  bit:      "bit",
+  bite:     "bite",
+  kit:      "kit",
+  rid:      "rid",
+  hid:      "hid",
+  hide:     "hide",
+
+  // o_e 추가
+  hop:      "hop",
+  hope:     "hope",
+  rod:      "rod",
+  rode:     "rode",
+  not:      "not",
+  note:     "note",
+
+  // u_e 추가
+  cut:      "cut",
+  cute:     "cute",
+  tub:      "tub",
+
   // ═══ Level 4: Blends (대기 중) ═══
-  // 완료한 단어만 주석 해제하세요
   // chair:    "chair",
   // cheese:   "cheese",
   // chicken:  "chicken",
@@ -112,7 +103,6 @@ const WORD_TO_PUBLIC_ID = {
   // fruit:    "fruit",
 };
 
-// ── 메인 함수: 단어로 이미지 URL 가져오기 ──
 export function getCuratedImageUrl(word) {
   if (!word) return null;
   const key = word.toLowerCase().trim();
@@ -121,7 +111,6 @@ export function getCuratedImageUrl(word) {
   return `${CLOUDINARY_BASE}${TRANSFORM}${publicId}`;
 }
 
-// ── 단어가 큐레이션 되어 있는지 확인 ──
 export function hasCuratedImage(word) {
   if (!word) return false;
   return WORD_TO_PUBLIC_ID[word.toLowerCase().trim()] !== undefined;

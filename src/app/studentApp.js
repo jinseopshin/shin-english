@@ -22,6 +22,7 @@ import { MyWordbook } from "./MyWordbook";
 import { PhonicsMenu } from "./PhonicsGames";
 import { PronunciationGame } from "./PronunciationGame";
 import { PronunciationWidget } from "./PronunciationWidget";
+import { SentenceBuilderMenu } from "./SentenceBuilderGame";
 import { getTodayReviewWords } from "./studentWords";
 import { isSoundEnabled, setSoundEnabled, getVolume, setVolume, playClick } from "./soundEffects";
 
@@ -340,6 +341,7 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
   if (screen === "game-search")   return <WordSearchGame  name={name} setStudents={setStudents} onExit={exitGame} />;
   if (screen === "game-dictation")return <DictationGame   name={name} setStudents={setStudents} onExit={exitGame} />;
   if (screen === "game-pronunciation") return <PronunciationGame name={name} setStudents={setStudents} student={me} onExit={exitGame} />;
+  if (screen === "sentence-builder") return <SentenceBuilderMenu studentName={name} onExit={exitGame} />;
   if (screen === "quiz" && quizSet) return <StudentQuiz name={name} setStudents={setStudents} qset={quizSet} onExit={() => { setScreen("home"); setQuizSet(null); }} />;
 
   const hour = new Date().getHours();
@@ -781,6 +783,21 @@ export function StudentHome({ name, bank, setStudents, students, onLogout, darkM
               <div style={{ fontSize: 30, marginBottom: 4 }}>✅</div>
               <div style={{ fontSize: 13, fontWeight: 900, color: T.green }}>복습 완료!</div>
               <div style={{ fontSize: 10, color: T.textMid, marginTop: 3 }}>오늘 복습할 단어가 없어요</div>
+            </Card>
+
+{/* 📝 문장 만들기 (다음 단계 학습) */}
+            <Card onClick={() => setScreen("sentence-builder")} style={{
+              marginBottom: 14, padding: "14px 16px",
+              background: `linear-gradient(135deg, #f59e0b, #f97316)`,
+              color: "white", cursor: "pointer", border: "none",
+              display: "flex", alignItems: "center", gap: 12,
+            }}>
+              <div style={{ fontSize: 32 }}>📝</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 900 }}>문장 만들기</div>
+                <div style={{ fontSize: 11, opacity: 0.9, marginTop: 2 }}>섞인 단어로 문장을 완성해요</div>
+              </div>
+              <div style={{ fontSize: 20, opacity: 0.7 }}>›</div>
             </Card>
           )}
 

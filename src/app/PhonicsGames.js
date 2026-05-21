@@ -11,7 +11,6 @@ import {
 } from "./soundEffects";
 import { useAngela, getComboReaction, getFinishReaction, FullScreenConfetti } from "./AngelaMascot";
 import { PhonicsClassMode } from "./PhonicsClassMode";
-import { SentenceBuilderMenu } from "./SentenceBuilderGame";
 // ✨ 새로 추가: Cloudinary 큐레이션 이미지
 import { getCuratedImageUrl, hasCuratedImage, preloadImages } from "./phonicsImages";
 
@@ -87,24 +86,13 @@ function shuffle(arr) {
 export function PhonicsMenu({ studentName, onExit }) {
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [selectedCustomSet, setSelectedCustomSet] = useState(null);
-  const [showSentenceBuilder, setShowSentenceBuilder] = useState(false);
   const progress = useMemo(() => getProgress(studentName), [studentName]);
-
   const myAssignedSets = useMemo(() => getStudentAssignedSets(studentName), [studentName]);
   const publicSets = useMemo(() => {
     const assignedIds = new Set(myAssignedSets.map(s => s.id));
     return getPublicSets().filter(s => !assignedIds.has(s.id));
   }, [myAssignedSets]);
-
-if (showSentenceBuilder) {
-    return (
-      <SentenceBuilderMenu
-        studentName={studentName}
-        onExit={() => setShowSentenceBuilder(false)}
-      />
-    );
-  }
-  
+ 
   if (selectedCustomSet) {
     return (
       <CustomSetMenu
@@ -226,81 +214,6 @@ if (showSentenceBuilder) {
         </div>
       )}
 
-      {/* 📝 문장 만들기 (신규) */}
-      <div style={{ marginBottom: 18 }}>
-        <div style={{
-          fontSize: 13, fontWeight: 800, color: T.text,
-          marginBottom: 8, display: "flex", alignItems: "center", gap: 6
-        }}>
-          <span style={{ fontSize: 16 }}>📝</span>
-          문장 만들기
-        </div>
-        <Card onClick={() => { playClick(); setShowSentenceBuilder(true); }}
-          style={{
-            padding: 14, cursor: "pointer",
-            background: `linear-gradient(135deg, #fef3c7, white)`,
-            borderLeft: `5px solid #f59e0b`,
-            display: "flex", alignItems: "center", gap: 14
-          }}>
-          <div style={{ fontSize: 36 }}>📝</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 900, color: T.text, marginBottom: 4 }}>
-              문장 만들기
-            </div>
-            <div style={{ fontSize: 11, color: T.textMid }}>
-              섞인 단어를 순서대로 클릭해서 문장을 완성해요
-            </div>
-          </div>
-          <div style={{ fontSize: 20, color: T.textDim }}>›</div>
-        </Card>
-      </div>  
-        
-      <div style={{
-        fontSize: 13, fontWeight: 800, color: T.text,
-        marginBottom: 8, display: "flex", alignItems: "center", gap: 6
-      }}>
-        <span style={{ fontSize: 16 }}>📚</span>
-        기본 단계
-      </div>
-      <div style={{ display: "grid", gap: 10 }}>
-        {PHONICS_LEVELS.map((lv, idx) => {
-          const stars = Math.max(
-            ...["alphabet-sound", "first-sound", "cvc-blank", "picture-letter", "build-word"]
-              .map(g => (progress[`${lv.id}_${g}`]?.bestStars || 0))
-          );
-          return (
-            <Card key={lv.id} onClick={() => { playClick(); setSelectedLevel(lv.id); }}
-              style={{
-                padding: 14,
-                background: `linear-gradient(135deg, ${lv.bg}, white)`,
-                borderLeft: `5px solid ${lv.color}`,
-                cursor: "pointer",
-                display: "flex", alignItems: "center", gap: 14
-              }}>
-              <div style={{ fontSize: 36 }}>{lv.icon}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                  <span style={{ fontSize: 10, color: T.textMid, fontWeight: 700 }}>STEP {idx+1}</span>
-                  <span style={{ fontSize: 14, fontWeight: 900, color: T.text }}>{lv.label}</span>
-                </div>
-                <div style={{ fontSize: 10, color: T.textMid, marginBottom: 4 }}>{lv.desc}</div>
-                <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
-                  {[1, 2, 3].map(i => (
-                    <span key={i} style={{ fontSize: 13, opacity: stars >= i ? 1 : 0.25 }}>⭐</span>
-                  ))}
-                  <span style={{ fontSize: 10, color: T.textDim, marginLeft: 4 }}>
-                    · {lv.count}개 단어
-                  </span>
-                </div>
-              </div>
-              <div style={{ fontSize: 20, color: T.textDim }}>›</div>
-            </Card>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 // ══════════════════════════════════════════════════════════════════════════
 //   📦 커스텀 단어집 메뉴

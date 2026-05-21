@@ -5,20 +5,15 @@ import {
   PHONICS_LEVELS, getPhonicsWords, getCustomSet
 } from "./phonicsData";
 import { playClick, isSoundEnabled } from "./soundEffects";
-// ✨ Cloudinary 큐레이션 이미지 import 추가
-import { getCuratedImageUrl, hasCuratedImage } from "./phonicsImages";
+// ⚡ v4: 큐레이션 이미지 + 사전 로드
+import { getCuratedImageUrl, hasCuratedImage, preloadImage, preloadImages } from "./phonicsImages";
 
 // ══════════════════════════════════════════════════════════════════════════
-//   📖 PhonicsClassMode.js — 수업 모드
-//   선생님과 학생이 같이 보면서 천천히 단어를 익히는 모드
-//   - 큰 화면 카드형 표시
-//   - 자동 발음 (선택 가능)
-//   - 다시듣기 / 이전 / 다음
-//   - 정답/오답 없음 (학습 중심)
-//   - ✨ v2: Cloudinary 큐레이션 이미지 우선, 없으면 이모지 폴백
+//   📖 PhonicsClassMode.js v4 — 수업 모드 (속도 최적화)
+//   - Cloudinary 큐레이션 이미지 우선, 이모지 폴백
+//   - 다음 카드 이미지 사전 로드 (체감 즉시 표시)
 // ══════════════════════════════════════════════════════════════════════════
 
-// TTS 발음
 function speakEN(text, rate = 0.85) {
   if (typeof window === "undefined" || !window.speechSynthesis) return;
   if (!isSoundEnabled()) return;
@@ -32,9 +27,6 @@ function speakEN(text, rate = 0.85) {
   } catch {}
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-//   메인 컴포넌트: 단어 카드 1개씩 큰 화면에 표시
-// ══════════════════════════════════════════════════════════════════════════
 export function PhonicsClassMode({ words, title, levelId, onExit }) {
   const [idx, setIdx] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
@@ -45,8 +37,21 @@ export function PhonicsClassMode({ words, title, levelId, onExit }) {
   const level = PHONICS_LEVELS.find(l => l.id === levelId);
   const current = words?.[idx];
 
-  // ✨ 큐레이션 이미지 URL 가져오기
   const imageUrl = useMemo(() => current ? getCuratedImageUrl(current.word) : null, [current]);
+
+  // ⚡ 컴포넌트 마운트 시: 처음 3개 단어 사전 로드 (시작 빠르게)
+  useEffect(() => {
+    if (!words || words.length === 0) return;
+    const initialBatch = words.slice(0, 3);
+    preloadImages(initialBatch);
+  }, [words]);
+
+  // ⚡ 현재 카드 변경 시: 다음 2개 단어 사전 로드 (카드 넘김 즉시)
+  useEffect(() => {
+    if (!words) return;
+    const nextWords = words.slice(idx + 1, idx + 3);
+    preloadImages(nextWords);
+  }, [idx, words]);
 
   // 슬라이드 변경 시 자동 발음 + 이미지 에러 초기화
   useEffect(() => {
@@ -71,7 +76,6 @@ export function PhonicsClassMode({ words, title, levelId, onExit }) {
     }
   };
 
-  // 키보드 단축키
   useEffect(() => {
     const handler = (e) => {
       if (e.key === "ArrowLeft") goPrev();
@@ -184,18 +188,18 @@ export function PhonicsClassMode({ words, title, levelId, onExit }) {
             position: "relative",
             overflow: "hidden"
           }}>
-          {/* 배경 데코 */}
           <div style={{
             position: "absolute", top: -40, right: -40,
             fontSize: 200, opacity: 0.05,
             transform: "rotate(15deg)", pointerEvents: "none"
           }}>{current.emoji || "📝"}</div>
 
-          {/* ✨ 이미지 또는 이모지 */}
+          {/* 이미지 또는 이모지 폴백 */}
           {showImage ? (
             <img
               src={imageUrl}
               alt={current.word}
+              loading="lazy"
               onError={() => setImageError(true)}
               style={{
                 width: "100%", maxWidth: 320, height: 240,
@@ -214,7 +218,6 @@ export function PhonicsClassMode({ words, title, levelId, onExit }) {
             </div>
           )}
 
-          {/* 영어 단어 */}
           {showWord && (
             <div style={{
               fontSize: 64, fontWeight: 900,
@@ -226,7 +229,6 @@ export function PhonicsClassMode({ words, title, levelId, onExit }) {
             </div>
           )}
 
-          {/* 한글 뜻 */}
           {showKo && current.ko && (
             <div style={{
               fontSize: 24, fontWeight: 700,
@@ -237,7 +239,6 @@ export function PhonicsClassMode({ words, title, levelId, onExit }) {
             </div>
           )}
 
-          {/* 클릭 안내 */}
           <div style={{
             fontSize: 11, color: T.textDim, marginTop: 20,
             position: "relative", zIndex: 1
@@ -298,7 +299,6 @@ export function PhonicsClassMode({ words, title, levelId, onExit }) {
           )}
         </div>
 
-        {/* 키보드 안내 */}
         <div style={{
           marginTop: 16, fontSize: 10, color: T.textDim,
           textAlign: "center", lineHeight: 1.6

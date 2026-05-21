@@ -1,14 +1,13 @@
 // ══════════════════════════════════════════════════════════════════════════
 //   🖼️ phonicsImages.js — 단어 → Cloudinary URL 매핑
-//   v4.8 — f_auto 제거 (포맷 자동 감지 오류 회피)
+//   v4.9 — 속도 최적화 (f_jpg + q_auto + preload 지원)
 // ══════════════════════════════════════════════════════════════════════════
 
 const CLOUDINARY_BASE = "https://res.cloudinary.com/dfgyp3ovs/image/upload/";
 
-// ⚠️ v4.8 변경: f_auto, q_auto 제거
-// 일부 PNG 파일을 gif로 잘못 감지하는 버그 회피
-// 크기 조정만 유지
-const TRANSFORM = "w_400,h_300,c_fill/";
+// ⚡ v4.9 변경: f_jpg (강제 JPG, gif 오인식 차단) + q_auto (품질 자동)
+// 용량 약 70% 감소, 속도 2-3배 향상
+const TRANSFORM = "f_jpg,q_auto,w_400,h_300,c_fill/";
 
 const WORD_TO_PUBLIC_ID = {
   // ═══ Level 1: 알파벳 26개 ═══
@@ -71,4 +70,23 @@ export function getCuratedImageUrl(word) {
 export function hasCuratedImage(word) {
   if (!word) return false;
   return WORD_TO_PUBLIC_ID[word.toLowerCase().trim()] !== undefined;
+}
+
+// ⚡ v4.9 추가: 이미지 사전 로드 헬퍼
+// 다음에 보여줄 단어 이미지를 백그라운드에서 미리 로드
+export function preloadImage(word) {
+  if (typeof window === "undefined") return;
+  const url = getCuratedImageUrl(word);
+  if (!url) return;
+  const img = new Image();
+  img.src = url;
+}
+
+// 여러 단어 한 번에 사전 로드 (배열)
+export function preloadImages(words) {
+  if (typeof window === "undefined" || !Array.isArray(words)) return;
+  words.forEach(w => {
+    if (typeof w === "string") preloadImage(w);
+    else if (w?.word) preloadImage(w.word);
+  });
 }

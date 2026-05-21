@@ -5,6 +5,8 @@ import {
   PHONICS_LEVELS, getPhonicsWords, getCustomSet
 } from "./phonicsData";
 import { playClick, isSoundEnabled } from "./soundEffects";
+// ✨ Cloudinary 큐레이션 이미지 import 추가
+import { getCuratedImageUrl, hasCuratedImage } from "./phonicsImages";
 
 // ══════════════════════════════════════════════════════════════════════════
 //   📖 PhonicsClassMode.js — 수업 모드
@@ -13,6 +15,7 @@ import { playClick, isSoundEnabled } from "./soundEffects";
 //   - 자동 발음 (선택 가능)
 //   - 다시듣기 / 이전 / 다음
 //   - 정답/오답 없음 (학습 중심)
+//   - ✨ v2: Cloudinary 큐레이션 이미지 우선, 없으면 이모지 폴백
 // ══════════════════════════════════════════════════════════════════════════
 
 // TTS 발음
@@ -31,23 +34,23 @@ function speakEN(text, rate = 0.85) {
 
 // ══════════════════════════════════════════════════════════════════════════
 //   메인 컴포넌트: 단어 카드 1개씩 큰 화면에 표시
-//   props:
-//   - words: [{ word, ko, emoji }] 배열
-//   - title: 단어집 이름
-//   - levelId: 단계 ID
-//   - onExit: 종료 콜백
 // ══════════════════════════════════════════════════════════════════════════
 export function PhonicsClassMode({ words, title, levelId, onExit }) {
   const [idx, setIdx] = useState(0);
-  const [autoPlay, setAutoPlay] = useState(true); // 자동 발음 재생
-  const [showKo, setShowKo] = useState(true); // 한글 뜻 표시
-  const [showWord, setShowWord] = useState(true); // 영어 단어 표시
+  const [autoPlay, setAutoPlay] = useState(true);
+  const [showKo, setShowKo] = useState(true);
+  const [showWord, setShowWord] = useState(true);
+  const [imageError, setImageError] = useState(false);
 
   const level = PHONICS_LEVELS.find(l => l.id === levelId);
   const current = words?.[idx];
 
-  // 슬라이드 변경 시 자동 발음
+  // ✨ 큐레이션 이미지 URL 가져오기
+  const imageUrl = useMemo(() => current ? getCuratedImageUrl(current.word) : null, [current]);
+
+  // 슬라이드 변경 시 자동 발음 + 이미지 에러 초기화
   useEffect(() => {
+    setImageError(false);
     if (current && autoPlay) {
       const t = setTimeout(() => speakEN(current.word, 0.8), 400);
       return () => clearTimeout(t);
@@ -68,7 +71,7 @@ export function PhonicsClassMode({ words, title, levelId, onExit }) {
     }
   };
 
-  // 키보드 단축키 (왼쪽/오른쪽 화살표, 스페이스)
+  // 키보드 단축키
   useEffect(() => {
     const handler = (e) => {
       if (e.key === "ArrowLeft") goPrev();
@@ -95,6 +98,7 @@ export function PhonicsClassMode({ words, title, levelId, onExit }) {
   if (!current) return null;
 
   const progress = ((idx + 1) / words.length) * 100;
+  const showImage = imageUrl && !imageError;
 
   return (
     <div style={{
@@ -121,7 +125,6 @@ export function PhonicsClassMode({ words, title, levelId, onExit }) {
             <div style={{ fontSize: 10, color: T.textMid }}>{idx + 1} / {words.length}</div>
           </div>
 
-          {/* 설정 토글 */}
           <button onClick={() => { playClick(); setAutoPlay(a => !a); }} title="자동 발음"
             style={{
               background: autoPlay ? T.accent : T.bg,
@@ -171,12 +174,12 @@ export function PhonicsClassMode({ words, title, levelId, onExit }) {
           style={{
             background: T.card,
             borderRadius: 32,
-            padding: "60px 30px",
+            padding: "40px 30px",
             textAlign: "center",
             boxShadow: "0 20px 60px rgba(0,0,0,0.1)",
             cursor: "pointer",
             minHeight: 480,
-            display: "flex", flexDirection: "column", justifyContent: "center",
+            display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",
             border: `3px solid ${level?.color || T.accent}`,
             position: "relative",
             overflow: "hidden"
@@ -188,13 +191,28 @@ export function PhonicsClassMode({ words, title, levelId, onExit }) {
             transform: "rotate(15deg)", pointerEvents: "none"
           }}>{current.emoji || "📝"}</div>
 
-          {/* 이모지 (가장 큼) */}
-          <div style={{
-            fontSize: 200, marginBottom: 20, lineHeight: 1,
-            position: "relative", zIndex: 1
-          }}>
-            {current.emoji || "📝"}
-          </div>
+          {/* ✨ 이미지 또는 이모지 */}
+          {showImage ? (
+            <img
+              src={imageUrl}
+              alt={current.word}
+              onError={() => setImageError(true)}
+              style={{
+                width: "100%", maxWidth: 320, height: 240,
+                objectFit: "contain",
+                marginBottom: 20,
+                borderRadius: 16,
+                position: "relative", zIndex: 1
+              }}
+            />
+          ) : (
+            <div style={{
+              fontSize: 200, marginBottom: 20, lineHeight: 1,
+              position: "relative", zIndex: 1
+            }}>
+              {current.emoji || "📝"}
+            </div>
+          )}
 
           {/* 영어 단어 */}
           {showWord && (
@@ -280,7 +298,7 @@ export function PhonicsClassMode({ words, title, levelId, onExit }) {
           )}
         </div>
 
-        {/* 키보드 안내 (데스크탑용) */}
+        {/* 키보드 안내 */}
         <div style={{
           marginTop: 16, fontSize: 10, color: T.textDim,
           textAlign: "center", lineHeight: 1.6

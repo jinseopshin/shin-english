@@ -7,6 +7,7 @@ import {
   AreaChart, Area
 } from "recharts";
 import { WORD_LEVELS, WORD_CATEGORIES, ALL_WORDS, getWordsForGrade } from "./wordData";
+import { T, Btn, Tag, Card, Input } from "./theme";
 
 // ══════════════════════════════════════════════════════════════════════════
 //   Angela's English Academy - features.js
@@ -14,19 +15,7 @@ import { WORD_LEVELS, WORD_CATEGORIES, ALL_WORDS, getWordsForGrade } from "./wor
 //   Phase 2: 주간 리그 / 문장 빈칸 게임 / 학부모 뷰어 / 월간 성적표 / 수업 일정
 // ══════════════════════════════════════════════════════════════════════════
 
-const T = {
-  bg:"#f0f7ff", card:"#ffffff", border:"#dce8ff",
-  accent:"#4f8ef7", accentDark:"#2563eb", accentLight:"#e8f0ff",
-  green:"#22c55e", greenLight:"#dcfce7",
-  red:"#ef4444", redLight:"#fee2e2",
-  yellow:"#f59e0b", yellowLight:"#fef3c7",
-  purple:"#a855f7", purpleLight:"#f3e8ff",
-  pink:"#ec4899", pinkLight:"#fce7f3",
-  orange:"#f97316", orangeLight:"#fff7ed",
-  text:"#1e293b", textMid:"#64748b", textDim:"#94a3b8",
-  shadow:"0 4px 16px rgba(79,142,247,0.12)",
-  shadowLg:"0 8px 32px rgba(79,142,247,0.18)",
-};
+// (T는 ./theme 에서 import — 자체 정의 제거)
 
 const GRADES = ["유치원","초등1","초등2","초등3","초등4","초등5","초등6","중1","중2","중3"];
 
@@ -112,48 +101,7 @@ export function computeStudentStats(s) {
 }
 
 // ── 공통 UI ────────────────────────────────────────────────────────────────
-function Btn({ children, onClick, v="primary", size="md", style={}, disabled }) {
-  const vs = {
-    primary:{bg:T.accent,color:"white"}, secondary:{bg:T.accentLight,color:T.accent},
-    danger:{bg:T.red,color:"white"}, success:{bg:T.green,color:"white"},
-    ghost:{bg:"transparent",color:T.textMid},
-  }[v];
-  const sz = {sm:{padding:"5px 10px",fontSize:11}, md:{padding:"9px 16px",fontSize:13}, lg:{padding:"12px 20px",fontSize:14}}[size];
-  return (
-    <button onClick={onClick} disabled={disabled} style={{
-      ...sz, ...vs, border:"none", borderRadius:10, fontWeight:700,
-      cursor:disabled?"not-allowed":"pointer", opacity:disabled?.6:1,
-      transition:"all 0.15s", ...style
-    }}>{children}</button>
-  );
-}
-
-function Card({ children, style={}, onClick }) {
-  return (
-    <div onClick={onClick} style={{
-      background:T.card, borderRadius:16, padding:16,
-      boxShadow:T.shadow, border:`1px solid ${T.border}`,
-      cursor:onClick?"pointer":"default", ...style
-    }}>{children}</div>
-  );
-}
-
-function Tag({ children, color="blue" }) {
-  const cl = {
-    blue:{c:T.accent,b:T.accentLight}, green:{c:T.green,b:T.greenLight},
-    red:{c:T.red,b:T.redLight}, yellow:{c:T.yellow,b:T.yellowLight},
-    purple:{c:T.purple,b:T.purpleLight}, pink:{c:T.pink,b:T.pinkLight},
-    orange:{c:T.orange,b:T.orangeLight},
-  }[color]||{c:T.accent,b:T.accentLight};
-  return <span style={{fontSize:10,fontWeight:800,padding:"3px 8px",borderRadius:7,color:cl.c,background:cl.b}}>{children}</span>;
-}
-
-function Input({ value, onChange, placeholder, type="text", style={} }) {
-  return <input type={type} value={value} onChange={onChange} placeholder={placeholder} style={{
-    padding:"10px 12px", borderRadius:10, border:`1.5px solid ${T.border}`,
-    fontSize:13, outline:"none", width:"100%", boxSizing:"border-box", ...style
-  }} />;
-}
+// (Btn / Card / Tag / Input 은 ./theme 에서 import — 자체 정의 제거하여 디자인 통일)
 
 const uid = () => Math.random().toString(36).slice(2,9);
 
@@ -1064,8 +1012,8 @@ export function ReportPrint({ students }) {
             </div>
             <table style={{width:"100%",borderCollapse:"collapse",marginBottom:16,fontSize:13}}>
               <thead>
-                <tr style={{background:"#f0f7ff"}}>
-                  {["항목","이번 달 수치","평가"].map(h=><th key={h} style={{padding:"8px 10px",border:"1px solid #dce8ff",textAlign:"center"}}>{h}</th>)}
+                <tr style={{background:T.accentLight}}>
+                  {["항목","이번 달 수치","평가"].map(h=><th key={h} style={{padding:"8px 10px",border:`1px solid ${T.border}`,textAlign:"center"}}>{h}</th>)}
                 </tr>
               </thead>
               <tbody>
@@ -1077,11 +1025,11 @@ export function ReportPrint({ students }) {
                   ["획득 포인트",`${st.pts}점`,""],
                   ["획득 뱃지",`${st.earned.length}개`,st.earned.length>=5?"우수 ★★★":st.earned.length>=2?"양호 ★★":"기초 ★"],
                 ].map(([label,val,grade],i)=>(
-                  <tr key={i}><td style={{padding:"7px 10px",border:"1px solid #dce8ff"}}>{label}</td><td style={{padding:"7px 10px",border:"1px solid #dce8ff",textAlign:"center",fontWeight:700}}>{val}</td><td style={{padding:"7px 10px",border:"1px solid #dce8ff",textAlign:"center",color:"#4f8ef7"}}>{grade}</td></tr>
+                  <tr key={i}><td style={{padding:"7px 10px",border:`1px solid ${T.border}`}}>{label}</td><td style={{padding:"7px 10px",border:`1px solid ${T.border}`,textAlign:"center",fontWeight:700}}>{val}</td><td style={{padding:"7px 10px",border:`1px solid ${T.border}`,textAlign:"center",color:T.accent}}>{grade}</td></tr>
                 ))}
               </tbody>
             </table>
-            <div style={{background:"#f0f7ff",padding:"12px 14px",borderRadius:8,marginBottom:14}}>
+            <div style={{background:T.accentLight,padding:"12px 14px",borderRadius:8,marginBottom:14}}>
               <div style={{fontWeight:700,marginBottom:4,fontSize:13}}>📝 종합 평가</div>
               <div style={{fontSize:12,lineHeight:1.8,color:"#555"}}>{comment(st)}</div>
             </div>
@@ -1093,7 +1041,7 @@ export function ReportPrint({ students }) {
                 </div>
               </div>
             )}
-            <div style={{borderTop:"1px solid #dce8ff",paddingTop:10,display:"flex",justifyContent:"space-between",fontSize:12,color:"#888"}}>
+            <div style={{borderTop:`1px solid ${T.border}`,paddingTop:10,display:"flex",justifyContent:"space-between",fontSize:12,color:"#888"}}>
               <span>Angela's English Academy</span>
               <span>담임교사: Angela 선생님</span>
               <span>학부모 확인: ___________</span>

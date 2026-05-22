@@ -1393,14 +1393,24 @@ export function PictureWordGame({ name, setStudents, onExit }) {
         <span style={{fontSize:12,fontWeight:700,color:T.textMid}}>{round+1}/{questions.length}</span>
         <span key={score} style={{fontSize:12,fontWeight:700,color:T.yellow,display:"inline-block",animation:"pop-once 0.35s ease-out"}}>⭐{score}</span>
       </div>
-      <div style={{height:5,background:T.border,borderRadius:3,marginBottom:14,overflow:"hidden"}}>
-        <div style={{height:"100%",width:`${(round/questions.length)*100}%`,background:mode==="en"?T.accent:T.green,borderRadius:3,transition:"width 0.3s"}}/>
+      <div style={{height:9,background:T.border,borderRadius:T.radiusFull,marginBottom:16,overflow:"hidden"}}>
+        <div style={{height:"100%",width:`${(round/questions.length)*100}%`,background:`linear-gradient(90deg,${mode==="en"?T.accent:T.green},${mode==="en"?T.purple:T.teal})`,borderRadius:T.radiusFull,transition:"width 0.4s cubic-bezier(.34,1.56,.64,1)"}}/>
       </div>
-      <Card key={round} style={{marginBottom:14,textAlign:"center",padding:"32px 16px",background:mode==="en"?T.accentLight:T.greenLight,animation:"fade-in-up 0.35s ease-out"}}>
-        <div style={{fontSize:10,color:T.textMid,fontWeight:700,marginBottom:8}}>이 그림의 {mode==="en"?"영어 단어는?":"한글 뜻은?"} <span style={{color:T.accent,fontWeight:800}}>(그림 탭하면 발음!)</span></div>
+      <Card key={round} style={{marginBottom:16,textAlign:"center",padding:"28px 16px 32px",background:mode==="en"?T.accentLight:T.greenLight,animation:"fade-in-up 0.35s ease-out",position:"relative",overflow:"hidden"}}>
+        {/* 은은한 배경 데코 */}
+        <div style={{position:"absolute",top:-30,right:-30,width:120,height:120,borderRadius:"50%",background:"rgba(255,255,255,0.4)",pointerEvents:"none"}}/>
+        <div style={{position:"absolute",bottom:-40,left:-20,width:90,height:90,borderRadius:"50%",background:"rgba(255,255,255,0.3)",pointerEvents:"none"}}/>
+        <div style={{fontSize:11,color:T.textMid,fontWeight:700,marginBottom:14,position:"relative"}}>이 그림의 {mode==="en"?"영어 단어는?":"한글 뜻은?"} <span style={{color:T.accent,fontWeight:800}}>(그림 탭하면 발음! 🔊)</span></div>
         <div
           onClick={()=>speak(q.en)}
-          style={{fontSize:90,lineHeight:1,marginBottom:8,cursor:"pointer",userSelect:"none",transition:"transform 0.1s"}}
+          style={{
+            width:150,height:150,margin:"0 auto 14px",
+            background:"white",borderRadius:"50%",
+            display:"flex",alignItems:"center",justifyContent:"center",
+            fontSize:84,lineHeight:1,cursor:"pointer",userSelect:"none",
+            boxShadow:"0 8px 24px rgba(0,0,0,0.10), inset 0 -4px 8px rgba(0,0,0,0.04)",
+            transition:"transform 0.15s cubic-bezier(.34,1.56,.64,1)",position:"relative"
+          }}
           onMouseDown={e=>e.currentTarget.style.transform="scale(0.92)"}
           onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}
           onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}
@@ -1408,14 +1418,14 @@ export function PictureWordGame({ name, setStudents, onExit }) {
           onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"}
           title="탭하면 발음을 들을 수 있어요"
         >{q.emoji}</div>
-        <div style={{fontSize:12,color:T.textMid,marginBottom:10}}>{mode==="en"?q.ko:q.en}</div>
+        <div style={{fontSize:13,fontWeight:700,color:T.textMid,marginBottom:12,position:"relative"}}>{mode==="en"?q.ko:q.en}</div>
         <button
           onClick={(e)=>{e.stopPropagation();speak(q.en);}}
           style={{
-            background:"rgba(255,255,255,0.85)",
-            border:`2px solid ${mode==="en"?T.accent:T.green}`,
-            borderRadius:10,
-            padding:"6px 16px",
+            background:"white",
+            border:"none",
+            borderRadius:T.radiusFull,
+            padding:"9px 20px",
             fontSize:13,
             fontWeight:800,
             cursor:"pointer",
@@ -1423,15 +1433,17 @@ export function PictureWordGame({ name, setStudents, onExit }) {
             display:"inline-flex",
             alignItems:"center",
             gap:6,
+            boxShadow:"0 3px 10px rgba(0,0,0,0.08)",
+            position:"relative",
           }}
         >🔊 발음 듣기</button>
       </Card>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
         {q.opts.map((o,idx) => {
           const isAns = idx === ansIdx;
           let bg=T.card,color=T.text,border=T.border;let anim="";
           if (answered){ if(isAns){bg=T.green;color="white";border=T.green;anim="answer-pop";} else if(idx===picked){bg=T.red;color="white";border=T.red;anim="wrong-shake";} }
-          return <button key={idx} onClick={()=>pick(idx)} disabled={answered} style={{padding:"18px 10px",borderRadius:13,border:`2px solid ${border}`,background:bg,color,fontSize:15,fontWeight:800,cursor:answered?"default":"pointer",transition:"all 0.2s",lineHeight:1.3,animation:anim?`${anim} 0.45s ease`:"none"}}>
+          return <button key={idx} onClick={()=>pick(idx)} disabled={answered} style={{padding:"20px 12px",borderRadius:T.radiusLg,border:`2.5px solid ${border}`,background:bg,color,fontSize:16,fontWeight:800,cursor:answered?"default":"pointer",transition:"all 0.2s",lineHeight:1.3,animation:anim?`${anim} 0.45s ease`:"none",boxShadow:answered?"none":"0 2px 8px rgba(0,0,0,0.05)"}}>
             {mode==="en"?o.en:o.ko}
           </button>;
         })}

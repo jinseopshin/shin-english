@@ -10,6 +10,34 @@ import {
 import { onCorrect, onWrong, onFinish, playCombo, playClick } from "./soundEffects";
 import { useAngela, getComboReaction, getFinishReaction, FullScreenConfetti, ComboFireEffect } from "./AngelaMascot";
 
+// AngelaCharacter 팝업 컴포넌트 (games.js와 동일)
+function AngelaCharacter({ state = "thinking", size = 120, style = {} }) {
+  const images = {
+    thinking: "/angela/angela-think.png",
+    happy: "/angela/angela-happy.png",
+    oops: "/angela/angela-oops.png"
+  };
+  const animations = {
+    thinking: "angela-float 2s ease-in-out infinite",
+    happy: "angela-celebrate 0.6s ease-out",
+    oops: "angela-oops 0.5s ease-out"
+  };
+  return (
+    <img
+      src={images[state] || images.thinking}
+      alt="Angela"
+      style={{
+        width: size,
+        height: size,
+        objectFit: "contain",
+        animation: animations[state] || animations.thinking,
+        filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.15))",
+        ...style
+      }}
+    />
+  );
+}
+
 // ══════════════════════════════════════════════════════════════════════════
 //   🎮 CORE GAMES v2.0 — 4개 핵심 학습 게임
 //   게임 로직 100% 유지, 디자인 토큰 적용 + 하드코딩 색상 정리
@@ -74,6 +102,10 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
   const [confettiTrigger, setConfettiTrigger] = useState(0);
   const wrongCountRef = useRef(0);
   const angela = useAngela();
+
+  // AngelaCharacter 팝업 상태
+  const [angelaState, setAngelaState] = useState("thinking");
+  const [showAngela, setShowAngela] = useState(false);
 
   const questions = useMemo(() => {
     if (!mode) return [];
@@ -208,6 +240,11 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
     const isCorrect = idx === q.ansIdx;
     recordWordEncounter(name, q, isCorrect);
 
+    // AngelaCharacter 팝업 즉시 표시
+    setAngelaState(isCorrect ? "happy" : "oops");
+    setShowAngela(true);
+    setTimeout(() => setShowAngela(false), 800);
+
     if (isCorrect) {
       const newCombo = combo + 1;
       setCombo(newCombo);
@@ -239,7 +276,11 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
       setTimeout(() => angela.show("wrong"), 200);
       if (levelId === "homework") updateWordMastery(setStudents, name, q.en, false);
     }
-    setTimeout(() => { setFeedback(null); setRound(round + 1); }, 1000);
+    setTimeout(() => { 
+      setFeedback(null); 
+      setAngelaState("thinking");
+      setRound(round + 1); 
+    }, 1000);
   };
 
   const questionText = q[q.qField];
@@ -361,6 +402,24 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
           }
         </div>
       )}
+
+      {/* AngelaCharacter 팝업 */}
+      {showAngela && (
+        <div style={{position:"fixed",top:"25%",left:0,right:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",zIndex:1000}}>
+          <AngelaCharacter 
+            state={angelaState} 
+            size={combo >= 5 ? 240 : 220}
+            style={{
+              animation: "angela-popup 0.6s cubic-bezier(.34,1.56,.64,1)",
+              filter: combo >= 10 
+                ? "drop-shadow(0 0 30px rgba(255,100,100,0.8))"
+                : combo >= 5
+                ? "drop-shadow(0 0 20px rgba(255,200,0,0.7))"
+                : "drop-shadow(0 4px 16px rgba(0,0,0,0.2))"
+            }}
+          />
+        </div>
+      )}
     </div>
     <angela.AngelaComponent />
     </>
@@ -375,6 +434,8 @@ export function SpellingGame({ name, setStudents, student, onExit, levelId = "al
   const [score, setScore] = useState(0);
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState(null);
+  const [angelaState, setAngelaState] = useState("thinking");
+  const [showAngela, setShowAngela] = useState(false);
   const awardedRef = useRef(false);
 
   const [combo, setCombo] = useState(0);
@@ -447,6 +508,11 @@ export function SpellingGame({ name, setStudents, student, onExit, levelId = "al
     const isCorrect = input.trim().toLowerCase() === q.en.toLowerCase();
     recordWordEncounter(name, q, isCorrect);
 
+    // AngelaCharacter 팝업 즉시 표시
+    setAngelaState(isCorrect ? "happy" : "oops");
+    setShowAngela(true);
+    setTimeout(() => setShowAngela(false), 800);
+
     if (isCorrect) {
       const newCombo = combo + 1;
       setCombo(newCombo);
@@ -476,7 +542,12 @@ export function SpellingGame({ name, setStudents, student, onExit, levelId = "al
       setTimeout(() => angela.show("wrong"), 200);
     }
     if (levelId === "homework") updateWordMastery(setStudents, name, q.en, isCorrect);
-    setTimeout(() => { setFeedback(null); setInput(""); setRound(round + 1); }, 1200);
+    setTimeout(() => { 
+      setFeedback(null); 
+      setInput(""); 
+      setAngelaState("thinking");
+      setRound(round + 1); 
+    }, 1200);
   };
 
   const comboStyle = getComboStyle(combo);
@@ -519,6 +590,24 @@ export function SpellingGame({ name, setStudents, student, onExit, levelId = "al
           {feedback === "correct" ? "✓ 정답!" : `✗ 정답: ${q.en}`}
         </div>
       )}
+
+      {/* AngelaCharacter 팝업 */}
+      {showAngela && (
+        <div style={{position:"fixed",top:"25%",left:0,right:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",zIndex:1000}}>
+          <AngelaCharacter 
+            state={angelaState} 
+            size={combo >= 5 ? 240 : 220}
+            style={{
+              animation: "angela-popup 0.6s cubic-bezier(.34,1.56,.64,1)",
+              filter: combo >= 10 
+                ? "drop-shadow(0 0 30px rgba(255,100,100,0.8))"
+                : combo >= 5
+                ? "drop-shadow(0 0 20px rgba(255,200,0,0.7))"
+                : "drop-shadow(0 4px 16px rgba(0,0,0,0.2))"
+            }}
+          />
+        </div>
+      )}
     </div>
     <angela.AngelaComponent />
     </>
@@ -533,6 +622,8 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(10);
+  const [angelaState, setAngelaState] = useState("thinking");
+  const [showAngela, setShowAngela] = useState(false);
   const awardedRef = useRef(false);
 
   const [combo, setCombo] = useState(0);
@@ -672,6 +763,14 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
     const isCorrect = idx === q.ansIdx;
     recordWordEncounter(name, q, isCorrect);
 
+    // AngelaCharacter 팝업 즉시 표시
+    setAngelaState(isCorrect ? "happy" : "oops");
+    setShowAngela(true);
+    setTimeout(() => {
+      setShowAngela(false);
+      setAngelaState("thinking");
+    }, 800);
+
     if (isCorrect) {
       const newCombo = combo + 1;
       setCombo(newCombo);
@@ -762,6 +861,24 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
           }}>{o[q.aField]}</button>
         ))}
       </div>
+
+      {/* AngelaCharacter 팝업 */}
+      {showAngela && (
+        <div style={{position:"fixed",top:"25%",left:0,right:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",zIndex:1000}}>
+          <AngelaCharacter 
+            state={angelaState} 
+            size={combo >= 5 ? 240 : 220}
+            style={{
+              animation: "angela-popup 0.6s cubic-bezier(.34,1.56,.64,1)",
+              filter: combo >= 10 
+                ? "drop-shadow(0 0 30px rgba(255,100,100,0.8))"
+                : combo >= 5
+                ? "drop-shadow(0 0 20px rgba(255,200,0,0.7))"
+                : "drop-shadow(0 4px 16px rgba(0,0,0,0.2))"
+            }}
+          />
+        </div>
+      )}
     </div>
     <angela.AngelaComponent />
     </>
@@ -778,6 +895,8 @@ export function FlashCard({ name, setStudents, student, onExit, levelId = "all" 
   const [isFav, setIsFav] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
   const [studied, setStudied] = useState(0);
+  const [angelaState, setAngelaState] = useState("thinking");
+  const [showAngela, setShowAngela] = useState(false);
   const angela = useAngela();
 
   useEffect(() => {
@@ -810,6 +929,13 @@ export function FlashCard({ name, setStudents, student, onExit, levelId = "all" 
     if (idx < cards.length - 1) {
       setIdx(idx + 1); setFlipped(false); setStudied(studied + 1);
       playClick();
+      
+      // 카드 넘길 때마다 Angela 격려 (확률적)
+      if (Math.random() < 0.3) {
+        setAngelaState("happy");
+        setShowAngela(true);
+        setTimeout(() => setShowAngela(false), 800);
+      }
     } else {
       saveStudentRecord(setStudents, name, {
         type: "game", gameType: "플래시카드",
@@ -819,6 +945,12 @@ export function FlashCard({ name, setStudents, student, onExit, levelId = "all" 
       });
       onFinish(cards.length, cards.length);
       angela.show("perfect");
+      
+      // 완료 시 Angela 축하
+      setAngelaState("happy");
+      setShowAngela(true);
+      setTimeout(() => setShowAngela(false), 800);
+      
       setTimeout(onExit, 1500);
     }
   };
@@ -867,6 +999,13 @@ export function FlashCard({ name, setStudents, student, onExit, levelId = "all" 
         <Btn v="secondary" size="lg" onClick={prev} style={{ flex: 1 }} disabled={idx === 0}>← 이전</Btn>
         <Btn v="primary" size="lg" onClick={next} style={{ flex: 1 }}>{idx === cards.length - 1 ? "완료" : "다음 →"}</Btn>
       </div>
+
+      {/* AngelaCharacter 팝업 */}
+      {showAngela && (
+        <div style={{position:"fixed",top:"25%",left:0,right:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",zIndex:1000}}>
+          <AngelaCharacter state={angelaState} size={220} style={{animation: "angela-popup 0.6s cubic-bezier(.34,1.56,.64,1)"}} />
+        </div>
+      )}
     </div>
     <angela.AngelaComponent />
     </>

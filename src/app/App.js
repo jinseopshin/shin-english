@@ -2154,6 +2154,7 @@ function AssignmentManager({ students, bank, assignments, setAssignments }) {
 
 function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStudents, savedPw, setSavedPw, darkMode, setDarkMode }) {
   const [screen, setScreen] = useState("dashboard");
+  const [prevScreen, setPrevScreen] = useState("dashboard"); // 뒤로가기용: 직전 화면 기억
   const [viewExamId, setViewExamId] = useState(null);
   const [assignments, setAssignments] = useStorage("angela_assignments", []);
   const [groups,      setGroups]      = useStorage("angela_groups",      []);
@@ -2163,7 +2164,12 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
   const [attendance,  setAttendance]  = useStorage("angela_attendance",  {});
   const [reportStudent, setReportStudent] = useState(null);
 
-  const onNav = (s, id) => { setScreen(s); if (id) setViewExamId(id); };
+  const onNav = (s, id) => {
+    // 화면 이동 전에 현재 화면을 직전 화면으로 기억 (뒤로가기에서 사용)
+    if (s !== screen) setPrevScreen(screen);
+    setScreen(s);
+    if (id) setViewExamId(id);
+  };
   const examView = exams.find(e => e.id === viewExamId);
 
   const SCREEN_INFO_MAP = {
@@ -2196,16 +2202,26 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
   useEffect(() => {
     const handler = (e) => {
       if (e.altKey && e.key === "ArrowLeft") {
+        const dualEntry = ["phonics", "word-stats", "sentence-builder-teacher", "custom-exam", "word-homework"];
         const info = SCREEN_INFO_MAP[screen];
-        if (info?.back) onNav(info.back);
+        // 양쪽 진입 화면이면 직전 화면으로, 아니면 고정 back으로
+        const dest = (dualEntry.includes(screen) && (prevScreen === "more" || prevScreen === "dashboard"))
+          ? prevScreen
+          : info?.back;
+        if (dest) onNav(dest);
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screen]);
+  }, [screen, prevScreen]);
 
-  const curInfo = SCREEN_INFO_MAP[screen] || { title: screen, back: "dashboard" };
+  // 홈과 더보기 양쪽에서 진입 가능한 화면들 — 뒤로가기는 "직전 화면"으로 (홈에서 왔으면 홈, 더보기에서 왔으면 더보기)
+  const DUAL_ENTRY_SCREENS = ["phonics", "word-stats", "sentence-builder-teacher", "custom-exam", "word-homework"];
+  const rawInfo = SCREEN_INFO_MAP[screen] || { title: screen, back: "dashboard" };
+  const curInfo = (DUAL_ENTRY_SCREENS.includes(screen) && (prevScreen === "more" || prevScreen === "dashboard"))
+    ? { ...rawInfo, back: prevScreen }
+    : rawInfo;
 
   return (
     <div style={{ minHeight: "100vh", background: T.bg, paddingBottom: 80 }}>

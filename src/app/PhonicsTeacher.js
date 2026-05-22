@@ -46,8 +46,8 @@ export function PhonicsTeacherMenu({ students, onExit }) {
     <div style={{ padding: 14, maxWidth: 900, margin: "0 auto" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
         <button onClick={onExit} style={{
-          background: T.card, border: `1px solid ${T.border}`, borderRadius: 10,
-          padding: "8px 12px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid
+          background: T.bgSoft, border: "none", borderRadius: T.radiusSm,
+          padding: "9px 14px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid
         }}>← 뒤로</button>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: T.text }}>🔤 파닉스 단어집 관리</div>
@@ -62,8 +62,8 @@ export function PhonicsTeacherMenu({ students, onExit }) {
 
       {sets.length === 0 ? (
         <div style={{
-          background: T.card, borderRadius: 16, padding: 40,
-          textAlign: "center", color: T.textMid, border: `2px dashed ${T.border}`
+          background: T.card, borderRadius: T.radiusXl, padding: 40,
+          textAlign: "center", color: T.textMid, border: `2px dashed ${T.borderMid}`
         }}>
           <div style={{ fontSize: 56, marginBottom: 12 }}>📚</div>
           <div style={{ fontSize: 14, fontWeight: 800, color: T.text, marginBottom: 6 }}>
@@ -84,9 +84,9 @@ export function PhonicsTeacherMenu({ students, onExit }) {
                 borderLeft: `5px solid ${level?.color || T.accent}`
               }}>
                 <div style={{
-                  width: 50, height: 50, background: level?.bg || T.bg, borderRadius: 12,
+                  width: 56, height: 56, background: level?.bg || T.bgSoft, borderRadius: T.radius,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 26
+                  fontSize: 28
                 }}>{level?.icon || "📚"}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 14, fontWeight: 900, color: T.text }}>{s.name}</div>
@@ -127,7 +127,7 @@ export function PhonicsTeacherMenu({ students, onExit }) {
 
       {/* 안내 박스 */}
       <div style={{
-        marginTop: 20, padding: 14, background: T.bg, borderRadius: 12,
+        marginTop: 20, padding: 16, background: T.bgSoft, borderRadius: T.radius,
         border: `1px solid ${T.border}`
       }}>
         <div style={{ fontSize: 12, fontWeight: 800, color: T.text, marginBottom: 6 }}>
@@ -225,8 +225,8 @@ function PhonicsSetEditor({ setId, onSave, onCancel }) {
     <div style={{ padding: 14, maxWidth: 900, margin: "0 auto" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
         <button onClick={onCancel} style={{
-          background: T.card, border: `1px solid ${T.border}`, borderRadius: 10,
-          padding: "8px 12px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid
+          background: T.bgSoft, border: "none", borderRadius: T.radiusSm,
+          padding: "9px 14px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid
         }}>← 취소</button>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>
@@ -238,7 +238,7 @@ function PhonicsSetEditor({ setId, onSave, onCancel }) {
 
       {error && (
         <div style={{
-          padding: 12, background: "#fee2e2", borderRadius: 10,
+          padding: 12, background: T.redLight, borderRadius: T.radiusSm,
           color: T.red, fontSize: 12, fontWeight: 700, marginBottom: 12
         }}>
           ⚠️ {error}
@@ -258,7 +258,7 @@ function PhonicsSetEditor({ setId, onSave, onCancel }) {
             placeholder="예: Lv1 동물 단어, Magic E 연습"
             style={{
               width: "100%", padding: "10px 12px",
-              border: `1px solid ${T.border}`, borderRadius: 8,
+              border: `1px solid ${T.border}`, borderRadius: T.radiusSm,
               fontSize: 13, background: T.bg, color: T.text
             }}
           />
@@ -271,7 +271,7 @@ function PhonicsSetEditor({ setId, onSave, onCancel }) {
             onChange={e => setLevelId(e.target.value)}
             style={{
               width: "100%", padding: "10px 12px",
-              border: `1px solid ${T.border}`, borderRadius: 8,
+              border: `1px solid ${T.border}`, borderRadius: T.radiusSm,
               fontSize: 13, background: T.bg, color: T.text
             }}>
             {PHONICS_LEVELS.map(l => (
@@ -311,7 +311,7 @@ function PhonicsSetEditor({ setId, onSave, onCancel }) {
           rows={4}
           style={{
             width: "100%", padding: 10,
-            border: `1px solid ${T.border}`, borderRadius: 8,
+            border: `1px solid ${T.border}`, borderRadius: T.radiusSm,
             fontSize: 12, fontFamily: "monospace",
             background: T.card, color: T.text, resize: "vertical"
           }}
@@ -334,7 +334,7 @@ function PhonicsSetEditor({ setId, onSave, onCancel }) {
           <div style={{
             padding: 24, textAlign: "center",
             color: T.textMid, fontSize: 12,
-            border: `1px dashed ${T.border}`, borderRadius: 10
+            border: `1px dashed ${T.border}`, borderRadius: T.radiusSm
           }}>
             위의 "빠른 추가" 또는 "한 줄 추가"로 단어를 입력해주세요
           </div>
@@ -343,14 +343,14 @@ function PhonicsSetEditor({ setId, onSave, onCancel }) {
             {words.map((w, idx) => (
               <div key={idx} style={{
                 display: "flex", alignItems: "center", gap: 6,
-                padding: 6, background: T.bg, borderRadius: 8
+                padding: 6, background: T.bg, borderRadius: T.radiusSm
               }}>
                 {/* 이모지 선택 */}
                 <button onClick={() => { playClick(); setShowEmojiPicker(showEmojiPicker === idx ? null : idx); }}
                   style={{
                     width: 44, height: 44, fontSize: 22,
                     background: T.card, border: `1px solid ${T.border}`,
-                    borderRadius: 8, cursor: "pointer"
+                    borderRadius: T.radiusSm, cursor: "pointer"
                   }}>
                   {w.emoji || "📝"}
                 </button>
@@ -362,7 +362,7 @@ function PhonicsSetEditor({ setId, onSave, onCancel }) {
                   placeholder="영어"
                   style={{
                     flex: 1.5, padding: "8px 10px",
-                    border: `1px solid ${T.border}`, borderRadius: 6,
+                    border: `1px solid ${T.border}`, borderRadius: T.radiusSm,
                     fontSize: 13, background: T.card, color: T.text
                   }}
                 />
@@ -374,7 +374,7 @@ function PhonicsSetEditor({ setId, onSave, onCancel }) {
                   placeholder="한글"
                   style={{
                     flex: 1, padding: "8px 10px",
-                    border: `1px solid ${T.border}`, borderRadius: 6,
+                    border: `1px solid ${T.border}`, borderRadius: T.radiusSm,
                     fontSize: 13, background: T.card, color: T.text
                   }}
                 />
@@ -395,7 +395,7 @@ function PhonicsSetEditor({ setId, onSave, onCancel }) {
           zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 16
         }}>
           <div onClick={e => e.stopPropagation()} style={{
-            background: T.card, borderRadius: 16, padding: 16,
+            background: T.card, borderRadius: T.radiusLg, padding: 16,
             maxWidth: 480, width: "100%", maxHeight: "70vh", overflowY: "auto"
           }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
@@ -417,7 +417,7 @@ function PhonicsSetEditor({ setId, onSave, onCancel }) {
                 }} style={{
                   width: 40, height: 40, fontSize: 22,
                   background: T.bg, border: `1px solid ${T.border}`,
-                  borderRadius: 6, cursor: "pointer"
+                  borderRadius: T.radiusSm, cursor: "pointer"
                 }}>
                   {emo}
                 </button>
@@ -469,8 +469,8 @@ function PhonicsAssignView({ setId, students, onBack }) {
     <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
         <button onClick={onBack} style={{
-          background: T.card, border: `1px solid ${T.border}`, borderRadius: 10,
-          padding: "8px 12px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid
+          background: T.bgSoft, border: "none", borderRadius: T.radiusSm,
+          padding: "9px 14px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid
         }}>← 뒤로</button>
         <div>
           <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>👥 학생 배정</div>
@@ -481,7 +481,7 @@ function PhonicsAssignView({ setId, students, onBack }) {
       </div>
 
       <div style={{
-        padding: 12, background: T.bg, borderRadius: 10,
+        padding: 12, background: T.bg, borderRadius: T.radiusSm,
         fontSize: 11, color: T.textMid, marginBottom: 12, lineHeight: 1.6
       }}>
         💡 학생 이름을 클릭하면 배정/해제됩니다. 배정된 학생은 메인 화면에 이 단어집이 표시돼요.
@@ -498,7 +498,7 @@ function PhonicsAssignView({ setId, students, onBack }) {
               const assigned = assignedNames.includes(s.name);
               return (
                 <div key={s.id || s.name} onClick={() => toggle(s.name)} style={{
-                  padding: 12, borderRadius: 12, cursor: "pointer",
+                  padding: 12, borderRadius: T.radius, cursor: "pointer",
                   background: assigned ? T.green : T.card,
                   color: assigned ? "white" : T.text,
                   border: `2px solid ${assigned ? T.green : T.border}`,
@@ -521,7 +521,7 @@ function PhonicsAssignView({ setId, students, onBack }) {
           <div style={{
             padding: 30, textAlign: "center",
             color: T.textMid, fontSize: 13,
-            border: `2px dashed ${T.border}`, borderRadius: 12
+            border: `2px dashed ${T.border}`, borderRadius: T.radius
           }}>
             📚 등록된 학생이 없어요. 학생을 먼저 추가해주세요.
           </div>
@@ -529,7 +529,7 @@ function PhonicsAssignView({ setId, students, onBack }) {
       })()}
 
       <div style={{
-        marginTop: 16, padding: 10, background: T.bg, borderRadius: 8,
+        marginTop: 16, padding: 10, background: T.bg, borderRadius: T.radiusSm,
         fontSize: 11, color: T.textMid, textAlign: "center"
       }}>
         현재 <strong style={{ color: T.green }}>{assignedNames.length}명</strong>에게 배정됨

@@ -496,6 +496,8 @@ export function WrongNoteGame({ name, students, setStudents, onExit }) {
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState(null);
   const [done, setDone] = useState(false);
+  const [angelaState, setAngelaState] = useState("thinking");
+  const [showAngela, setShowAngela] = useState(false);
   const awardedRef = useRef(false);
 
   // 오답 단어 추출 (과거 기록에서 틀린 것들)
@@ -547,19 +549,27 @@ export function WrongNoteGame({ name, students, setStudents, onExit }) {
 
   const pick=(idx)=>{
     if(answered)return;
+    const isCorrect = idx===q.ansIdx;
+    setAngelaState(isCorrect ? "happy" : "oops");
+    setShowAngela(true);
+    setTimeout(() => setShowAngela(false), 800);
     setPicked(idx);
     // 오답 기록 업데이트
     const key=`angela_wrong_${name}`;
     try{
       const data=ls.get(key, {});
       data[q.en]=data[q.en]||{wrong:0,correct:0};
-      if(idx===q.ansIdx){data[q.en].correct++;setScore(s=>s+1);onCorrect();}
+      if(isCorrect){data[q.en].correct++;setScore(s=>s+1);onCorrect();}
       else {data[q.en].wrong++;onWrong();}
       ls.set(key, data);
     }catch{}
   };
 
-  const next=()=>{setPicked(null);if(round<wrongWords.length-1)setRound(r=>r+1);else setDone(true);};
+  const next=()=>{
+    setPicked(null);
+    setAngelaState("thinking");
+    if(round<wrongWords.length-1)setRound(r=>r+1);else setDone(true);
+  };
 
   const wrongCount=()=>{try{const d=ls.get(`angela_wrong_${name}`, {});return d[q.en]?.wrong||0;}catch{return 0;}};
 
@@ -585,6 +595,14 @@ export function WrongNoteGame({ name, students, setStudents, onExit }) {
           return <button key={idx} onClick={()=>pick(idx)} disabled={answered} style={{padding:"18px 10px",borderRadius:13,border:`2px solid ${border}`,background:bg,color,fontSize:15,fontWeight:800,cursor:answered?"default":"pointer",transition:"all 0.2s",animation:anim?`${anim} 0.45s ease`:"none"}}>{o.en}</button>;
         })}
       </div>
+
+      {/* Angela 팝업 */}
+      {showAngela && (
+        <div style={{position:"fixed",top:"25%",left:0,right:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",zIndex:1000}}>
+          <AngelaCharacter state={angelaState} size={220} style={{animation: "angela-popup 0.6s cubic-bezier(.34,1.56,.64,1)"}} />
+        </div>
+      )}
+
       {answered&&<div><div style={{textAlign:"center",fontSize:14,fontWeight:900,color:picked===q.ansIdx?T.green:T.red,marginBottom:10}}>{picked===q.ansIdx?"✓ 이번엔 맞았어요!":"✗ 정답: "+q.en}</div><Btn v="primary" size="lg" onClick={next} style={{width:"100%"}}>{round<wrongWords.length-1?"다음 →":"결과 보기"}</Btn></div>}
     </div>
   );
@@ -1063,6 +1081,8 @@ export function WordTwenty({ name, setStudents, onExit }) {
   const [hintIdx, setHintIdx] = useState(0);
   const [picked, setPicked] = useState(null);
   const [done, setDone] = useState(false);
+  const [angelaState, setAngelaState] = useState("thinking");
+  const [showAngela, setShowAngela] = useState(false);
   const awardedRef = useRef(false);
 
   const generateHints = (w)=>[
@@ -1103,14 +1123,23 @@ export function WordTwenty({ name, setStudents, onExit }) {
 
   const pick=(idx)=>{
     if(answered)return;
+    const isCorrect = idx===q.ansIdx;
+    setAngelaState(isCorrect ? "happy" : "oops");
+    setShowAngela(true);
+    setTimeout(() => setShowAngela(false), 800);
     setPicked(idx);
-    if(idx===q.ansIdx){setScore(s=>s+1+bonusPts);onCorrect();} else onWrong();
-    recordWrong(name,q.en,idx===q.ansIdx);
+    if(isCorrect){setScore(s=>s+1+bonusPts);onCorrect();} else onWrong();
+    recordWrong(name,q.en,isCorrect);
   };
 
   const showHint=()=>{if(hintIdx<q.hints.length-1)setHintIdx(h=>h+1);};
 
-  const next=()=>{setPicked(null);setHintIdx(0);if(round<questions.length-1)setRound(r=>r+1);else setDone(true);};
+  const next=()=>{
+    setPicked(null);
+    setAngelaState("thinking");
+    setHintIdx(0);
+    if(round<questions.length-1)setRound(r=>r+1);else setDone(true);
+  };
 
   return (
     <div style={{minHeight:"100vh",background:T.bg,padding:16}}>
@@ -1149,6 +1178,14 @@ export function WordTwenty({ name, setStudents, onExit }) {
           return <button key={idx} onClick={()=>pick(idx)} disabled={answered} style={{padding:"16px 10px",borderRadius:12,border:`2px solid ${border}`,background:bg,color,fontSize:14,fontWeight:800,cursor:answered?"default":"pointer",transition:"all 0.2s",lineHeight:1.3,animation:anim?`${anim} 0.45s ease`:"none"}}>{o.en}<div style={{fontSize:11,fontWeight:500,opacity:.7,marginTop:2}}>{o.ko}</div></button>;
         })}
       </div>
+
+      {/* Angela 팝업 */}
+      {showAngela && (
+        <div style={{position:"fixed",top:"25%",left:0,right:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",zIndex:1000}}>
+          <AngelaCharacter state={angelaState} size={220} style={{animation: "angela-popup 0.6s cubic-bezier(.34,1.56,.64,1)"}} />
+        </div>
+      )}
+
       {answered&&<div><div style={{textAlign:"center",fontSize:14,fontWeight:900,color:picked===q.ansIdx?T.green:T.red,marginBottom:8}}>{picked===q.ansIdx?`✓ 정답! ${bonusPts>0?"+"+bonusPts+"보너스!":""}`:"✗ 정답: "+q.en+" ("+q.ko+")"}</div><Btn v="primary" size="lg" onClick={next} style={{width:"100%"}}>{round<questions.length-1?"다음 →":"결과 보기"}</Btn></div>}
     </div>
   );

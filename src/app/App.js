@@ -147,11 +147,11 @@ function Landing({ onTeacher, onStudent }) {
   return (
     <div style={{
       minHeight: "100vh",
-      background: `linear-gradient(135deg, ${T.accent} 0%, ${T.purple} 100%)`,
+      background: `linear-gradient(135deg, ${T.accent} 0%, ${T.purple} 60%, ${T.pink} 100%)`,
       display: "flex", alignItems: "center", justifyContent: "center", padding: 20
     }}>
       <div style={{ maxWidth: 480, width: "100%", textAlign: "center" }}>
-        <div style={{ fontSize: 64, marginBottom: 8 }}>🎀</div>
+        <div style={{ fontSize: 72, marginBottom: 8 }}>🎀</div>
         <div style={{ fontSize: 28, fontWeight: 900, color: "white", marginBottom: 4 }}>
           Angela's English Academy
         </div>
@@ -161,19 +161,25 @@ function Landing({ onTeacher, onStudent }) {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <Card onClick={onTeacher} style={{
-            padding: "28px 16px", textAlign: "center",
-            transition: "all 0.2s", border: "2px solid transparent"
+            padding: "32px 16px", textAlign: "center",
+            transition: "all 0.2s", borderRadius: T.radiusXl
           }}>
-            <div style={{ fontSize: 48, marginBottom: 10 }}>👩‍🏫</div>
+            <div style={{
+              width: 72, height: 72, borderRadius: T.radiusLg, background: T.accentLight,
+              margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40
+            }}>👩‍🏫</div>
             <div style={{ fontSize: 16, fontWeight: 900, color: T.text, marginBottom: 4 }}>선생님</div>
             <div style={{ fontSize: 11, color: T.textMid }}>출제 · 학생 관리</div>
           </Card>
 
           <Card onClick={onStudent} style={{
-            padding: "28px 16px", textAlign: "center",
-            transition: "all 0.2s", border: "2px solid transparent"
+            padding: "32px 16px", textAlign: "center",
+            transition: "all 0.2s", borderRadius: T.radiusXl
           }}>
-            <div style={{ fontSize: 48, marginBottom: 10 }}>🧒</div>
+            <div style={{
+              width: 72, height: 72, borderRadius: T.radiusLg, background: T.pinkLight,
+              margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40
+            }}>🧒</div>
             <div style={{ fontSize: 16, fontWeight: 900, color: T.text, marginBottom: 4 }}>학생</div>
             <div style={{ fontSize: 11, color: T.textMid }}>과제 · 게임</div>
           </Card>
@@ -1349,12 +1355,13 @@ function TeacherHome({ bank, exams, students, onNav }) {
     <div>
       <div style={{
         background: `linear-gradient(135deg, ${T.accent} 0%, ${T.purple} 100%)`,
-        borderRadius: 16, padding: "20px 18px", color: "white", marginBottom: 14,
-        boxShadow: T.shadowLg
+        borderRadius: T.radiusLg, padding: "22px 20px", color: "white", marginBottom: 16,
+        boxShadow: T.shadowLg, position: "relative", overflow: "hidden"
       }}>
-        <div style={{ fontSize: 12, opacity: 0.9, marginBottom: 4 }}>안녕하세요 👋</div>
-        <div style={{ fontSize: 20, fontWeight: 900 }}>Angela 선생님</div>
-        <div style={{ fontSize: 11, opacity: 0.85, marginTop: 6 }}>오늘도 멋진 수업 화이팅!</div>
+        <div style={{ position: "absolute", right: -10, top: -10, fontSize: 90, opacity: 0.12, transform: "rotate(12deg)", pointerEvents: "none" }}>👩‍🏫</div>
+        <div style={{ fontSize: 12, opacity: 0.9, marginBottom: 4, position: "relative" }}>안녕하세요 👋</div>
+        <div style={{ fontSize: 21, fontWeight: 900, position: "relative" }}>Angela 선생님</div>
+        <div style={{ fontSize: 11, opacity: 0.85, marginTop: 6, position: "relative" }}>오늘도 멋진 수업 화이팅!</div>
       </div>
 
       <div className="stat-grid" style={{ marginBottom: 16 }}>
@@ -1402,11 +1409,11 @@ function TeacherHome({ bank, exams, students, onNav }) {
 
       {/* 🔤 파닉스 학습 관리 — 큰 카드 (눈에 잘 띄게) */}
       <Card onClick={() => onNav("phonics")} style={{
-        padding: "18px 20px",
-        background: `linear-gradient(135deg, #fbbf24, #ec4899, #a855f7)`,
+        padding: "20px 22px",
+        background: `linear-gradient(135deg, ${T.yellow}, ${T.pink}, ${T.purple})`,
         color: "white", cursor: "pointer", border: "none",
         marginBottom: 16, position: "relative", overflow: "hidden",
-        boxShadow: T.shadowLg
+        boxShadow: T.shadowLg, borderRadius: T.radiusLg
       }}>
         <div style={{
           position: "absolute", right: -30, top: -20,
@@ -1420,7 +1427,7 @@ function TeacherHome({ bank, exams, students, onNav }) {
               <span style={{
                 fontSize: 10, fontWeight: 800,
                 background: "rgba(255,255,255,0.25)",
-                padding: "2px 8px", borderRadius: 8
+                padding: "3px 10px", borderRadius: T.radiusFull
               }}>NEW</span>
             </div>
             <div style={{ fontSize: 11, opacity: 0.95, lineHeight: 1.5 }}>
@@ -1444,8 +1451,8 @@ function TeacherHome({ bank, exams, students, onNav }) {
         ].map(m => (
           <Card key={m.id} onClick={() => onNav(m.id)} style={{ padding: 16 }}>
             <div style={{
-              width: 48, height: 48, borderRadius: 14, background: m.bg, marginBottom: 10,
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26
+              width: 56, height: 56, borderRadius: T.radius, background: m.bg, marginBottom: 12,
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30
             }}>{m.icon}</div>
             <div style={{ fontSize: 14, fontWeight: 900, color: T.text, marginBottom: 3 }}>{m.label}</div>
             <div style={{ fontSize: 10, color: T.textMid, lineHeight: 1.4 }}>{m.desc}</div>
@@ -2205,7 +2212,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
       <div className="topbar" style={{ background: T.card, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 50 }}>
        <div className="top-bar-inner">
         {curInfo.back !== null ? (
-          <button onClick={() => onNav(curInfo.back)} style={{ display:"flex", alignItems:"center", gap:4, background:"none", border:"none", cursor:"pointer", color:T.accent, fontSize:13, fontWeight:700, padding:"4px 8px", borderRadius:8, flexShrink:0 }}>
+          <button onClick={() => onNav(curInfo.back)} style={{ display:"flex", alignItems:"center", gap:4, background:T.bgSoft, border:"none", cursor:"pointer", color:T.accent, fontSize:13, fontWeight:700, padding:"7px 12px", borderRadius:T.radiusSm, flexShrink:0 }}>
             ← 뒤로
           </button>
         ) : (
@@ -2224,7 +2231,7 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
           )}
         </div>
         <button onClick={() => setDarkMode && setDarkMode(d => !d)} title={darkMode?"라이트 모드":"다크 모드"}
-          style={{ background:"none", border:"none", cursor:"pointer", fontSize:18, padding:"4px 6px", borderRadius:8 }}>
+          style={{ background:T.bgSoft, border:"none", cursor:"pointer", fontSize:16, padding:"8px 10px", borderRadius:T.radiusFull, width:36, height:36, display:"flex", alignItems:"center", justifyContent:"center" }}>
           {darkMode ? "☀️" : "🌙"}
         </button>
         <Btn v="ghost" size="sm" onClick={onLogout}>로그아웃</Btn>
@@ -2410,13 +2417,21 @@ function TeacherApp({ onLogout, bank, setBank, exams, setExams, students, setStu
       </div>
 
       <div className="no-print bottom-nav">
-        {TEACHER_NAV.map(n => (
-          <button key={n.id} onClick={() => onNav(n.id)} style={{ flex: 1, background: "none", border: "none", padding: "8px 2px 14px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-            <div style={{ fontSize: 20, transition: "transform 0.15s", transform: screen === n.id ? "scale(1.2)" : "scale(1)" }}>{n.icon}</div>
-            <div style={{ fontSize: 9, fontWeight: 800, color: screen === n.id ? T.accent : T.textDim }}>{n.label}</div>
-            {screen === n.id && <div style={{ width: 16, height: 2.5, borderRadius: 2, background: T.accent, marginTop: 1 }} />}
-          </button>
-        ))}
+        {TEACHER_NAV.map(n => {
+          const active = screen === n.id;
+          return (
+            <button key={n.id} onClick={() => onNav(n.id)} style={{ flex: 1, background: "none", border: "none", padding: "8px 2px 14px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+              <div style={{
+                fontSize: 19, transition: "all 0.15s",
+                transform: active ? "scale(1.1)" : "scale(1)",
+                background: active ? T.accentLight : "transparent",
+                width: 38, height: 28, borderRadius: T.radiusFull,
+                display: "flex", alignItems: "center", justifyContent: "center"
+              }}>{n.icon}</div>
+              <div style={{ fontSize: 9, fontWeight: 800, color: active ? T.accent : T.textDim }}>{n.label}</div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

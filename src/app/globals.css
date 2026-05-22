@@ -363,3 +363,29 @@ div[style*="cursor: pointer"]:active {
   button:not(:disabled):active { transform: none; }
   .fade-in-up, .pop-once, .float-gentle { animation: none; }
 }
+/* ══════════════════════════════════════════════════════════════════════════
+   Angela Character Animations
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Angela thinking - 부드러운 떠다니기 */
+@keyframes angela-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Angela happy - 환호! */
+@keyframes angela-celebrate {
+  0% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.15) rotate(-5deg); }
+  50% { transform: scale(1.1) rotate(5deg); }
+  75% { transform: scale(1.15) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Angela oops - 갸우뚱 */
+@keyframes angela-oops {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-4px) rotate(-3deg); }
+  50% { transform: translateX(4px) rotate(3deg); }
+  75% { transform: translateX(-4px) rotate(-2deg); }
+}

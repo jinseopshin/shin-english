@@ -58,8 +58,8 @@ export function SentenceBuilderEditor({ onExit }) {
     <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
         <button onClick={onExit} style={{
-          background: T.card, border: `1px solid ${T.border}`, borderRadius: 10,
-          padding: "8px 12px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid
+          background: T.bgSoft, border: "none", borderRadius: T.radiusSm,
+          padding: "9px 14px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid
         }}>← 뒤로</button>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>
@@ -72,21 +72,27 @@ export function SentenceBuilderEditor({ onExit }) {
         <button onClick={() => { playClick(); setEditing("new"); }}
           style={{
             background: T.accent, color: "white", border: "none",
-            borderRadius: 10, padding: "10px 14px",
-            fontSize: 13, fontWeight: 800, cursor: "pointer"
+            borderRadius: T.radiusSm, padding: "11px 16px",
+            fontSize: 13, fontWeight: 800, cursor: "pointer",
+            boxShadow: T.shadowColor
           }}>
           + 새 문장
         </button>
       </div>
 {/* 🤖 AI 자동 생성 진입 배너 */}
       <Card style={{
-        marginBottom: 14, padding: 14,
+        marginBottom: 14, padding: 16,
         background: `linear-gradient(135deg, ${T.purple}, ${T.accent})`,
         color: "white", cursor: "pointer", border: "none",
-        display: "flex", alignItems: "center", gap: 12
+        display: "flex", alignItems: "center", gap: 14,
+        borderRadius: T.radiusLg, position: "relative", overflow: "hidden"
       }} onClick={() => { playClick(); setShowAIGen(true); }}>
-        <div style={{ fontSize: 36 }}>🤖</div>
-        <div style={{ flex: 1 }}>
+        <div style={{ position: "absolute", right: -10, top: -10, fontSize: 80, opacity: 0.15, transform: "rotate(12deg)", pointerEvents: "none" }}>🤖</div>
+        <div style={{
+          width: 52, height: 52, background: "rgba(255,255,255,0.25)", borderRadius: T.radius,
+          display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, position: "relative"
+        }}>🤖</div>
+        <div style={{ flex: 1, position: "relative" }}>
           <div style={{ fontSize: 14, fontWeight: 900, marginBottom: 3 }}>
             AI로 문장 자동 생성
           </div>
@@ -94,13 +100,13 @@ export function SentenceBuilderEditor({ onExit }) {
             주제 선택 → AI가 즉시 학습용 문장 생성
           </div>
         </div>
-        <div style={{ fontSize: 22, opacity: 0.85 }}>›</div>
+        <div style={{ fontSize: 22, opacity: 0.85, position: "relative" }}>›</div>
       </Card>
 
       {sentences.length === 0 ? (
         <div style={{
           padding: 40, textAlign: "center", marginTop: 20,
-          background: T.card, borderRadius: 20, border: `2px solid ${T.border}`
+          background: T.card, borderRadius: T.radiusXl, border: `2px dashed ${T.borderMid}`
         }}>
           <div style={{ fontSize: 60, marginBottom: 16 }}>📝</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: T.text, marginBottom: 8 }}>
@@ -112,8 +118,9 @@ export function SentenceBuilderEditor({ onExit }) {
           <button onClick={() => { playClick(); setEditing("new"); }}
             style={{
               background: T.accent, color: "white", border: "none",
-              borderRadius: 12, padding: "12px 24px",
-              fontSize: 13, fontWeight: 800, cursor: "pointer"
+              borderRadius: T.radius, padding: "12px 24px",
+              fontSize: 13, fontWeight: 800, cursor: "pointer",
+              boxShadow: T.shadowColor
             }}>
             + 첫 문장 만들기
           </button>
@@ -150,32 +157,32 @@ function SentenceCard({ sentence, onEdit, onDelete }) {
     <Card style={{ padding: 14 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
         <span style={{
-          padding: "2px 8px", borderRadius: 8,
+          padding: "2px 8px", borderRadius: T.radiusSm,
           background: diff.bg, color: diff.color,
           fontSize: 10, fontWeight: 800
         }}>{diff.label}</span>
         {sentence.isPublic && (
           <span style={{
-            padding: "2px 8px", borderRadius: 8,
+            padding: "2px 8px", borderRadius: T.radiusSm,
             background: T.green, color: "white",
             fontSize: 10, fontWeight: 800
           }}>🌐 공개</span>
         )}
         {assignedCount > 0 && (
           <span style={{
-            padding: "2px 8px", borderRadius: 8,
+            padding: "2px 8px", borderRadius: T.radiusSm,
             background: T.accent, color: "white",
             fontSize: 10, fontWeight: 800
           }}>👤 {assignedCount}명</span>
         )}
         <div style={{ flex: 1 }} />
         <button onClick={() => { playClick(); onEdit(); }} style={{
-          background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8,
+          background: T.bg, border: `1px solid ${T.border}`, borderRadius: T.radiusSm,
           padding: "4px 10px", fontSize: 11, fontWeight: 700,
           color: T.textMid, cursor: "pointer"
         }}>✏️ 수정</button>
         <button onClick={onDelete} style={{
-          background: T.bg, border: `1px solid ${T.red}`, borderRadius: 8,
+          background: T.bg, border: `1px solid ${T.red}`, borderRadius: T.radiusSm,
           padding: "4px 10px", fontSize: 11, fontWeight: 700,
           color: T.red, cursor: "pointer"
         }}>🗑️</button>
@@ -192,7 +199,7 @@ function SentenceCard({ sentence, onEdit, onDelete }) {
         {sentence.words?.map((w, i) => (
           <span key={i} style={{
             padding: "2px 8px", background: T.bg,
-            border: `1px solid ${T.border}`, borderRadius: 6,
+            border: `1px solid ${T.border}`, borderRadius: 8,
             fontSize: 11, color: T.textMid, fontFamily: "monospace"
           }}>{w}</span>
         ))}
@@ -262,8 +269,8 @@ function SentenceForm({ sentence, onSave, onCancel }) {
     <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
         <button onClick={onCancel} style={{
-          background: T.card, border: `1px solid ${T.border}`, borderRadius: 10,
-          padding: "8px 12px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid
+          background: T.bgSoft, border: "none", borderRadius: T.radiusSm,
+          padding: "9px 14px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid
         }}>← 취소</button>
         <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>
           {sentence ? "✏️ 문장 수정" : "+ 새 문장"}
@@ -280,7 +287,7 @@ function SentenceForm({ sentence, onSave, onCancel }) {
             placeholder="The cat is fat."
             style={{
               flex: 1, padding: "10px 12px",
-              border: `2px solid ${T.border}`, borderRadius: 10,
+              border: `2px solid ${T.border}`, borderRadius: T.radiusSm,
               fontSize: 15, fontFamily: "inherit"
             }}
           />
@@ -309,7 +316,7 @@ function SentenceForm({ sentence, onSave, onCancel }) {
             }}
             style={{
               background: T.purpleLight, color: T.purple,
-              border: `2px solid ${T.purple}`, borderRadius: 10,
+              border: `2px solid ${T.purple}`, borderRadius: T.radiusSm,
               padding: "0 12px", fontSize: 11, fontWeight: 800,
               cursor: "pointer", whiteSpace: "nowrap"
             }}
@@ -343,7 +350,7 @@ function SentenceForm({ sentence, onSave, onCancel }) {
             placeholder="고양이가 뚱뚱해요."
             style={{
               flex: 1, padding: "10px 12px",
-              border: `2px solid ${T.border}`, borderRadius: 10,
+              border: `2px solid ${T.border}`, borderRadius: T.radiusSm,
               fontSize: 14, fontFamily: "inherit"
             }}
           />
@@ -372,7 +379,7 @@ function SentenceForm({ sentence, onSave, onCancel }) {
             }}
             style={{
               background: T.purpleLight, color: T.purple,
-              border: `2px solid ${T.purple}`, borderRadius: 10,
+              border: `2px solid ${T.purple}`, borderRadius: T.radiusSm,
               padding: "0 12px", fontSize: 11, fontWeight: 800,
               cursor: "pointer", whiteSpace: "nowrap"
             }}
@@ -396,7 +403,7 @@ function SentenceForm({ sentence, onSave, onCancel }) {
                 background: difficulty === key ? val.color : T.bg,
                 color: difficulty === key ? "white" : T.textMid,
                 border: `2px solid ${difficulty === key ? val.color : T.border}`,
-                borderRadius: 10, fontSize: 12, fontWeight: 800,
+                borderRadius: T.radiusSm, fontSize: 12, fontWeight: 800,
                 cursor: "pointer"
               }}>
               {val.label}
@@ -414,7 +421,7 @@ function SentenceForm({ sentence, onSave, onCancel }) {
           placeholder="https://res.cloudinary.com/.../image.jpg"
           style={{
             width: "100%", padding: "10px 12px",
-            border: `2px solid ${T.border}`, borderRadius: 10,
+            border: `2px solid ${T.border}`, borderRadius: T.radiusSm,
             fontSize: 12, fontFamily: "monospace"
           }}
         />
@@ -424,7 +431,7 @@ function SentenceForm({ sentence, onSave, onCancel }) {
         {imageUrl && (
           <div style={{
             marginTop: 8, width: "100%", maxWidth: 200, height: 120,
-            border: `1px solid ${T.border}`, borderRadius: 8, overflow: "hidden",
+            border: `1px solid ${T.border}`, borderRadius: T.radiusSm, overflow: "hidden",
             background: T.bg
           }}>
             <img src={imageUrl} alt="미리보기"
@@ -439,7 +446,7 @@ function SentenceForm({ sentence, onSave, onCancel }) {
       <div style={{ marginBottom: 14 }}>
         <label style={{
           display: "flex", alignItems: "center", gap: 10,
-          padding: 12, background: T.bg, borderRadius: 10,
+          padding: 12, background: T.bg, borderRadius: T.radiusSm,
           cursor: "pointer"
         }}>
           <input type="checkbox" checked={isPublic} onChange={e => setIsPublic(e.target.checked)}
@@ -468,13 +475,13 @@ function SentenceForm({ sentence, onSave, onCancel }) {
               placeholder="학생 이름 입력"
               style={{
                 flex: 1, padding: "8px 12px",
-                border: `2px solid ${T.border}`, borderRadius: 10,
+                border: `2px solid ${T.border}`, borderRadius: T.radiusSm,
                 fontSize: 13
               }}
             />
             <button onClick={addStudent} style={{
               background: T.accent, color: "white", border: "none",
-              borderRadius: 10, padding: "8px 16px",
+              borderRadius: T.radiusSm, padding: "8px 16px",
               fontSize: 12, fontWeight: 800, cursor: "pointer"
             }}>
               + 추가
@@ -489,7 +496,7 @@ function SentenceForm({ sentence, onSave, onCancel }) {
                   display: "inline-flex", alignItems: "center", gap: 4,
                   padding: "4px 8px",
                   background: T.accentLight, color: T.accent,
-                  borderRadius: 8, fontSize: 11, fontWeight: 700
+                  borderRadius: T.radiusSm, fontSize: 11, fontWeight: 700
                 }}>
                   👤 {a.studentName}
                   <button onClick={() => removeStudent(a.studentName)} style={{
@@ -508,14 +515,14 @@ function SentenceForm({ sentence, onSave, onCancel }) {
       <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
         <button onClick={onCancel} style={{
           flex: 1, padding: 14, background: T.card,
-          color: T.text, border: `2px solid ${T.border}`, borderRadius: 12,
+          color: T.text, border: `2px solid ${T.border}`, borderRadius: T.radius,
           fontSize: 13, fontWeight: 800, cursor: "pointer"
         }}>
           취소
         </button>
         <button onClick={handleSave} style={{
           flex: 2, padding: 14, background: T.green,
-          color: "white", border: "none", borderRadius: 12,
+          color: "white", border: "none", borderRadius: T.radius,
           fontSize: 14, fontWeight: 900, cursor: "pointer"
         }}>
           💾 저장

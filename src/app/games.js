@@ -416,7 +416,7 @@ export function DailyChallenge({ name, setStudents, onExit }) {
         <div style={{fontSize:11,color:T.textMid,marginTop:6}}>{q.cat}</div>
       </Card>
 
-      {/* 보기 위 2개 */}
+      {/* 보기 */}
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
         {q.opts.slice(0, 2).map((o,idx)=>{
           const isAns=idx===q.ansIdx;
@@ -425,16 +425,6 @@ export function DailyChallenge({ name, setStudents, onExit }) {
           return <button key={idx} onClick={()=>pick(idx)} disabled={answered} style={{padding:"18px 10px",borderRadius:13,border:`2px solid ${border}`,background:bg,color,fontSize:15,fontWeight:800,cursor:answered?"default":"pointer",transition:"all 0.2s",animation:anim?`${anim} 0.45s ease`:"none"}}>{o.en}</button>;
         })}
       </div>
-
-      {/* Angela - 보기 사이 */}
-      <div style={{display:"flex",justifyContent:"center",marginBottom:12}}>
-        <AngelaCharacter 
-          state={angelaState}
-          size={90}
-        />
-      </div>
-
-      {/* 보기 아래 2개 */}
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
         {q.opts.slice(2, 4).map((o,idx)=>{
           const realIdx = idx + 2;
@@ -444,6 +434,27 @@ export function DailyChallenge({ name, setStudents, onExit }) {
           return <button key={realIdx} onClick={()=>pick(realIdx)} disabled={answered} style={{padding:"18px 10px",borderRadius:13,border:`2px solid ${border}`,background:bg,color,fontSize:15,fontWeight:800,cursor:answered?"default":"pointer",transition:"all 0.2s",animation:anim?`${anim} 0.45s ease`:"none"}}>{o.en}</button>;
         })}
       </div>
+
+      {/* Angela 팝업 - 정답/오답 시에만 화면 중앙에 등장! */}
+      {answered && (
+        <div style={{
+          position:"fixed",
+          top:0,left:0,right:0,bottom:0,
+          display:"flex",
+          alignItems:"center",
+          justifyContent:"center",
+          pointerEvents:"none",
+          zIndex:1000,
+        }}>
+          <AngelaCharacter 
+            state={angelaState}
+            size={180}
+            style={{
+              animation: "angela-popup 0.6s cubic-bezier(.34,1.56,.64,1)"
+            }}
+          />
+        </div>
+      )}
 
       {answered && (
         <div>
@@ -989,22 +1000,6 @@ export function WordRelay({ name, setStudents, onExit }) {
         })}
       </div>
 
-      {/* Angela - 보기 사이 + 콤보 효과 */}
-      <div style={{display:"flex",justifyContent:"center",marginBottom:12}}>
-        <AngelaCharacter 
-          state={angelaState}
-          size={combo >= 5 ? 110 : 90}
-          style={{
-            transition: "all 0.3s ease-out",
-            filter: combo >= 10 
-              ? "drop-shadow(0 0 20px rgba(255,100,100,0.6)) drop-shadow(0 4px 12px rgba(0,0,0,0.15))"
-              : combo >= 5
-              ? "drop-shadow(0 0 15px rgba(255,200,0,0.5)) drop-shadow(0 4px 12px rgba(0,0,0,0.15))"
-              : "drop-shadow(0 4px 12px rgba(0,0,0,0.15))"
-          }}
-        />
-      </div>
-
       {/* 보기 아래 2개 */}
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
         {q.opts.slice(2, 4).map((o,idx)=>{
@@ -1015,6 +1010,33 @@ export function WordRelay({ name, setStudents, onExit }) {
           return <button key={realIdx} onClick={()=>pick(realIdx)} disabled={answered} style={{padding:"16px 10px",borderRadius:12,border:`2px solid ${border}`,background:bg,color,fontSize:14,fontWeight:800,cursor:answered?"default":"pointer",transition:"all 0.2s",animation:anim?`${anim} 0.45s ease`:"none"}}>{o.ko}</button>;
         })}
       </div>
+
+      {/* Angela 팝업 - 정답/오답 시 + 콤보 효과! */}
+      {answered && (
+        <div style={{
+          position:"fixed",
+          top:0,left:0,right:0,bottom:0,
+          display:"flex",
+          alignItems:"center",
+          justifyContent:"center",
+          pointerEvents:"none",
+          zIndex:1000,
+        }}>
+          <AngelaCharacter 
+            state={angelaState}
+            size={combo >= 5 ? 200 : 180}
+            style={{
+              animation: "angela-popup 0.6s cubic-bezier(.34,1.56,.64,1)",
+              filter: combo >= 10 
+                ? "drop-shadow(0 0 30px rgba(255,100,100,0.8)) drop-shadow(0 4px 16px rgba(0,0,0,0.2))"
+                : combo >= 5
+                ? "drop-shadow(0 0 20px rgba(255,200,0,0.7)) drop-shadow(0 4px 16px rgba(0,0,0,0.2))"
+                : "drop-shadow(0 4px 16px rgba(0,0,0,0.2))"
+            }}
+          />
+        </div>
+      )}
+
       {answered&&<div><div style={{textAlign:"center",fontSize:14,fontWeight:900,color:picked===q.ansIdx?T.green:T.red,marginBottom:8}}>{picked===q.ansIdx?`✓ 정답! ${combo>=2?"🔥"+combo+"콤보!":""}`:"✗ 정답: "+q.ko}</div><Btn v="primary" size="lg" onClick={next} style={{width:"100%"}}>{round<chain.length-1?"다음 →":"결과 보기"}</Btn></div>}
     </div>
   );
@@ -1571,18 +1593,10 @@ export function PictureWordGame({ name, setStudents, onExit }) {
         })}
       </div>
 
-      {/* Angela - 보기 사이에 배치 */}
-      <div style={{display:"flex",justifyContent:"center",marginBottom:16}}>
-        <AngelaCharacter 
-          state={angelaState}
-          size={90}
-        />
-      </div>
-
       {/* 보기 아래 2개 */}
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
         {q.opts.slice(2, 4).map((o,idx) => {
-          const realIdx = idx + 2; // 실제 인덱스는 2, 3
+          const realIdx = idx + 2;
           const isAns = realIdx === ansIdx;
           let bg=T.card,color=T.text,border=T.border;let anim="";
           if (answered){ if(isAns){bg=T.green;color="white";border=T.green;anim="answer-pop";} else if(realIdx===picked){bg=T.red;color="white";border=T.red;anim="wrong-shake";} }
@@ -1591,6 +1605,27 @@ export function PictureWordGame({ name, setStudents, onExit }) {
           </button>;
         })}
       </div>
+
+      {/* Angela 팝업 - 정답/오답 시에만! */}
+      {answered && (
+        <div style={{
+          position:"fixed",
+          top:0,left:0,right:0,bottom:0,
+          display:"flex",
+          alignItems:"center",
+          justifyContent:"center",
+          pointerEvents:"none",
+          zIndex:1000,
+        }}>
+          <AngelaCharacter 
+            state={angelaState}
+            size={180}
+            style={{
+              animation: "angela-popup 0.6s cubic-bezier(.34,1.56,.64,1)"
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

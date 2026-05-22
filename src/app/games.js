@@ -1,9 +1,10 @@
 "use client";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { ALL_WORDS, getWordsByLevel } from "./wordData";
+import { T, Btn, Card } from "./theme";
 
 // ══════════════════════════════════════════════════════════════════════════
-//   Angela's English Academy — games.js
+//   Angela's English Academy — games.js v2.0 (theme.js T/Btn/Card 통일)
 //   12개 게임: 메모리카드 / 데일리챌린지 / 오답노트 / 애너그램 /
 //              타이핑레이스 / 단어릴레이 / 스무고개 / 단어월드RPG /
 //              그림단어 / 단어연결 / 단어찾기퍼즐 / 받아쓰기
@@ -29,20 +30,7 @@ function speak(text) {
   }
 }
 
-const T = {
-  bg:"#f0f7ff", card:"#ffffff", border:"#dce8ff",
-  accent:"#4f8ef7", accentLight:"#e8f0ff",
-  green:"#22c55e", greenLight:"#dcfce7",
-  red:"#ef4444", redLight:"#fee2e2",
-  yellow:"#f59e0b", yellowLight:"#fef3c7",
-  purple:"#a855f7", purpleLight:"#f3e8ff",
-  pink:"#ec4899", pinkLight:"#fce7f3",
-  orange:"#f97316", orangeLight:"#fff7ed",
-  teal:"#14b8a6", tealLight:"#ccfbf1",
-  text:"#1e293b", textMid:"#64748b", textDim:"#94a3b8",
-  shadow:"0 4px 16px rgba(79,142,247,0.12)",
-  shadowLg:"0 8px 32px rgba(79,142,247,0.18)",
-};
+// (T는 ./theme 에서 import — 자체 정의 제거하여 디자인 통일)
 
 // ── SSR 안전 유틸 ──────────────────────────────────────────────────────────
 const isBrowser = typeof window !== "undefined";
@@ -94,19 +82,9 @@ function saveGameRecord(setStudents, name, gameType, score, total, points) {
   });
 }
 
-function Btn({ children, onClick, v="primary", size="md", style={}, disabled }) {
-  const vs = {
-    primary:{bg:T.accent,color:"white"}, secondary:{bg:T.accentLight,color:T.accent},
-    danger:{bg:T.red,color:"white"}, success:{bg:T.green,color:"white"},
-    ghost:{bg:"transparent",color:T.textMid}, warning:{bg:T.yellow,color:"white"},
-  }[v];
-  const sz = {sm:{padding:"5px 10px",fontSize:11},md:{padding:"9px 16px",fontSize:13},lg:{padding:"12px 20px",fontSize:14}}[size];
-  return <button onClick={onClick} disabled={disabled} style={{...sz,...vs,border:"none",borderRadius:10,fontWeight:700,cursor:disabled?"not-allowed":"pointer",opacity:disabled?.55:1,transition:"all 0.15s",...style}}>{children}</button>;
-}
+// (Btn은 ./theme 에서 import)
 
-function Card({ children, style={}, onClick }) {
-  return <div onClick={onClick} style={{background:T.card,borderRadius:16,padding:16,boxShadow:T.shadow,border:`1px solid ${T.border}`,cursor:onClick?"pointer":"default",...style}}>{children}</div>;
-}
+// (Card는 ./theme 에서 import)
 
 // 공통 결과 화면
 function ResultScreen({ score, total, bonus=0, title, emoji, onExit, onRetry }) {
@@ -1018,11 +996,11 @@ export function WordTwenty({ name, setStudents, onExit }) {
 //  ⑧ 단어 월드 RPG
 // ══════════════════════════════════════════════════════════════════════════
 const RPG_WORLDS = [
-  { id:1, name:"초록 숲",    emoji:"🌲", bg:"#dcfce7", color:"#22c55e", level:"유치원~초등저", wordLevel:"kinder",  bosses:5, desc:"쉬운 단어들이 모험을 기다려요!" },
-  { id:2, name:"꽃 마을",    emoji:"🌸", bg:"#fce7f3", color:"#ec4899", level:"초등 저학년",  wordLevel:"elem1",   bosses:7, desc:"마을 사람들과 영어로 대화해요!" },
-  { id:3, name:"학교 성",    emoji:"🏰", bg:"#e8f0ff", color:"#4f8ef7", level:"초등 고학년",  wordLevel:"elem2",   bosses:8, desc:"어려운 단어들이 성을 지키고 있어요!" },
-  { id:4, name:"미지의 동굴", emoji:"🦇", bg:"#f3e8ff", color:"#a855f7", level:"중학교",      wordLevel:"middle",  bosses:10,desc:"강력한 단어 보스를 물리쳐요!" },
-  { id:5, name:"전설의 탑",   emoji:"⚡", bg:"#fef3c7", color:"#f59e0b", level:"종합 최강",    wordLevel:"all",     bosses:12,desc:"최고 난이도! 전설의 탐험가에 도전!" },
+  { id:1, name:"초록 숲",    emoji:"🌲", bg:T.greenLight,  color:T.green,  level:"유치원~초등저", wordLevel:"kinder",  bosses:5, desc:"쉬운 단어들이 모험을 기다려요!" },
+  { id:2, name:"꽃 마을",    emoji:"🌸", bg:T.pinkLight,   color:T.pink,   level:"초등 저학년",  wordLevel:"elem1",   bosses:7, desc:"마을 사람들과 영어로 대화해요!" },
+  { id:3, name:"학교 성",    emoji:"🏰", bg:T.accentLight, color:T.accent, level:"초등 고학년",  wordLevel:"elem2",   bosses:8, desc:"어려운 단어들이 성을 지키고 있어요!" },
+  { id:4, name:"미지의 동굴", emoji:"🦇", bg:T.purpleLight, color:T.purple, level:"중학교",      wordLevel:"middle",  bosses:10,desc:"강력한 단어 보스를 물리쳐요!" },
+  { id:5, name:"전설의 탑",   emoji:"⚡", bg:T.yellowLight, color:T.yellow, level:"종합 최강",    wordLevel:"all",     bosses:12,desc:"최고 난이도! 전설의 탐험가에 도전!" },
 ];
 
 const ITEMS = [
@@ -1112,7 +1090,7 @@ export function WordWorldRPG({ name, setStudents, onExit }) {
           const locked=w.id>1&&!save.clearedWorlds.includes(w.id-1);
           return(
             <Card key={w.id} onClick={!locked?()=>startBattle(w):undefined}
-              style={{marginBottom:10,background:locked?"#f8fafc":w.bg,opacity:locked?.6:1,border:`2px solid ${locked?"#e2e8f0":w.color}33`,display:"flex",alignItems:"center",gap:12}}>
+              style={{marginBottom:10,background:locked?T.bgSoft:w.bg,opacity:locked?.6:1,border:`2px solid ${locked?T.borderMid:w.color}33`,display:"flex",alignItems:"center",gap:12}}>
               <div style={{fontSize:36,flexShrink:0}}>{locked?"🔒":w.emoji}</div>
               <div style={{flex:1}}>
                 <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:3,flexWrap:"wrap"}}>
@@ -1744,9 +1722,9 @@ export function WordSearchGame({ name, setStudents, onExit }) {
                     style={{
                       width:CELL,height:CELL,display:"flex",alignItems:"center",justifyContent:"center",
                       fontSize:13,fontWeight:800,borderRadius:6,margin:1,cursor:"pointer",
-                      background:isFound?"#22c55e":isSel?"#a855f7":"#fff",
+                      background:isFound?T.green:isSel?T.purple:T.card,
                       color:isFound||isSel?"white":T.text,
-                      border:`1px solid ${isFound?"#16a34a":isSel?"#7c3aed":T.border}`,
+                      border:`1px solid ${isFound?T.green:isSel?T.purpleDark||T.purple:T.border}`,
                       transition:"background 0.1s"
                     }}>{ch}</div>
                 );

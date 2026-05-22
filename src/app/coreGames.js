@@ -11,10 +11,10 @@ import { onCorrect, onWrong, onFinish, playCombo, playClick } from "./soundEffec
 import { useAngela, getComboReaction, getFinishReaction, FullScreenConfetti, ComboFireEffect } from "./AngelaMascot";
 
 // ══════════════════════════════════════════════════════════════════════════
-//   🎮 CORE GAMES — 4개 핵심 학습 게임 (콤보 + Angela 마스코트 + 사운드)
+//   🎮 CORE GAMES v2.0 — 4개 핵심 학습 게임
+//   게임 로직 100% 유지, 디자인 토큰 적용 + 하드코딩 색상 정리
 // ══════════════════════════════════════════════════════════════════════════
 
-// 콤보 보너스 포인트 계산
 function getComboBonus(combo) {
   if (combo >= 15) return 100;
   if (combo >= 10) return 50;
@@ -24,15 +24,17 @@ function getComboBonus(combo) {
   return 0;
 }
 
-// 콤보 카운터 배경 색상
+// 콤보 카운터 배경 색상 (새 팔레트 적용)
 function getComboStyle(combo) {
-  if (combo >= 10) return { bg: "linear-gradient(135deg, #ef4444, #f97316)", shadow: "0 0 12px #ef444466" };
-  if (combo >= 5)  return { bg: "linear-gradient(135deg, #f59e0b, #fbbf24)", shadow: "0 0 12px #f59e0b66" };
-  if (combo >= 3)  return { bg: "linear-gradient(135deg, #22c55e, #84cc16)", shadow: "none" };
-  return { bg: "#94a3b8", shadow: "none" };
+  if (combo >= 10) return { bg: `linear-gradient(135deg, ${T.red}, ${T.orange})`, shadow: "0 0 12px rgba(239,68,68,0.4)" };
+  if (combo >= 5)  return { bg: `linear-gradient(135deg, ${T.orange}, ${T.yellow})`, shadow: "0 0 12px rgba(245,158,11,0.4)" };
+  if (combo >= 3)  return { bg: `linear-gradient(135deg, ${T.green}, ${T.teal})`, shadow: "none" };
+  return { bg: T.textDim, shadow: "none" };
 }
 
-// 게임에서 사용할 단어 풀 결정
+// 콤보 보너스 카드 배경 (새 팔레트)
+const COMBO_BONUS_BG = `linear-gradient(135deg, ${T.yellowLight}, ${T.orangeLight})`;
+
 export function getGameWordPool(levelId, student) {
   if (levelId === "homework") {
     const hw = student?.wordHomework;
@@ -48,7 +50,7 @@ export function getGameWordPool(levelId, student) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// 게임 1: 단어 맞추기 (콤보 + Angela + 사운드)
+// 게임 1: 단어 맞추기
 // ──────────────────────────────────────────────────────────────────────────
 const MATCH_MODES = [
   { id: "ko2en", label: "한글 → 영어", desc: "한글 보고 영단어 고르기", icon: "🇰🇷→🇺🇸" },
@@ -65,7 +67,6 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
   const [favLoading, setFavLoading] = useState(false);
   const awardedRef = useRef(false);
 
-  // 🔥 콤보 시스템
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
   const [bonusPoints, setBonusPoints] = useState(0);
@@ -106,7 +107,6 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
     setFavLoading(false);
   };
 
-  // 게임 종료 시 점수 저장 + 축하 효과
   useEffect(() => {
     if (!mode || awardedRef.current) return;
     if (questions.length === 0 || round < questions.length) return;
@@ -143,7 +143,7 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
               border: `2px solid ${T.border}`, cursor: "pointer"
             }}>
               <div style={{
-                width: 56, height: 56, borderRadius: 16, flexShrink: 0,
+                width: 56, height: 56, borderRadius: T.radius, flexShrink: 0,
                 background: m.id === "ko2en" ? T.accentLight : m.id === "en2ko" ? T.greenLight : T.yellowLight,
                 display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900,
                 color: m.id === "ko2en" ? T.accent : m.id === "en2ko" ? T.green : T.yellow
@@ -161,7 +161,6 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
     );
   }
 
-  // 게임 종료 화면
   if (round >= questions.length) {
     const total = questions.length;
     const percent = Math.round((score / total) * 100);
@@ -178,13 +177,13 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
           <div style={{ fontSize: 14, fontWeight: 800, color: T.text }}>⭐ 기본 +{score * 10} 포인트</div>
         </Card>
         {bonusPoints > 0 && (
-          <Card style={{ maxWidth: 320, margin: "0 auto 8px", background: "linear-gradient(135deg, #fef3c7, #fed7aa)" }}>
-            <div style={{ fontSize: 14, fontWeight: 900, color: "#dc2626" }}>🔥 콤보 보너스 +{bonusPoints} 포인트!</div>
+          <Card style={{ maxWidth: 320, margin: "0 auto 8px", background: COMBO_BONUS_BG }}>
+            <div style={{ fontSize: 14, fontWeight: 900, color: "#C2410C" }}>🔥 콤보 보너스 +{bonusPoints} 포인트!</div>
           </Card>
         )}
         {maxCombo >= 5 && (
           <Card style={{ maxWidth: 320, margin: "0 auto 14px", background: T.purpleLight }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: T.purple }}>🏅 최고 {maxCombo}연속 정답!</div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#7E22CE" }}>🏅 최고 {maxCombo}연속 정답!</div>
           </Card>
         )}
 
@@ -217,21 +216,17 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
       setFeedback("correct");
       onCorrect();
 
-      // 콤보 보너스
       const bonus = getComboBonus(newCombo);
       if (bonus > 0 && newCombo >= 3 && [3, 5, 7, 10, 15].includes(newCombo)) {
         setBonusPoints(p => p + bonus);
         playCombo();
         setComboAnimating(true);
         setTimeout(() => setComboAnimating(false), 500);
-        // 콤보 마스코트
         setTimeout(() => angela.show(getComboReaction(newCombo)), 200);
       } else if (wrongCountRef.current > 0 && Math.random() < 0.4) {
-        // 오답 후 회복
         setTimeout(() => angela.show("recovery"), 200);
         wrongCountRef.current = 0;
       } else if (Math.random() < 0.25) {
-        // 일반 정답 시 30% 확률 마스코트
         setTimeout(() => angela.show(round === 0 ? "firstCorrect" : "correct"), 200);
       }
 
@@ -271,7 +266,7 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
               color: "white",
               boxShadow: comboStyle.shadow,
               fontSize: 12, fontWeight: 900,
-              padding: "4px 10px", borderRadius: 10,
+              padding: "4px 10px", borderRadius: T.radiusFull,
               display: "inline-flex", alignItems: "center", gap: 4,
               transition: "all 0.2s",
             }}>
@@ -285,17 +280,17 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
 
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}>
         <button onClick={toggleFav} disabled={favLoading} style={{
-          padding: "5px 10px", borderRadius: 8,
-          background: isFav ? "#fef3c7" : "white",
-          color: isFav ? "#f59e0b" : T.textMid,
-          border: `1.5px solid ${isFav ? "#f59e0b" : T.border}`,
+          padding: "6px 12px", borderRadius: T.radiusSm,
+          background: isFav ? T.yellowLight : T.card,
+          color: isFav ? "#B45309" : T.textMid,
+          border: `1.5px solid ${isFav ? T.yellow : T.border}`,
           fontSize: 11, fontWeight: 800, cursor: favLoading ? "wait" : "pointer",
         }}>
           {isFav ? "⭐ 단어장" : "☆ 단어장 추가"}
         </button>
       </div>
 
-      <div style={{ height: 5, background: T.border, borderRadius: 3, marginBottom: 16, overflow: "hidden" }}>
+      <div style={{ height: 6, background: T.border, borderRadius: 3, marginBottom: 16, overflow: "hidden" }}>
         <div style={{
           height: "100%", borderRadius: 3, transition: "width 0.3s",
           width: `${(round / questions.length) * 100}%`,
@@ -324,7 +319,7 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
           <div style={{ marginTop: 10 }}>
             <button onClick={(e) => { e.stopPropagation(); speak(q.en); }} style={{
               background: "rgba(255,255,255,0.7)", border: "none",
-              borderRadius: 10, padding: "5px 14px", fontSize: 12,
+              borderRadius: T.radiusSm, padding: "6px 16px", fontSize: 12,
               fontWeight: 700, cursor: "pointer", color: T.green
             }}>🔊 발음 듣기</button>
           </div>
@@ -340,7 +335,7 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
           else if (feedback === "wrong" && !isCorrectOpt) { bg = T.card; color = T.textDim; }
           return (
             <button key={idx} onClick={() => pick(idx)} disabled={!!feedback} style={{
-              padding: "18px 12px", borderRadius: 14,
+              padding: "18px 12px", borderRadius: T.radius,
               border: `2px solid ${borderColor}`,
               background: bg, color,
               fontSize: 15, fontWeight: 800, cursor: feedback ? "default" : "pointer",
@@ -355,10 +350,10 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
 
       {feedback && (
         <div style={{
-          textAlign: "center", marginTop: 14, padding: "10px 16px",
-          borderRadius: 12, fontSize: 14, fontWeight: 900,
+          textAlign: "center", marginTop: 14, padding: "12px 16px",
+          borderRadius: T.radius, fontSize: 14, fontWeight: 900,
           background: feedback === "correct" ? T.greenLight : T.redLight,
-          color: feedback === "correct" ? T.green : T.red
+          color: feedback === "correct" ? "#047857" : "#B91C1C"
         }}>
           {feedback === "correct"
             ? `✓ 정답! ${isKo2En ? q.en : q.ko}`
@@ -373,7 +368,7 @@ export function WordMatchGame({ name, setStudents, student, onExit, levelId = "a
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// 게임 2: 스펠링 (콤보 + Angela + 사운드)
+// 게임 2: 스펠링
 // ──────────────────────────────────────────────────────────────────────────
 export function SpellingGame({ name, setStudents, student, onExit, levelId = "all" }) {
   const [round, setRound] = useState(0);
@@ -382,7 +377,6 @@ export function SpellingGame({ name, setStudents, student, onExit, levelId = "al
   const [feedback, setFeedback] = useState(null);
   const awardedRef = useRef(false);
 
-  // 🔥 콤보 시스템
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
   const [bonusPoints, setBonusPoints] = useState(0);
@@ -427,8 +421,8 @@ export function SpellingGame({ name, setStudents, student, onExit, levelId = "al
           <div style={{ fontSize: 14, fontWeight: 800 }}>⭐ 기본 +{score * 15} 포인트</div>
         </Card>
         {bonusPoints > 0 && (
-          <Card style={{ maxWidth: 320, margin: "0 auto 8px", background: "linear-gradient(135deg, #fef3c7, #fed7aa)" }}>
-            <div style={{ fontSize: 14, fontWeight: 900, color: "#dc2626" }}>🔥 콤보 보너스 +{bonusPoints} 포인트!</div>
+          <Card style={{ maxWidth: 320, margin: "0 auto 8px", background: COMBO_BONUS_BG }}>
+            <div style={{ fontSize: 14, fontWeight: 900, color: "#C2410C" }}>🔥 콤보 보너스 +{bonusPoints} 포인트!</div>
           </Card>
         )}
 
@@ -499,7 +493,7 @@ export function SpellingGame({ name, setStudents, student, onExit, levelId = "al
               background: comboStyle.bg, color: "white",
               boxShadow: comboStyle.shadow,
               fontSize: 12, fontWeight: 900,
-              padding: "4px 10px", borderRadius: 10,
+              padding: "4px 10px", borderRadius: T.radiusFull,
               display: "inline-flex", alignItems: "center", gap: 4,
             }}>
               {combo >= 3 ? <ComboFireEffect active={true} size={16} /> : "🔥"}
@@ -532,7 +526,7 @@ export function SpellingGame({ name, setStudents, student, onExit, levelId = "al
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// 게임 3: 스피드 퀴즈 (콤보 + Angela + 사운드)
+// 게임 3: 스피드 퀴즈
 // ──────────────────────────────────────────────────────────────────────────
 export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" }) {
   const [mode, setMode] = useState(null);
@@ -541,7 +535,6 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
   const [time, setTime] = useState(10);
   const awardedRef = useRef(false);
 
-  // 🔥 콤보 시스템
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
   const [bonusPoints, setBonusPoints] = useState(0);
@@ -571,7 +564,6 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
       setTime(t => {
         if (t <= 1) {
           clearInterval(interval);
-          // 시간 초과 = 오답 처리
           setCombo(0);
           wrongCountRef.current++;
           onWrong();
@@ -623,7 +615,7 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
               padding: 18, display: "flex", alignItems: "center", gap: 14, cursor: "pointer"
             }}>
               <div style={{
-                width: 52, height: 52, borderRadius: 14, background: m.bg,
+                width: 52, height: 52, borderRadius: T.radius, background: m.bg,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 22, fontWeight: 900, color: m.color, flexShrink: 0
               }}>{m.icon}</div>
@@ -653,8 +645,8 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
           <div style={{ fontSize: 14, fontWeight: 800 }}>⭐ 기본 +{score * 12} 포인트</div>
         </Card>
         {bonusPoints > 0 && (
-          <Card style={{ maxWidth: 320, margin: "0 auto 8px", background: "linear-gradient(135deg, #fef3c7, #fed7aa)" }}>
-            <div style={{ fontSize: 14, fontWeight: 900, color: "#dc2626" }}>🔥 콤보 보너스 +{bonusPoints} 포인트!</div>
+          <Card style={{ maxWidth: 320, margin: "0 auto 8px", background: COMBO_BONUS_BG }}>
+            <div style={{ fontSize: 14, fontWeight: 900, color: "#C2410C" }}>🔥 콤보 보너스 +{bonusPoints} 포인트!</div>
           </Card>
         )}
 
@@ -723,7 +715,7 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
               background: comboStyle.bg, color: "white",
               boxShadow: comboStyle.shadow,
               fontSize: 12, fontWeight: 900,
-              padding: "4px 10px", borderRadius: 10,
+              padding: "4px 10px", borderRadius: T.radiusFull,
               display: "inline-flex", alignItems: "center", gap: 4,
             }}>
               {combo >= 3 ? <ComboFireEffect active={true} size={16} /> : "🔥"}
@@ -754,8 +746,8 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
         {!isKo2En && (
           <div>
             <button onClick={(e) => { e.stopPropagation(); speak(q.en); }} style={{
-              background: "rgba(255,255,255,0.7)", border: "none", borderRadius: 10,
-              padding: "5px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: T.yellow
+              background: "rgba(255,255,255,0.7)", border: "none", borderRadius: T.radiusSm,
+              padding: "6px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "#B45309"
             }}>🔊 발음 듣기</button>
           </div>
         )}
@@ -764,8 +756,8 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         {q.opts.map((o, idx) => (
           <button key={idx} onClick={() => pick(idx)} style={{
-            padding: "18px 12px", borderRadius: 14, border: `2px solid ${T.border}`,
-            background: T.card, fontSize: 15, fontWeight: 800, cursor: "pointer",
+            padding: "18px 12px", borderRadius: T.radius, border: `2px solid ${T.border}`,
+            background: T.card, color: T.text, fontSize: 15, fontWeight: 800, cursor: "pointer",
             boxShadow: T.shadow, lineHeight: 1.3
           }}>{o[q.aField]}</button>
         ))}
@@ -777,7 +769,7 @@ export function SpeedQuiz({ name, setStudents, student, onExit, levelId = "all" 
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// 게임 4: 플래시카드 (Angela 격려 — 콤보 X)
+// 게임 4: 플래시카드
 // ──────────────────────────────────────────────────────────────────────────
 export function FlashCard({ name, setStudents, student, onExit, levelId = "all" }) {
   const [idx, setIdx] = useState(0);
@@ -793,9 +785,7 @@ export function FlashCard({ name, setStudents, student, onExit, levelId = "all" 
       speak(cards[idx].en);
       recordWordEncounter(name, cards[idx], true);
     }
-    // 첫 카드에 환영 메시지
     if (idx === 0) angela.show("start");
-    // 중간에 격려 (40%에 도달했을 때)
     else if (idx === Math.floor(cards.length * 0.4)) angela.show("correct");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx]);
@@ -845,7 +835,7 @@ export function FlashCard({ name, setStudents, student, onExit, levelId = "all" 
       </div>
 
       <div onClick={() => { setFlipped(!flipped); playClick(); }} style={{
-        background: flipped ? T.purple : T.card, borderRadius: 20, padding: "60px 20px",
+        background: flipped ? T.purple : T.card, borderRadius: T.radiusLg, padding: "60px 20px",
         textAlign: "center", color: flipped ? "white" : T.text, marginBottom: 12,
         cursor: "pointer", boxShadow: T.shadowLg, minHeight: 220, display: "flex",
         flexDirection: "column", justifyContent: "center", alignItems: "center", position: "relative"
@@ -860,11 +850,11 @@ export function FlashCard({ name, setStudents, student, onExit, levelId = "all" 
       </div>
 
       <button onClick={(e) => { e.stopPropagation(); toggleFav(); }} disabled={favLoading} style={{
-        width: "100%", marginBottom: 8, padding: "10px",
-        background: isFav ? "#fef3c7" : "white",
-        color: isFav ? "#f59e0b" : T.textMid,
-        border: `2px solid ${isFav ? "#f59e0b" : T.border}`,
-        borderRadius: 12, fontSize: 13, fontWeight: 800, cursor: favLoading ? "wait" : "pointer",
+        width: "100%", marginBottom: 8, padding: "12px",
+        background: isFav ? T.yellowLight : T.card,
+        color: isFav ? "#B45309" : T.textMid,
+        border: `2px solid ${isFav ? T.yellow : T.border}`,
+        borderRadius: T.radius, fontSize: 13, fontWeight: 800, cursor: favLoading ? "wait" : "pointer",
       }}>
         {isFav ? "⭐ 내 단어장에 있어요" : "☆ 내 단어장에 추가"}
       </button>
@@ -895,7 +885,7 @@ export function LevelSelect({ gameInfo, onSelect, onCancel }) {
 
       <div style={{ textAlign: "center", marginBottom: 22 }}>
         <div style={{
-          width: 70, height: 70, borderRadius: 18, background: gameInfo.bg, margin: "0 auto 10px",
+          width: 70, height: 70, borderRadius: T.radius, background: gameInfo.bg, margin: "0 auto 10px",
           display: "flex", alignItems: "center", justifyContent: "center", fontSize: 38
         }}>{gameInfo.icon}</div>
         <div style={{ fontSize: 20, fontWeight: 900, color: T.text }}>{gameInfo.name}</div>
@@ -911,7 +901,7 @@ export function LevelSelect({ gameInfo, onSelect, onCancel }) {
               background: lv.color, border: `2px solid ${lv.accent}33`
             }}>
               <div style={{
-                width: 50, height: 50, borderRadius: 14, background: "white",
+                width: 50, height: 50, borderRadius: T.radius, background: "white",
                 display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, flexShrink: 0
               }}>{lv.icon}</div>
               <div style={{ flex: 1 }}>

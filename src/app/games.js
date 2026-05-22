@@ -163,6 +163,8 @@ export function MemoryCardGame({ name, setStudents, onExit }) {
   const [done, setDone] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [elapsed, setElapsed] = useState(0);
+  const [angelaState, setAngelaState] = useState("thinking");
+  const [showAngela, setShowAngela] = useState(false);
   const timerRef = useRef(null);
   const awardedRef = useRef(false);
 
@@ -204,6 +206,11 @@ export function MemoryCardGame({ name, setStudents, onExit }) {
       setMoves(m => m+1);
       const [a, b] = [cards[next[0]], cards[next[1]]];
       if (a.pairId === b.pairId && a.side !== b.side) {
+        // 짝 맞춤 성공!
+        setAngelaState("happy");
+        setShowAngela(true);
+        setTimeout(() => setShowAngela(false), 800);
+        onCorrect();
         const nm = new Set(matched); nm.add(a.pairId);
         setMatched(nm);
         setFlipped([]);
@@ -211,7 +218,14 @@ export function MemoryCardGame({ name, setStudents, onExit }) {
           clearInterval(timerRef.current);
           setDone(true);
         }
-      } else setTimeout(() => setFlipped([]), 900);
+      } else {
+        // 짝 안 맞음
+        setAngelaState("oops");
+        setShowAngela(true);
+        setTimeout(() => setShowAngela(false), 800);
+        onWrong();
+        setTimeout(() => setFlipped([]), 900);
+      }
     }
   }, [flipped, matched, cards]);
 
@@ -281,6 +295,13 @@ export function MemoryCardGame({ name, setStudents, onExit }) {
           );
         })}
       </div>
+
+      {/* Angela 팝업 */}
+      {showAngela && (
+        <div style={{position:"fixed",top:"25%",left:0,right:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",zIndex:1000}}>
+          <AngelaCharacter state={angelaState} size={220} style={{animation: "angela-popup 0.6s cubic-bezier(.34,1.56,.64,1)"}} />
+        </div>
+      )}
     </div>
   );
 }
@@ -639,6 +660,8 @@ export function AnagramGame({ name, setStudents, onExit }) {
   const [answer, setAnswer] = useState([]);
   const [feedback, setFeedback] = useState(null);
   const [done, setDone] = useState(false);
+  const [angelaState, setAngelaState] = useState("thinking");
+  const [showAngela, setShowAngela] = useState(false);
   const awardedRef = useRef(false);
 
   const questions = useMemo(()=>shuffle(ALL_WORDS.filter(w=>w.en.length>=3&&w.en.length<=8&&!w.en.includes(" "))).slice(0,10),[]);
@@ -685,9 +708,13 @@ export function AnagramGame({ name, setStudents, onExit }) {
     const built=answer.map(t=>t.char).join("");
     const correct=built.toLowerCase()===q.en.toLowerCase();
     setFeedback(correct?"correct":"wrong");
+    setAngelaState(correct ? "happy" : "oops");
+    setShowAngela(true);
+    setTimeout(() => setShowAngela(false), 800);
     if(correct){setScore(s=>s+1);onCorrect();} else onWrong();
     recordWrong(name,q.en,correct);
     setTimeout(()=>{
+      setAngelaState("thinking");
       if(round<questions.length-1)setRound(r=>r+1); else setDone(true);
     },1000);
   };
@@ -739,6 +766,13 @@ export function AnagramGame({ name, setStudents, onExit }) {
         <Btn v="ghost" size="md" onClick={()=>{setTiles(t=>[...t,...answer]);setAnswer([]);}} disabled={!!feedback||answer.length===0} style={{flex:1}}>↩ 초기화</Btn>
         <Btn v="primary" size="md" onClick={check} disabled={!!feedback||answer.length!==q.en.length} style={{flex:1}}>✓ 확인</Btn>
       </div>
+
+      {/* Angela 팝업 */}
+      {showAngela && (
+        <div style={{position:"fixed",top:"25%",left:0,right:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",zIndex:1000}}>
+          <AngelaCharacter state={angelaState} size={220} style={{animation: "angela-popup 0.6s cubic-bezier(.34,1.56,.64,1)"}} />
+        </div>
+      )}
     </div>
   );
 }
@@ -2027,6 +2061,8 @@ export function DictationGame({ name, setStudents, onExit }) {
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState(null);
   const [played, setPlayed] = useState(false);
+  const [angelaState, setAngelaState] = useState("thinking");
+  const [showAngela, setShowAngela] = useState(false);
   const inputRef = useRef(null);
   const awardedRef = useRef(false);
 
@@ -2073,11 +2109,20 @@ export function DictationGame({ name, setStudents, onExit }) {
     const inp = input.toLowerCase().replace(/[.,!?]/g,"").trim();
     const correct = ans===inp;
     setFeedback(correct?"correct":"wrong");
+    setAngelaState(correct ? "happy" : "oops");
+    setShowAngela(true);
+    setTimeout(() => setShowAngela(false), 800);
     if (correct) { setScore(s=>s+1); onCorrect(); } else onWrong();
     recordWrong(name, questions[round].en, correct);
   };
 
-  const next = () => { setFeedback(null); setInput(""); setPlayed(false); setRound(r=>r+1); };
+  const next = () => { 
+    setFeedback(null); 
+    setInput(""); 
+    setPlayed(false); 
+    setAngelaState("thinking");
+    setRound(r=>r+1); 
+  };
 
   if (!mode) return (
     <div style={{minHeight:"100vh",background:T.bg,padding:16}}>
@@ -2159,6 +2204,13 @@ export function DictationGame({ name, setStudents, onExit }) {
         <Btn v={feedback==="correct"?"success":"danger"} size="lg" onClick={next} style={{width:"100%"}}>
           {feedback==="correct"?"✓ 정답! → 다음":"✗ 오답 → 다음"}
         </Btn>
+      )}
+
+      {/* Angela 팝업 */}
+      {showAngela && (
+        <div style={{position:"fixed",top:"25%",left:0,right:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",zIndex:1000}}>
+          <AngelaCharacter state={angelaState} size={220} style={{animation: "angela-popup 0.6s cubic-bezier(.34,1.56,.64,1)"}} />
+        </div>
       )}
     </div>
   );

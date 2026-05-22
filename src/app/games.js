@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { ALL_WORDS, getWordsByLevel } from "./wordData";
 import { T, Btn, Card } from "./theme";
+import { onCorrect, onWrong, onFinish, triggerConfetti } from "./soundEffects";
 
 // ══════════════════════════════════════════════════════════════════════════
 //   Angela's English Academy — games.js v2.0 (theme.js T/Btn/Card 통일)
@@ -138,6 +139,7 @@ export function MemoryCardGame({ name, setStudents, onExit }) {
     const bonus = Math.max(0, 200 - elapsed);
     const pts = matched.size * 10 + bonus;
     saveGameRecord(setStudents, name, "메모리카드", matched.size, matched.size, pts);
+    onFinish(matched.size, matched.size);
   }, [done, elapsed, matched.size, name, setStudents]);
 
   const initGame = useCallback((n) => {
@@ -275,6 +277,7 @@ export function DailyChallenge({ name, setStudents, onExit }) {
     const bonus = score === 5 ? 50 : 0;
     const pts = score * 15 + bonus;
     saveGameRecord(setStudents, name, "데일리챌린지", score, 5, pts);
+    onFinish(score, 5);
     ls.set(storageKey, { score, completedAt: new Date().toISOString() });
   }, [phase, score, name, setStudents, storageKey]);
 
@@ -322,7 +325,8 @@ export function DailyChallenge({ name, setStudents, onExit }) {
   const pick = (idx) => {
     if (answered) return;
     setPicked(idx);
-    if (idx===q.ansIdx) setScore(s=>s+1);
+    if (idx===q.ansIdx) { setScore(s=>s+1); onCorrect(); }
+    else onWrong();
   };
 
   const next = () => {
@@ -437,6 +441,7 @@ export function WrongNoteGame({ name, students, setStudents, onExit }) {
     awardedRef.current = true;
     const pts = score * 12;
     saveGameRecord(setStudents, name, "오답노트", score, wrongWords.length, pts);
+    onFinish(score, wrongWords.length);
   }, [gameOver, wrongWords.length, score, name, setStudents]);
 
   if (wrongWords.length===0) return (
@@ -463,8 +468,8 @@ export function WrongNoteGame({ name, students, setStudents, onExit }) {
     try{
       const data=ls.get(key, {});
       data[q.en]=data[q.en]||{wrong:0,correct:0};
-      if(idx===q.ansIdx){data[q.en].correct++;setScore(s=>s+1);}
-      else data[q.en].wrong++;
+      if(idx===q.ansIdx){data[q.en].correct++;setScore(s=>s+1);onCorrect();}
+      else {data[q.en].wrong++;onWrong();}
       ls.set(key, data);
     }catch{}
   };
@@ -552,6 +557,7 @@ export function AnagramGame({ name, setStudents, onExit }) {
     awardedRef.current = true;
     const pts = score * 15;
     saveGameRecord(setStudents, name, "애너그램", score, questions.length, pts);
+    onFinish(score, questions.length);
   }, [gameOver, score, questions.length, name, setStudents]);
 
   if (gameOver) {
@@ -576,7 +582,7 @@ export function AnagramGame({ name, setStudents, onExit }) {
     const built=answer.map(t=>t.char).join("");
     const correct=built.toLowerCase()===q.en.toLowerCase();
     setFeedback(correct?"correct":"wrong");
-    if(correct)setScore(s=>s+1);
+    if(correct){setScore(s=>s+1);onCorrect();} else onWrong();
     recordWrong(name,q.en,correct);
     setTimeout(()=>{
       if(round<questions.length-1)setRound(r=>r+1); else setDone(true);
@@ -701,6 +707,7 @@ export function TypingRace({ name, setStudents, onExit }) {
     awardedRef.current = true;
     const pts = score * 8;
     saveGameRecord(setStudents, name, "타이핑레이스", score, score, pts);
+    onFinish(score, score);
   }, [done, score, name, setStudents]);
 
   const tryType=(e)=>{
@@ -801,6 +808,7 @@ export function WordRelay({ name, setStudents, onExit }) {
     awardedRef.current = true;
     const pts = score * 10 + bonus;
     saveGameRecord(setStudents, name, "단어릴레이", score, chain.length, pts);
+    onFinish(score, chain.length);
   }, [gameOver, score, bonus, chain.length, name, setStudents]);
 
   if (gameOver) {
@@ -819,8 +827,10 @@ export function WordRelay({ name, setStudents, onExit }) {
       const nc=combo+1;
       setCombo(nc);
       setMaxCombo(m=>Math.max(m,nc));
+      onCorrect();
+      if(nc>=5) triggerConfetti();  // 5콤보 이상 색종이!
       if(nc>=2){setComboFlash(true);setTimeout(()=>setComboFlash(false),600);}
-    } else {setCombo(0);}
+    } else {setCombo(0);onWrong();}
     recordWrong(name,q.en,idx===q.ansIdx);
   };
 
@@ -928,6 +938,7 @@ export function WordTwenty({ name, setStudents, onExit }) {
     awardedRef.current = true;
     const pts = score * 15;
     saveGameRecord(setStudents, name, "단어스무고개", score, questions.length, pts);
+    onFinish(score, questions.length);
   }, [gameOver, score, questions.length, name, setStudents]);
 
   if (gameOver) {
@@ -942,7 +953,7 @@ export function WordTwenty({ name, setStudents, onExit }) {
   const pick=(idx)=>{
     if(answered)return;
     setPicked(idx);
-    if(idx===q.ansIdx)setScore(s=>s+1+bonusPts);
+    if(idx===q.ansIdx){setScore(s=>s+1+bonusPts);onCorrect();} else onWrong();
     recordWrong(name,q.en,idx===q.ansIdx);
   };
 
@@ -1042,6 +1053,7 @@ export function WordWorldRPG({ name, setStudents, onExit }) {
     const stars=cleared?3:score>questions.length/2?1:0;
     const pts=score*20+(cleared?50:0);
     saveGameRecord(setStudents, name, "단어월드RPG", score, questions.length, pts);
+    onFinish(score, questions.length);
     if(cleared){
       const newSave={...save,clearedWorlds:[...new Set([...save.clearedWorlds,selectedWorld.id])],totalStars:save.totalStars+stars,questLog:[...save.questLog,{world:selectedWorld.name,score,clearedAt:new Date().toISOString()}]};
       persist(newSave);
@@ -1143,8 +1155,9 @@ export function WordWorldRPG({ name, setStudents, onExit }) {
       const correct=idx===q.ansIdx;
       setFeedback(correct?"correct":"wrong");
       recordWrong(name,q.en,correct);
-      if(correct){setScore(s=>s+1);setBossHp(h=>h-1);}
+      if(correct){setScore(s=>s+1);setBossHp(h=>h-1);onCorrect();}
       else{
+        onWrong();
         if(shieldActive)setShieldActive(false);
         else setHp(h=>h-1);
       }
@@ -1306,6 +1319,7 @@ export function PictureWordGame({ name, setStudents, onExit }) {
     awardedRef.current = true;
     const pts = score * 10;
     saveGameRecord(setStudents, name, "그림단어", score, questions.length, pts);
+    onFinish(score, questions.length);
   }, [gameOver, score, questions.length, name, setStudents]);
 
   if (!mode) return (
@@ -1357,7 +1371,7 @@ export function PictureWordGame({ name, setStudents, onExit }) {
   const pick = (idx) => {
     if (answered) return;
     setPicked(idx);
-    if (idx === ansIdx) setScore(s => s+1);
+    if (idx === ansIdx) { setScore(s => s+1); onCorrect(); } else onWrong();
     recordWrong(name, q.en, idx === ansIdx);
     setTimeout(() => { setPicked(null); setRound(r => r+1); }, 900);
   };
@@ -1446,6 +1460,7 @@ export function WordMatchLines({ name, setStudents, onExit }) {
     const total = ROUNDS * PER;
     const pts = score * 10;
     saveGameRecord(setStudents, name, "단어연결", score, total, pts);
+    onFinish(score, total);
   }, [done, score, name, setStudents]);
 
   const cur = sets[round];
@@ -1623,6 +1638,7 @@ export function WordSearchGame({ name, setStudents, onExit }) {
     awardedRef.current = true;
     const pts = found.length * 15;
     saveGameRecord(setStudents, name, "단어찾기퍼즐", found.length, placed.length, pts);
+    onFinish(found.length, placed.length);
   }, [done, found.length, placed.length, name, setStudents]);
 
   // 현재 선택 중인 셀들 계산
@@ -1781,6 +1797,7 @@ export function DictationGame({ name, setStudents, onExit }) {
     awardedRef.current = true;
     const pts = score * 12;
     saveGameRecord(setStudents, name, "받아쓰기", score, questions.length, pts);
+    onFinish(score, questions.length);
   }, [gameOver, score, questions.length, name, setStudents]);
 
   const speakQ = () => {
@@ -1801,7 +1818,7 @@ export function DictationGame({ name, setStudents, onExit }) {
     const inp = input.toLowerCase().replace(/[.,!?]/g,"").trim();
     const correct = ans===inp;
     setFeedback(correct?"correct":"wrong");
-    if (correct) setScore(s=>s+1);
+    if (correct) { setScore(s=>s+1); onCorrect(); } else onWrong();
     recordWrong(name, questions[round].en, correct);
   };
 

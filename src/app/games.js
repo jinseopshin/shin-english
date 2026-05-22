@@ -1496,33 +1496,24 @@ export function PictureWordGame({ name, setStudents, onExit }) {
         <div style={{position:"absolute",bottom:-40,left:-20,width:90,height:90,borderRadius:"50%",background:"rgba(255,255,255,0.3)",pointerEvents:"none"}}/>
         <div style={{fontSize:11,color:T.textMid,fontWeight:700,marginBottom:14,position:"relative"}}>이 그림의 {mode==="en"?"영어 단어는?":"한글 뜻은?"} <span style={{color:T.accent,fontWeight:800}}>(그림 탭하면 발음! 🔊)</span></div>
         
-        {/* 이모지 원형 + Angela 같이 배치 */}
-        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:12,marginBottom:14}}>
-          {/* Angela - 이모지 왼쪽에 작게 */}
-          <AngelaCharacter 
-            state={angelaState}
-            size={80}
-          />
-          
-          {/* 이모지 원형 */}
-          <div
-            onClick={()=>speak(q.en)}
-            style={{
-              width:150,height:150,
-              background:"white",borderRadius:"50%",
-              display:"flex",alignItems:"center",justifyContent:"center",
-              fontSize:84,lineHeight:1,cursor:"pointer",userSelect:"none",
-              boxShadow:"0 8px 24px rgba(0,0,0,0.10), inset 0 -4px 8px rgba(0,0,0,0.04)",
-              transition:"transform 0.15s cubic-bezier(.34,1.56,.64,1)",position:"relative"
-            }}
-            onMouseDown={e=>e.currentTarget.style.transform="scale(0.92)"}
-            onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}
-            onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}
-            onTouchStart={e=>e.currentTarget.style.transform="scale(0.92)"}
-            onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"}
-            title="탭하면 발음을 들을 수 있어요"
-          >{q.emoji}</div>
-        </div>
+        {/* 이모지 원형 - 중앙 */}
+        <div
+          onClick={()=>speak(q.en)}
+          style={{
+            width:150,height:150,margin:"0 auto 14px",
+            background:"white",borderRadius:"50%",
+            display:"flex",alignItems:"center",justifyContent:"center",
+            fontSize:84,lineHeight:1,cursor:"pointer",userSelect:"none",
+            boxShadow:"0 8px 24px rgba(0,0,0,0.10), inset 0 -4px 8px rgba(0,0,0,0.04)",
+            transition:"transform 0.15s cubic-bezier(.34,1.56,.64,1)",position:"relative"
+          }}
+          onMouseDown={e=>e.currentTarget.style.transform="scale(0.92)"}
+          onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}
+          onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}
+          onTouchStart={e=>e.currentTarget.style.transform="scale(0.92)"}
+          onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"}
+          title="탭하면 발음을 들을 수 있어요"
+        >{q.emoji}</div>
         <div style={{fontSize:13,fontWeight:700,color:T.textMid,marginBottom:12,position:"relative"}}>{mode==="en"?q.ko:q.en}</div>
         <button
           onClick={(e)=>{e.stopPropagation();speak(q.en);}}
@@ -1543,12 +1534,35 @@ export function PictureWordGame({ name, setStudents, onExit }) {
           }}
         >🔊 발음 듣기</button>
       </Card>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-        {q.opts.map((o,idx) => {
+      
+      {/* 보기 위 2개 */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
+        {q.opts.slice(0, 2).map((o,idx) => {
           const isAns = idx === ansIdx;
           let bg=T.card,color=T.text,border=T.border;let anim="";
           if (answered){ if(isAns){bg=T.green;color="white";border=T.green;anim="answer-pop";} else if(idx===picked){bg=T.red;color="white";border=T.red;anim="wrong-shake";} }
           return <button key={idx} onClick={()=>pick(idx)} disabled={answered} style={{padding:"20px 12px",borderRadius:T.radiusLg,border:`2.5px solid ${border}`,background:bg,color,fontSize:16,fontWeight:800,cursor:answered?"default":"pointer",transition:"all 0.2s",lineHeight:1.3,animation:anim?`${anim} 0.45s ease`:"none",boxShadow:answered?"none":"0 2px 8px rgba(0,0,0,0.05)"}}>
+            {mode==="en"?o.en:o.ko}
+          </button>;
+        })}
+      </div>
+
+      {/* Angela - 보기 사이에 배치 */}
+      <div style={{display:"flex",justifyContent:"center",marginBottom:16}}>
+        <AngelaCharacter 
+          state={angelaState}
+          size={90}
+        />
+      </div>
+
+      {/* 보기 아래 2개 */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+        {q.opts.slice(2, 4).map((o,idx) => {
+          const realIdx = idx + 2; // 실제 인덱스는 2, 3
+          const isAns = realIdx === ansIdx;
+          let bg=T.card,color=T.text,border=T.border;let anim="";
+          if (answered){ if(isAns){bg=T.green;color="white";border=T.green;anim="answer-pop";} else if(realIdx===picked){bg=T.red;color="white";border=T.red;anim="wrong-shake";} }
+          return <button key={realIdx} onClick={()=>pick(realIdx)} disabled={answered} style={{padding:"20px 12px",borderRadius:T.radiusLg,border:`2.5px solid ${border}`,background:bg,color,fontSize:16,fontWeight:800,cursor:answered?"default":"pointer",transition:"all 0.2s",lineHeight:1.3,animation:anim?`${anim} 0.45s ease`:"none",boxShadow:answered?"none":"0 2px 8px rgba(0,0,0,0.05)"}}>
             {mode==="en"?o.en:o.ko}
           </button>;
         })}

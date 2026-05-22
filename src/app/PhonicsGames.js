@@ -11,11 +11,11 @@ import {
 } from "./soundEffects";
 import { useAngela, getComboReaction, getFinishReaction, FullScreenConfetti } from "./AngelaMascot";
 import { PhonicsClassMode } from "./PhonicsClassMode";
-// ✨ 새로 추가: Cloudinary 큐레이션 이미지
 import { getCuratedImageUrl, hasCuratedImage, preloadImages } from "./phonicsImages";
 
 // ══════════════════════════════════════════════════════════════════════════
-//   🔤 PhonicsGames.js — 유치부 파닉스 게임 5종
+//   🔤 PhonicsGames.js v2.0 — 유치부 파닉스 게임 5종
+//   게임 로직 100% 유지, 디자인만 새 시스템 적용
 // ══════════════════════════════════════════════════════════════════════════
 
 // ── 헬퍼: TTS로 영어 발음 재생 ──
@@ -80,6 +80,17 @@ function shuffle(arr) {
   return out;
 }
 
+// ── 공통: 둥근 뒤로가기 버튼 ──
+function BackBtn({ onClick, label = "← 뒤로" }) {
+  return (
+    <button onClick={onClick} style={{
+      background: T.bgSoft, border: "none", borderRadius: T.radiusSm,
+      padding: "9px 14px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid,
+      transition: "all 0.15s"
+    }}>{label}</button>
+  );
+}
+
 // ══════════════════════════════════════════════════════════════════════════
 //   📋 메인 메뉴
 // ══════════════════════════════════════════════════════════════════════════
@@ -92,7 +103,7 @@ export function PhonicsMenu({ studentName, onExit }) {
     const assignedIds = new Set(myAssignedSets.map(s => s.id));
     return getPublicSets().filter(s => !assignedIds.has(s.id));
   }, [myAssignedSets]);
- 
+
   if (selectedCustomSet) {
     return (
       <CustomSetMenu
@@ -116,54 +127,97 @@ export function PhonicsMenu({ studentName, onExit }) {
   }
 
   return (
-    <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-        <button onClick={onExit} style={{
-          background: T.card, border: `1px solid ${T.border}`, borderRadius: 10,
-          padding: "8px 12px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid
-        }}>← 뒤로</button>
+    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
+        <BackBtn onClick={onExit} />
         <div>
           <div style={{ fontSize: 20, fontWeight: 900, color: T.text }}>🔤 파닉스 학습</div>
           <div style={{ fontSize: 11, color: T.textMid, marginTop: 2 }}>알파벳부터 차근차근 배워봐요!</div>
         </div>
       </div>
 
+      {/* 선생님이 내준 단어집 */}
       {myAssignedSets.length > 0 && (
-        <div style={{ marginBottom: 18 }}>
+        <div style={{ marginBottom: 20 }}>
           <div style={{
-            fontSize: 13, fontWeight: 800, color: T.text,
-            marginBottom: 8, display: "flex", alignItems: "center", gap: 6
+            fontSize: 13, fontWeight: 900, color: T.text,
+            marginBottom: 10, display: "flex", alignItems: "center", gap: 6
           }}>
             <span style={{ fontSize: 16 }}>⭐</span>
             선생님이 내준 단어집
             <span style={{
               fontSize: 10, background: T.accent, color: "white",
-              padding: "2px 8px", borderRadius: 8, marginLeft: 4
+              padding: "2px 9px", borderRadius: T.radiusFull, marginLeft: 4, fontWeight: 900
             }}>{myAssignedSets.length}</span>
           </div>
-          <div style={{ display: "grid", gap: 8 }}>
+          <div style={{ display: "grid", gap: 10 }}>
             {myAssignedSets.map(set => {
               const level = PHONICS_LEVELS.find(l => l.id === set.levelId);
               return (
-                <Card key={set.id} onClick={() => { playClick(); setSelectedCustomSet(set); }}
+                <div key={set.id} onClick={() => { playClick(); setSelectedCustomSet(set); }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = T.shadowLg; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = T.shadow; }}
                   style={{
-                    padding: 12, cursor: "pointer",
+                    padding: 14, cursor: "pointer", borderRadius: T.radiusLg,
                     background: `linear-gradient(135deg, ${T.accent}, ${T.purple})`,
-                    color: "white", border: "none",
-                    display: "flex", alignItems: "center", gap: 12
+                    color: "white", border: "none", boxShadow: T.shadow,
+                    display: "flex", alignItems: "center", gap: 12, transition: "all 0.2s"
                   }}>
                   <div style={{
-                    width: 40, height: 40, background: "rgba(255,255,255,0.25)",
-                    borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 22
+                    width: 48, height: 48, background: "rgba(255,255,255,0.25)",
+                    borderRadius: T.radius, display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 24
                   }}>{level?.icon || "📚"}</div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 900 }}>{set.name}</div>
+                    <div style={{ fontSize: 14, fontWeight: 900 }}>{set.name}</div>
                     <div style={{ fontSize: 10, opacity: 0.95, marginTop: 2 }}>
                       {level?.label} · {set.words?.length || 0}개 단어
                     </div>
                   </div>
-                  <div style={{ fontSize: 20, opacity: 0.8 }}>›</div>
+                  <div style={{ fontSize: 22, opacity: 0.8 }}>›</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 공개 단어집 */}
+      {publicSets.length > 0 && (
+        <div style={{ marginBottom: 20 }}>
+          <div style={{
+            fontSize: 13, fontWeight: 900, color: T.text,
+            marginBottom: 10, display: "flex", alignItems: "center", gap: 6
+          }}>
+            <span style={{ fontSize: 16 }}>🌐</span>
+            누구나 풀 수 있는 단어집
+            <span style={{
+              fontSize: 10, background: T.green, color: "white",
+              padding: "2px 9px", borderRadius: T.radiusFull, marginLeft: 4, fontWeight: 900
+            }}>{publicSets.length}</span>
+          </div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {publicSets.map(set => {
+              const level = PHONICS_LEVELS.find(l => l.id === set.levelId);
+              return (
+                <Card key={set.id} onClick={() => { playClick(); setSelectedCustomSet(set); }}
+                  style={{
+                    padding: 14, cursor: "pointer",
+                    border: `2px solid ${level?.color || T.green}`,
+                    display: "flex", alignItems: "center", gap: 12
+                  }}>
+                  <div style={{
+                    width: 48, height: 48, background: level?.bg || T.bgSoft,
+                    borderRadius: T.radius, display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 24
+                  }}>{level?.icon || "📚"}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 900, color: T.text }}>{set.name}</div>
+                    <div style={{ fontSize: 10, color: T.textMid, marginTop: 2 }}>
+                      {level?.label} · {set.words?.length || 0}개 단어
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 22, color: T.textDim }}>›</div>
                 </Card>
               );
             })}
@@ -171,80 +225,45 @@ export function PhonicsMenu({ studentName, onExit }) {
         </div>
       )}
 
-      {publicSets.length > 0 && (
-        <div style={{ marginBottom: 18 }}>
-          <div style={{
-            fontSize: 13, fontWeight: 800, color: T.text,
-            marginBottom: 8, display: "flex", alignItems: "center", gap: 6
-          }}>
-            <span style={{ fontSize: 16 }}>🌐</span>
-            누구나 풀 수 있는 단어집
-            <span style={{
-              fontSize: 10, background: T.green, color: "white",
-              padding: "2px 8px", borderRadius: 8, marginLeft: 4
-            }}>{publicSets.length}</span>
-          </div>
-          <div style={{ display: "grid", gap: 8 }}>
-            {publicSets.map(set => {
-              const level = PHONICS_LEVELS.find(l => l.id === set.levelId);
-              return (
-                <Card key={set.id} onClick={() => { playClick(); setSelectedCustomSet(set); }}
-                  style={{
-                    padding: 12, cursor: "pointer",
-                    background: T.card,
-                    border: `2px solid ${level?.color || T.green}`,
-                    display: "flex", alignItems: "center", gap: 12
-                  }}>
-                  <div style={{
-                    width: 40, height: 40, background: level?.bg || T.bg,
-                    borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 22
-                  }}>{level?.icon || "📚"}</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 900, color: T.text }}>{set.name}</div>
-                    <div style={{ fontSize: 10, color: T.textMid, marginTop: 2 }}>
-                      {level?.label} · {set.words?.length || 0}개 단어
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 20, color: T.textDim }}>›</div>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      )}
- 
       {/* 📚 기본 단계 */}
       <div style={{
-        fontSize: 13, fontWeight: 800, color: T.text,
-        marginBottom: 8, display: "flex", alignItems: "center", gap: 6
+        fontSize: 13, fontWeight: 900, color: T.text,
+        marginBottom: 10, display: "flex", alignItems: "center", gap: 6
       }}>
         <span style={{ fontSize: 16 }}>📚</span>
         기본 단계
       </div>
       <div style={{ display: "grid", gap: 10 }}>
         {PHONICS_LEVELS.map((lv, idx) => {
-          // 이 단계에서 가장 잘 한 게임의 별 수
           const stars = Math.max(
             ...["alphabet-sound", "first-sound", "cvc-blank", "picture-letter", "build-word"]
               .map(g => (progress[`${lv.id}_${g}`]?.bestStars || 0))
           );
           return (
-            <Card key={lv.id} onClick={() => { playClick(); setSelectedLevel(lv.id); }}
+            <div key={lv.id} onClick={() => { playClick(); setSelectedLevel(lv.id); }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = T.shadowLg; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = T.shadow; }}
               style={{
-                padding: 14,
-                background: `linear-gradient(135deg, ${lv.bg}, white)`,
+                padding: 16, borderRadius: T.radiusLg,
+                background: T.card,
+                border: `2px solid ${T.border}`,
                 borderLeft: `5px solid ${lv.color}`,
-                cursor: "pointer",
+                cursor: "pointer", boxShadow: T.shadow, transition: "all 0.2s",
                 display: "flex", alignItems: "center", gap: 14
               }}>
-              <div style={{ fontSize: 36 }}>{lv.icon}</div>
+              <div style={{
+                width: 56, height: 56, background: lv.bg, borderRadius: T.radius,
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32
+              }}>{lv.icon}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                  <span style={{ fontSize: 10, color: T.textMid, fontWeight: 700 }}>STEP {idx+1}</span>
-                  <span style={{ fontSize: 14, fontWeight: 900, color: T.text }}>{lv.label}</span>
+                  <span style={{
+                    fontSize: 9, color: "white", fontWeight: 800,
+                    background: lv.color, padding: "2px 7px", borderRadius: T.radiusFull
+                  }}>STEP {idx+1}</span>
+                  <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>{lv.label}</span>
                 </div>
-                <div style={{ fontSize: 10, color: T.textMid, marginBottom: 4 }}>{lv.desc}</div>
+                <div style={{ fontSize: 10, color: T.textMid, marginBottom: 6 }}>{lv.desc}</div>
                 <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
                   {[1, 2, 3].map(i => (
                     <span key={i} style={{ fontSize: 13, opacity: stars >= i ? 1 : 0.25 }}>⭐</span>
@@ -254,8 +273,8 @@ export function PhonicsMenu({ studentName, onExit }) {
                   </span>
                 </div>
               </div>
-              <div style={{ fontSize: 20, color: T.textDim }}>›</div>
-            </Card>
+              <div style={{ fontSize: 22, color: T.textDim }}>›</div>
+            </div>
           );
         })}
       </div>
@@ -301,12 +320,9 @@ function CustomSetMenu({ studentName, customSet, onBack, onExit }) {
   ];
 
   return (
-    <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-        <button onClick={onBack} style={{
-          background: T.card, border: `1px solid ${T.border}`, borderRadius: 10,
-          padding: "8px 12px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid
-        }}>← 뒤로</button>
+    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
+        <BackBtn onClick={onBack} />
         <div>
           <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>
             {level?.icon} {customSet.name}
@@ -319,32 +335,35 @@ function CustomSetMenu({ studentName, customSet, onBack, onExit }) {
 
       <div style={{ display: "grid", gap: 10 }}>
         {availableGames.map(g => (
-          <Card key={g.id} onClick={() => { playClick(); setMode(g.id); }}
+          <div key={g.id} onClick={() => { playClick(); setMode(g.id); }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = T.shadowLg; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = T.shadow; }}
             style={{
-              padding: 14, display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
+              padding: 16, display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
+              borderRadius: T.radiusLg, boxShadow: T.shadow, transition: "all 0.2s",
               background: g.featured
-                ? `linear-gradient(135deg, ${T.green}, ${T.accent})`
+                ? `linear-gradient(135deg, ${T.green}, ${T.teal})`
                 : T.card,
               color: g.featured ? "white" : T.text,
               border: g.featured ? "none" : `2px solid ${T.border}`,
             }}>
             <div style={{
-              width: 48, height: 48,
-              background: g.featured ? "rgba(255,255,255,0.25)" : (level?.bg || T.bg),
-              borderRadius: 12,
+              width: 52, height: 52,
+              background: g.featured ? "rgba(255,255,255,0.25)" : (level?.bg || T.bgSoft),
+              borderRadius: T.radius,
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 24
+              fontSize: 26
             }}>{g.icon}</div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 800 }}>{g.label}</div>
+              <div style={{ fontSize: 14, fontWeight: 800 }}>{g.label}</div>
               <div style={{
                 fontSize: 10,
                 color: g.featured ? "rgba(255,255,255,0.95)" : T.textMid,
                 marginTop: 2
               }}>{g.desc}</div>
             </div>
-            <div style={{ fontSize: 18, opacity: g.featured ? 0.85 : 0.5 }}>›</div>
-          </Card>
+            <div style={{ fontSize: 20, opacity: g.featured ? 0.85 : 0.5 }}>›</div>
+          </div>
         ))}
       </div>
     </div>
@@ -364,11 +383,7 @@ function CustomSetGameRunner({ studentName, customSet, gameId, onBack, onExit })
       return (
         <div style={{ padding: 20, textAlign: "center" }}>
           <div style={{ fontSize: 14, color: T.red, marginBottom: 12 }}>지원하지 않는 게임</div>
-          <button onClick={onBack} style={{
-            padding: "10px 20px", background: T.accent,
-            color: "white", border: "none", borderRadius: 10,
-            fontSize: 13, fontWeight: 800, cursor: "pointer"
-          }}>← 뒤로</button>
+          <BackBtn onClick={onBack} />
         </div>
       );
   }
@@ -417,12 +432,9 @@ function PhonicsGameMenu({ studentName, levelId, onBack, onExit }) {
   }
 
   return (
-    <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-        <button onClick={onBack} style={{
-          background: T.card, border: `1px solid ${T.border}`, borderRadius: 10,
-          padding: "8px 12px", fontSize: 13, fontWeight: 700, cursor: "pointer", color: T.textMid
-        }}>← 뒤로</button>
+    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
+        <BackBtn onClick={onBack} />
         <div>
           <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>
             {level?.icon} {level?.label}
@@ -432,26 +444,30 @@ function PhonicsGameMenu({ studentName, levelId, onBack, onExit }) {
       </div>
 
       <div style={{ display: "grid", gap: 10 }}>
-        <Card onClick={() => { playClick(); setShowClassMode(true); }}
+        {/* 수업 모드 (featured) */}
+        <div onClick={() => { playClick(); setShowClassMode(true); }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = T.shadowLg; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = T.shadow; }}
           style={{
-            padding: 14, display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
-            background: `linear-gradient(135deg, ${T.green}, ${T.accent})`,
+            padding: 16, display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
+            borderRadius: T.radiusLg, boxShadow: T.shadow, transition: "all 0.2s",
+            background: `linear-gradient(135deg, ${T.green}, ${T.teal})`,
             color: "white", border: "none"
           }}>
           <div style={{
-            width: 48, height: 48, background: "rgba(255,255,255,0.25)",
-            borderRadius: 12,
+            width: 52, height: 52, background: "rgba(255,255,255,0.25)",
+            borderRadius: T.radius,
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 24
+            fontSize: 26
           }}>📖</div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 900 }}>수업 모드</div>
+            <div style={{ fontSize: 14, fontWeight: 900 }}>수업 모드</div>
             <div style={{ fontSize: 10, opacity: 0.95, marginTop: 2 }}>
               선생님과 같이 보며 천천히 익혀요
             </div>
           </div>
-          <div style={{ fontSize: 18, opacity: 0.85 }}>›</div>
-        </Card>
+          <div style={{ fontSize: 20, opacity: 0.85 }}>›</div>
+        </div>
 
         {games.map(g => {
           const rec = progress[`${levelId}_${g.id}`];
@@ -459,17 +475,17 @@ function PhonicsGameMenu({ studentName, levelId, onBack, onExit }) {
           return (
             <Card key={g.id} onClick={() => { playClick(); setSelectedGame(g.id); }}
               style={{
-                padding: 14, display: "flex", alignItems: "center", gap: 12, cursor: "pointer"
+                padding: 16, display: "flex", alignItems: "center", gap: 12, cursor: "pointer"
               }}>
               <div style={{
-                width: 48, height: 48, background: level?.bg, borderRadius: 12,
+                width: 52, height: 52, background: level?.bg, borderRadius: T.radius,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 24
+                fontSize: 26
               }}>{g.icon}</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: T.text }}>{g.label}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: T.text }}>{g.label}</div>
                 <div style={{ fontSize: 10, color: T.textMid, marginTop: 2 }}>{g.desc}</div>
-                <div style={{ display: "flex", gap: 2, marginTop: 6 }}>
+                <div style={{ display: "flex", gap: 2, marginTop: 6, alignItems: "center" }}>
                   {[1, 2, 3].map(i => (
                     <span key={i} style={{ fontSize: 12, opacity: stars >= i ? 1 : 0.25 }}>⭐</span>
                   ))}
@@ -480,7 +496,7 @@ function PhonicsGameMenu({ studentName, levelId, onBack, onExit }) {
                   )}
                 </div>
               </div>
-              <div style={{ fontSize: 18, color: T.textDim }}>›</div>
+              <div style={{ fontSize: 20, color: T.textDim }}>›</div>
             </Card>
           );
         })}
@@ -550,7 +566,7 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
   }
 
   return (
-    <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
+    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
       <FullScreenConfetti trigger={confettiTrigger} />
       <GameHeader
         onBack={onBack}
@@ -561,8 +577,8 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
 
       <div style={{
         background: `linear-gradient(135deg, ${T.accent}, ${T.purple})`,
-        borderRadius: 24, padding: "40px 24px", textAlign: "center",
-        color: "white", marginBottom: 20
+        borderRadius: T.radiusXl, padding: "40px 24px", textAlign: "center",
+        color: "white", marginBottom: 20, boxShadow: T.shadowLg
       }}>
         <div style={{
           fontSize: 140, fontWeight: 900, lineHeight: 1,
@@ -582,7 +598,7 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
       <button onClick={() => { speakLetter(current.letter); setTimeout(() => speakWord(current.word), 1000); }}
         style={{
           width: "100%", padding: 14, background: T.card,
-          border: `2px solid ${T.accent}`, borderRadius: 14, marginBottom: 12,
+          border: `2px solid ${T.accent}`, borderRadius: T.radius, marginBottom: 12,
           fontSize: 14, fontWeight: 800, color: T.accent, cursor: "pointer"
         }}>
         🔊 다시 듣기
@@ -590,8 +606,9 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
 
       <button onClick={next} style={{
         width: "100%", padding: 18, background: T.green,
-        color: "white", border: "none", borderRadius: 14,
-        fontSize: 16, fontWeight: 900, cursor: "pointer"
+        color: "white", border: "none", borderRadius: T.radius,
+        fontSize: 16, fontWeight: 900, cursor: "pointer",
+        boxShadow: "0 4px 12px rgba(16,185,129,0.25)"
       }}>
         {idx < order.length - 1 ? "다음 →" : "끝내기 ✨"}
       </button>
@@ -668,7 +685,7 @@ function FirstSoundGame({ studentName, levelId, gameId, onBack, onExit, customWo
   }
 
   return (
-    <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
+    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
       <FullScreenConfetti trigger={confettiTrigger} />
       <angela.AngelaComponent />
       <GameHeader
@@ -681,14 +698,14 @@ function FirstSoundGame({ studentName, levelId, gameId, onBack, onExit, customWo
       />
 
       <div style={{
-        background: T.card, borderRadius: 24, padding: "30px 20px",
+        background: T.card, borderRadius: T.radiusXl, padding: "30px 20px",
         textAlign: "center", marginBottom: 16, border: `2px solid ${T.border}`
       }}>
         <div style={{ fontSize: 100, marginBottom: 8 }}>{current.emoji}</div>
         <button onClick={() => speakWord(current.word)}
           style={{
             background: T.accent, color: "white",
-            border: "none", borderRadius: 16, padding: "12px 20px",
+            border: "none", borderRadius: T.radius, padding: "12px 20px",
             fontSize: 16, fontWeight: 800, cursor: "pointer",
             display: "inline-flex", alignItems: "center", gap: 8
           }}>
@@ -712,7 +729,7 @@ function FirstSoundGame({ studentName, levelId, gameId, onBack, onExit, customWo
               disabled={isAnswered}
               style={{
                 background: bg, color, border: `3px solid ${border}`,
-                borderRadius: 16, padding: "30px 0",
+                borderRadius: T.radius, padding: "30px 0",
                 fontSize: 56, fontWeight: 900,
                 cursor: isAnswered ? "default" : "pointer",
                 transition: "all 0.2s"
@@ -803,7 +820,7 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
   }
 
   return (
-    <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
+    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
       <FullScreenConfetti trigger={confettiTrigger} />
       <angela.AngelaComponent />
       <GameHeader
@@ -816,7 +833,7 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
       />
 
       <div style={{
-        background: T.card, borderRadius: 24, padding: "30px 20px",
+        background: T.card, borderRadius: T.radiusXl, padding: "30px 20px",
         textAlign: "center", marginBottom: 16, border: `2px solid ${T.border}`
       }}>
         <div style={{ fontSize: 80, marginBottom: 12 }}>{current.emoji}</div>
@@ -832,7 +849,7 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
             display: "inline-block", minWidth: 60,
             color: feedback === "correct" ? T.green : T.orange,
             background: feedback ? "transparent" : T.yellowLight,
-            borderRadius: 8, padding: "0 4px"
+            borderRadius: T.radiusSm, padding: "0 4px"
           }}>
             {feedback ? parts.missing : "_"}
           </span>
@@ -842,7 +859,7 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
         <button onClick={() => speakWord(current.word)}
           style={{
             background: T.accent, color: "white",
-            border: "none", borderRadius: 12, padding: "10px 16px",
+            border: "none", borderRadius: T.radiusSm, padding: "10px 16px",
             fontSize: 13, fontWeight: 700, cursor: "pointer"
           }}>
           🔊 소리 듣기
@@ -860,7 +877,7 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
               disabled={isAnswered}
               style={{
                 background: bg, color, border: `3px solid ${border}`,
-                borderRadius: 16, padding: "26px 0",
+                borderRadius: T.radius, padding: "26px 0",
                 fontSize: 48, fontWeight: 900,
                 cursor: isAnswered ? "default" : "pointer",
                 transition: "all 0.2s"
@@ -875,12 +892,11 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-//   GAME 4: 🖼️ 그림 보고 첫글자 (✨ Cloudinary 큐레이션 이미지 + 힌트 버튼)
+//   GAME 4: 🖼️ 그림 보고 첫글자 (Cloudinary 큐레이션 이미지 + 힌트)
 // ══════════════════════════════════════════════════════════════════════════
 function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, customWords }) {
   const [rounds] = useState(() => {
     const source = customWords || getPhonicsWords(levelId);
-    // 큐레이션된 이미지가 있는 단어만 사용 (커스텀 단어집은 이모지 허용)
     const withImages = customWords
       ? source
       : source.filter(w => hasCuratedImage(w.word));
@@ -898,14 +914,11 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
 
   const current = rounds[idx];
 
-  // ⚡ 다음 라운드 이미지 사전 로드 (체감 속도 향상)
   useEffect(() => {
     if (!rounds || rounds.length === 0) return;
-    // 처음 진입 시 처음 3개 사전 로드
     if (idx === 0) {
       preloadImages(rounds.slice(0, 3));
     }
-    // 매 라운드마다 다음 2개 사전 로드
     const nextRounds = rounds.slice(idx + 1, idx + 3);
     preloadImages(nextRounds);
   }, [idx, rounds]);
@@ -968,7 +981,7 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
   const restOfWord = current.word.slice(1);
 
   return (
-    <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
+    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
       <FullScreenConfetti trigger={confettiTrigger} />
       <angela.AngelaComponent />
       <GameHeader
@@ -982,11 +995,10 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
 
       <div style={{
         background: `linear-gradient(135deg, ${T.yellowLight}, ${T.pinkLight})`,
-        borderRadius: 24, padding: "30px 20px 24px",
+        borderRadius: T.radiusXl, padding: "30px 20px 24px",
         textAlign: "center", marginBottom: 16,
         position: "relative"
       }}>
-        {/* 💡 힌트 버튼 */}
         {!showHint && feedback === null && (
           <button
             onClick={handleHint}
@@ -995,7 +1007,7 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
               position: "absolute", top: 12, right: 12,
               background: "rgba(255,255,255,0.85)",
               border: `1.5px solid ${T.orange}`,
-              borderRadius: 20, padding: "6px 12px",
+              borderRadius: T.radiusFull, padding: "6px 12px",
               fontSize: 12, fontWeight: 800,
               color: T.orange, cursor: "pointer",
               display: "flex", alignItems: "center", gap: 4,
@@ -1006,11 +1018,10 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
           </button>
         )}
 
-        {/* 이미지 영역 (Cloudinary 큐레이션 또는 이모지 폴백) */}
         <div style={{
           width: "100%", maxWidth: 320, height: 240,
           margin: "0 auto 14px",
-          borderRadius: 16, overflow: "hidden",
+          borderRadius: T.radius, overflow: "hidden",
           background: "rgba(255,255,255,0.6)",
           display: "flex", alignItems: "center", justifyContent: "center",
           boxShadow: "0 4px 12px rgba(0,0,0,0.08)"
@@ -1035,13 +1046,12 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
           이 그림의 첫 글자는?
         </div>
 
-        {/* 💡 힌트 표시 */}
         {showHint && feedback === null && (
           <div style={{
             marginTop: 12,
             display: "inline-flex", gap: 4,
             background: "rgba(255,255,255,0.7)",
-            padding: "8px 16px", borderRadius: 12,
+            padding: "8px 16px", borderRadius: T.radiusSm,
             border: `1.5px dashed ${T.orange}`,
             fontFamily: "monospace", letterSpacing: 2
           }}>
@@ -1068,7 +1078,7 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
               disabled={isAnswered}
               style={{
                 background: bg, color, border: `3px solid ${border}`,
-                borderRadius: 16, padding: "28px 0",
+                borderRadius: T.radius, padding: "28px 0",
                 fontSize: 52, fontWeight: 900,
                 cursor: isAnswered ? "default" : "pointer",
                 transition: "all 0.2s"
@@ -1094,7 +1104,7 @@ function EmptyPoolMessage({ onBack, message }) {
       </div>
       <button onClick={onBack} style={{
         marginTop: 16, padding: "12px 24px", background: T.accent,
-        color: "white", border: "none", borderRadius: 12,
+        color: "white", border: "none", borderRadius: T.radius,
         fontSize: 13, fontWeight: 800, cursor: "pointer"
       }}>← 뒤로</button>
     </div>
@@ -1205,7 +1215,7 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
   const cols = Math.min(5, letterChoices.length);
 
   return (
-    <div style={{ padding: 14, maxWidth: 720, margin: "0 auto" }}>
+    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
       <FullScreenConfetti trigger={confettiTrigger} />
       <angela.AngelaComponent />
       <GameHeader
@@ -1218,7 +1228,7 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
       />
 
       <div style={{
-        background: T.card, borderRadius: 24, padding: "24px 16px",
+        background: T.card, borderRadius: T.radiusXl, padding: "24px 16px",
         textAlign: "center", marginBottom: 16, border: `2px solid ${T.border}`
       }}>
         <div style={{ fontSize: 80, marginBottom: 6 }}>{current.emoji}</div>
@@ -1227,7 +1237,7 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
         <button onClick={() => speakWord(current.word)}
           style={{
             background: T.accent, color: "white",
-            border: "none", borderRadius: 12, padding: "10px 16px",
+            border: "none", borderRadius: T.radiusSm, padding: "10px 16px",
             fontSize: 13, fontWeight: 700, cursor: "pointer", marginBottom: 16
           }}>
           🔊 다시 듣기
@@ -1244,12 +1254,12 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
               <div key={i} style={{
                 width: 48, height: 56,
                 background: built
-                  ? (isCorrect ? T.green : isWrong ? "#fecaca" : T.accentLight)
+                  ? (isCorrect ? T.green : isWrong ? T.redLight : T.accentLight)
                   : T.bg,
                 border: `2px solid ${built
                   ? (isCorrect ? T.green : isWrong ? T.red : T.accent)
                   : T.border}`,
-                borderRadius: 10,
+                borderRadius: T.radiusSm,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 28, fontWeight: 900,
                 color: built
@@ -1266,7 +1276,7 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
         {builtLetters.length > 0 && !feedback && (
           <button onClick={undo} style={{
             background: "transparent", color: T.textMid,
-            border: `1px solid ${T.border}`, borderRadius: 8,
+            border: `1px solid ${T.border}`, borderRadius: T.radiusSm,
             padding: "4px 10px", fontSize: 11, fontWeight: 700,
             cursor: "pointer", marginTop: 6
           }}>
@@ -1295,7 +1305,7 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
                 background: used ? T.border : T.card,
                 color: used ? T.textDim : T.text,
                 border: `2px solid ${used ? T.border : T.accent}`,
-                borderRadius: 12, padding: "16px 0",
+                borderRadius: T.radiusSm, padding: "16px 0",
                 fontSize: 28, fontWeight: 900,
                 cursor: used || feedback ? "default" : "pointer",
                 opacity: used ? 0.4 : 1,
@@ -1315,17 +1325,17 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
 // ══════════════════════════════════════════════════════════════════════════
 function GameHeader({ onBack, title, progress, total, score, combo }) {
   return (
-    <div style={{ marginBottom: 14 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
         <button onClick={onBack} style={{
-          background: T.card, border: `1px solid ${T.border}`, borderRadius: 10,
-          padding: "6px 10px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: T.textMid
+          background: T.bgSoft, border: "none", borderRadius: T.radiusSm,
+          padding: "7px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", color: T.textMid
         }}>← 그만</button>
         <div style={{ flex: 1, fontSize: 15, fontWeight: 900, color: T.text }}>{title}</div>
         {combo > 0 && (
           <div style={{
             background: combo >= 3 ? T.orange : T.accent, color: "white",
-            padding: "2px 10px", borderRadius: 10, fontSize: 12, fontWeight: 900
+            padding: "3px 12px", borderRadius: T.radiusFull, fontSize: 12, fontWeight: 900
           }}>
             🔥 {combo}
           </div>
@@ -1335,7 +1345,7 @@ function GameHeader({ onBack, title, progress, total, score, combo }) {
         <div style={{ flex: 1, height: 8, background: T.border, borderRadius: 4, overflow: "hidden" }}>
           <div style={{
             width: `${(progress / total) * 100}%`, height: "100%",
-            background: T.accent, transition: "width 0.3s"
+            background: T.accent, transition: "width 0.3s", borderRadius: 4
           }} />
         </div>
         <div style={{ fontSize: 11, color: T.textMid, fontWeight: 700 }}>
@@ -1357,10 +1367,11 @@ function FinishScreen({ score, total, levelId, onBack, onExit }) {
   else { message = "괜찮아요, 다시 도전해봐요!"; mainEmoji = "💪"; }
 
   return (
-    <div style={{ padding: 14, maxWidth: 480, margin: "0 auto", textAlign: "center" }}>
+    <div style={{ padding: 16, maxWidth: 480, margin: "0 auto", textAlign: "center" }}>
       <div style={{
         background: `linear-gradient(135deg, ${T.accent}, ${T.purple})`,
-        color: "white", borderRadius: 28, padding: "40px 24px", marginTop: 40
+        color: "white", borderRadius: T.radiusXl, padding: "40px 24px", marginTop: 40,
+        boxShadow: T.shadowLg
       }}>
         <div style={{ fontSize: 96, marginBottom: 12 }}>{mainEmoji}</div>
         <div style={{ fontSize: 22, fontWeight: 900, marginBottom: 8 }}>{message}</div>
@@ -1383,15 +1394,16 @@ function FinishScreen({ score, total, levelId, onBack, onExit }) {
       <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
         <button onClick={onBack} style={{
           flex: 1, padding: 14, background: T.card,
-          color: T.text, border: `2px solid ${T.border}`, borderRadius: 14,
+          color: T.text, border: `2px solid ${T.border}`, borderRadius: T.radius,
           fontSize: 13, fontWeight: 800, cursor: "pointer"
         }}>
           다시 도전
         </button>
         <button onClick={onExit} style={{
           flex: 1, padding: 14, background: T.accent,
-          color: "white", border: "none", borderRadius: 14,
-          fontSize: 13, fontWeight: 800, cursor: "pointer"
+          color: "white", border: "none", borderRadius: T.radius,
+          fontSize: 13, fontWeight: 800, cursor: "pointer",
+          boxShadow: T.shadowColor
         }}>
           홈으로
         </button>

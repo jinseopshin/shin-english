@@ -407,6 +407,9 @@ function PhonicsGameMenu({ studentName, levelId, onBack, onExit }) {
       { id: "build-word",      icon: "🧩", label: "단어 만들기",        desc: "소리 듣고 순서대로 클릭", levels: ["cvc", "magic-e", "blends"] },
       { id: "letter-write",    icon: "✍️", label: "글자 따라쓰기",      desc: "획순 따라 손가락으로 쓰기", levels: ["alphabet", "cvc", "magic-e", "blends", "sight"] },
       { id: "review",          icon: "🔁", label: "오늘의 복습",        desc: "복습할 때가 된 글자 다시 쓰기", levels: ["alphabet", "cvc", "magic-e", "blends", "sight"] },
+      { id: "board",           icon: "🎲", label: "단어 보드게임",      desc: "주사위 굴리며 단어 읽기", levels: ["cvc", "magic-e", "blends", "sight"] },
+      { id: "bingo",           icon: "🎱", label: "단어 빙고",          desc: "듣고 단어 찾아 한 줄 완성", levels: ["cvc", "magic-e", "blends", "sight"] },
+      { id: "domino",          icon: "🁢", label: "끝소리 잇기",        desc: "끝 글자로 시작하는 단어 잇기", levels: ["cvc", "magic-e", "blends", "sight"] },
     ];
     return all.filter(g => g.levels.includes(levelId));
   }, [levelId]);
@@ -520,6 +523,9 @@ function PhonicsGameRunner({ studentName, levelId, gameId, onBack, onExit }) {
     case "build-word":      return <BuildWordGame {...props} />;
     case "letter-write":    return <LetterWriteGame {...props} />;
     case "review":          return <ReviewGame {...props} />;
+    case "board":           return <BoardGame {...props} />;
+    case "bingo":           return <BingoGame {...props} />;
+    case "domino":          return <DominoGame {...props} />;
     default: return <div>지원하지 않는 게임</div>;
   }
 }
@@ -1755,6 +1761,690 @@ function ReviewGame({ studentName, levelId, gameId, onBack, onExit }) {
       letterPool={pool}
       titleOverride="🔁 오늘의 복습"
     />
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//   GAME 8: 🎲 단어 보드게임 (30칸, 주사위 + 퀴즈 + 보너스/함정)
+// ══════════════════════════════════════════════════════════════════════════
+const BOARD_SIZE = 30;
+
+// 30칸 보드 생성: 출발/도착 + 중간 칸을 정해진 비율로 섞어 배치
+function buildBoard(words) {
+  const mid = []; // 1~28번 (28칸)
+  // 종류별 개수
+  const plan = [
+    ...Array(12).fill("quiz"),
+    ...Array(10).fill("word"),
+    ...Array(3).fill("bonus"),
+    ...Array(3).fill("trap"),
+  ];
+  // 섞기 (Fisher-Yates)
+  for (let i = plan.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [plan[i], plan[j]] = [plan[j], plan[i]];
+  }
+  // 도착 직전 칸이 함정이면 단어로 교체 (좌절 방지)
+  if (plan[plan.length - 1] === "trap") plan[plan.length - 1] = "word";
+  // 첫 칸이 어려우면 단어로
+  if (plan[0] === "trap" || plan[0] === "quiz") plan[0] = "word";
+
+  let wi = 0;
+  const pick = () => words.length ? words[wi++ % words.length] : { word: "cat", ko: "고양이", emoji: "🐱" };
+
+  const cells = [{ type: "start" }];
+  plan.forEach((type) => {
+    if (type === "word" || type === "quiz") {
+      cells.push({ type, w: pick() });
+    } else if (type === "bonus") {
+      cells.push({ type, n: 1 + Math.floor(Math.random() * 2) }); // +1~2
+    } else {
+      cells.push({ type, n: -(1 + Math.floor(Math.random() * 2)) }); // -1~2
+    }
+  });
+  cells.push({ type: "goal" });
+  return cells;
+}
+
+function BoardGame({ studentName, levelId, gameId, onBack, onExit }) {
+  const angela = useAngela();
+  const [board] = useState(() => {
+    const src = getPhonicsWords(levelId) || [];
+    const usable = src.filter(w => w && w.word);
+    return buildBoard(shuffle(usable));
+  });
+
+  const [pos, setPos] = useState(0);
+  const [rolling, setRolling] = useState(false);
+  const [busy, setBusy] = useState(false);     // 이동/처리 중 버튼 잠금
+  const [diceFace, setDiceFace] = useState(0); // 0=물음표
+  const [msg, setMsg] = useState("주사위를 굴려 출발해요!");
+  const [quiz, setQuiz] = useState(null);       // {word, choices, answer} | null
+  const [quizFeedback, setQuizFeedback] = useState(null); // null|correct|wrong
+  const [done, setDone] = useState(false);
+  const [confettiTrigger, setConfettiTrigger] = useState(0);
+  const [rollCount, setRollCount] = useState(0);
+
+  const posRef = useRef(0);
+  useEffect(() => { posRef.current = pos; }, [pos]);
+
+  const DICE_FACES = ["", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+
+  // 칸 도착 처리
+  function resolveCell(at) {
+    const cell = board[at];
+    if (!cell) { setBusy(false); return; }
+    if (cell.type === "goal") {
+      setMsg("🎉 도착! 참 잘했어요!");
+      setDone(true);
+      saveProgress(studentName, gameId, levelId, 1, 1);
+      setConfettiTrigger(t => t + 1);
+      setTimeout(() => angela.show("perfect"), 300);
+      onFinish(1, 1);
+      setBusy(false);
+      return;
+    }
+    if (cell.type === "word") {
+      setMsg(`📖 "${cell.w.word}" 소리 내어 읽어요!`);
+      speakWord(cell.w.word);
+      setTimeout(() => angela.show("happy"), 200);
+      setBusy(false);
+      return;
+    }
+    if (cell.type === "quiz") {
+      const ans = getFirstLetter(cell.w.word);
+      const choices = makeAlphabetChoices(ans);
+      setQuiz({ word: cell.w.word, choices, answer: ans });
+      setQuizFeedback(null);
+      setMsg(`❓ "${cell.w.word}" — 첫 글자를 골라요!`);
+      speakWord(cell.w.word);
+      // busy 유지 (퀴즈 풀어야 다음 가능)
+      return;
+    }
+    if (cell.type === "bonus") {
+      setMsg(`⬆️ 보너스! ${cell.n}칸 더 앞으로!`);
+      setTimeout(() => angela.show("happy"), 100);
+      onCorrect();
+      setTimeout(() => {
+        const next = Math.min(BOARD_SIZE - 1, at + cell.n);
+        moveTo(at, next, () => resolveCell(next));
+      }, 800);
+      return;
+    }
+    if (cell.type === "trap") {
+      setMsg(`⬇️ 앗! ${Math.abs(cell.n)}칸 뒤로...`);
+      setTimeout(() => angela.show("oops"), 100);
+      setTimeout(() => {
+        const next = Math.max(0, at + cell.n);
+        moveBack(at, next, () => resolveCell(next));
+      }, 800);
+      return;
+    }
+    setBusy(false);
+  }
+
+  // 앞으로 한 칸씩 이동 애니메이션
+  function moveTo(from, to, after) {
+    if (from >= to) { setPos(to); after && after(); return; }
+    const next = from + 1;
+    setPos(next);
+    if (next >= to) { after && after(); return; }
+    setTimeout(() => moveTo(next, to, after), 260);
+  }
+  // 뒤로 이동
+  function moveBack(from, to, after) {
+    if (from <= to) { setPos(to); after && after(); return; }
+    const next = from - 1;
+    setPos(next);
+    if (next <= to) { after && after(); return; }
+    setTimeout(() => moveBack(next, to, after), 220);
+  }
+
+  function rollDice() {
+    if (rolling || busy || done || quiz) return;
+    setRolling(true); setBusy(true);
+    const n = 1 + Math.floor(Math.random() * 6);
+    let ticks = 0;
+    const spin = setInterval(() => {
+      setDiceFace(1 + Math.floor(Math.random() * 6));
+      if (++ticks > 8) {
+        clearInterval(spin);
+        setDiceFace(n);
+        setRolling(false);
+        setRollCount(c => c + 1);
+        setMsg(`${n}칸 이동!`);
+        playClick();
+        setTimeout(() => {
+          const target = Math.min(BOARD_SIZE - 1, posRef.current + n);
+          moveTo(posRef.current, target, () => resolveCell(target));
+        }, 450);
+      }
+    }, 70);
+  }
+
+  function answerQuiz(letter) {
+    if (!quiz || quizFeedback === "correct") return;
+    if (letter === quiz.answer) {
+      setQuizFeedback("correct");
+      onCorrect();
+      recordReview(studentName, quiz.answer, true);
+      setMsg(`정답! "${quiz.word}"의 첫 글자는 ${quiz.answer} ⭐`);
+      setTimeout(() => angela.show("happy"), 100);
+      setTimeout(() => { setQuiz(null); setQuizFeedback(null); setBusy(false); }, 1100);
+    } else {
+      setQuizFeedback("wrong");
+      onWrong();
+      recordReview(studentName, quiz.answer, false);
+      setMsg("아쉬워요! 다시 골라볼까요?");
+      setTimeout(() => angela.show("oops"), 100);
+      // 제자리 멈춤: 다시 고를 수 있게 wrong 표시만 잠깐
+      setTimeout(() => setQuizFeedback(null), 700);
+    }
+  }
+
+  if (done) {
+    return <FinishScreen score={1} total={1} levelId={levelId} onBack={onBack} onExit={onExit} />;
+  }
+
+  // 보드 셀 색상
+  const cellStyle = (cell, isHere) => {
+    let bg = T.card, color = T.text;
+    if (cell.type === "start") { bg = T.tealLight || T.bgSoft; color = T.teal; }
+    else if (cell.type === "goal") { bg = T.greenLight || T.bgSoft; color = T.green; }
+    else if (cell.type === "quiz") { bg = T.yellowLight; color = T.orange; }
+    else if (cell.type === "bonus") { bg = T.greenLight || T.bgSoft; color = T.green; }
+    else if (cell.type === "trap") { bg = T.redLight; color = T.red; }
+    return {
+      position: "relative", aspectRatio: "1",
+      borderRadius: T.radiusSm,
+      background: bg, color,
+      border: isHere ? `2px solid ${T.accent}` : `1px solid ${T.border}`,
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      fontSize: 13, fontWeight: 800, overflow: "hidden",
+      boxShadow: isHere ? T.shadow : "none",
+    };
+  };
+
+  const cellInner = (cell) => {
+    if (cell.type === "start") return "출발";
+    if (cell.type === "goal") return "🏁";
+    if (cell.type === "word") return cell.w.word;
+    if (cell.type === "quiz") return "❓";
+    if (cell.type === "bonus") return `⬆️${cell.n}`;
+    if (cell.type === "trap") return `⬇️${cell.n}`;
+    return "";
+  };
+
+  return (
+    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
+      <FullScreenConfetti trigger={confettiTrigger} />
+      <angela.AngelaComponent />
+      <GameHeader
+        onBack={onBack}
+        title="🎲 단어 보드게임"
+        progress={pos}
+        total={BOARD_SIZE - 1}
+      />
+
+      {/* 보드 (6열 × 5행) */}
+      <div style={{
+        display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 5, marginBottom: 14
+      }}>
+        {board.map((cell, i) => {
+          const isHere = i === pos;
+          return (
+            <div key={i} style={cellStyle(cell, isHere)}>
+              <span style={{ fontSize: cell.type === "word" ? 12 : 14 }}>{cellInner(cell)}</span>
+              {isHere && (
+                <div style={{ position: "absolute", bottom: 1, fontSize: 16 }}>🧒</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 퀴즈 패널 또는 주사위 패널 */}
+      {quiz ? (
+        <div style={{
+          background: T.yellowLight, borderRadius: T.radiusLg, padding: 16, textAlign: "center"
+        }}>
+          <div style={{ fontSize: 15, fontWeight: 900, color: T.text, marginBottom: 4 }}>
+            "{quiz.word}"의 첫 글자는?
+          </div>
+          <button onClick={() => speakWord(quiz.word)} style={{
+            background: "none", border: "none", color: T.accent, fontSize: 13,
+            fontWeight: 700, cursor: "pointer", marginBottom: 12
+          }}>🔊 다시 듣기</button>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {quiz.choices.map((letter) => {
+              const isAns = letter === quiz.answer;
+              let bg = T.card, bc = T.border, col = T.text;
+              if (quizFeedback === "correct" && isAns) { bg = T.green; col = "white"; bc = T.green; }
+              if (quizFeedback === "wrong" && !isAns) { /* keep */ }
+              return (
+                <button key={letter} onClick={() => answerQuiz(letter)}
+                  disabled={quizFeedback === "correct"}
+                  style={{
+                    padding: "18px 0", fontSize: 28, fontWeight: 900,
+                    background: bg, color: col, border: `2px solid ${bc}`,
+                    borderRadius: T.radius, cursor: "pointer"
+                  }}>
+                  {letter}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        <div style={{
+          background: T.bgSoft, borderRadius: T.radiusLg, padding: 16, textAlign: "center"
+        }}>
+          <div style={{
+            width: 64, height: 64, margin: "0 auto 10px",
+            background: T.card, border: `1px solid ${T.border}`, borderRadius: T.radius,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 36
+          }}>{diceFace === 0 ? "🎲" : DICE_FACES[diceFace]}</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: T.textMid, minHeight: 40,
+            display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {msg}
+          </div>
+          <Btn v="primary" size="lg" onClick={rollDice} disabled={rolling || busy}>
+            🎲 주사위 굴리기
+          </Btn>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//   GAME 9: 🎱 단어 빙고 (3×3, 듣고 찾기 — 단어+그림)
+// ══════════════════════════════════════════════════════════════════════════
+const BINGO_LINES = [
+  [0, 1, 2], [3, 4, 5], [6, 7, 8],
+  [0, 3, 6], [1, 4, 7], [2, 5, 8],
+  [0, 4, 8], [2, 4, 6],
+];
+
+function BingoGame({ studentName, levelId, gameId, onBack, onExit }) {
+  const angela = useAngela();
+
+  // 9칸 채울 단어 + 부르는 순서
+  const setup = useMemo(() => {
+    const src = (getPhonicsWords(levelId) || []).filter(w => w && w.word);
+    const nine = shuffle(src).slice(0, 9);
+    // 단어가 9개 미만이면 채워질 때까지 반복(작은 풀 방어)
+    while (nine.length < 9 && src.length > 0) nine.push(src[nine.length % src.length]);
+    const callOrder = shuffle(nine.map((_, i) => i)); // 부를 순서(칸 인덱스)
+    return { cells: nine, callOrder };
+  }, [levelId]);
+
+  const [marked, setMarked] = useState(() => new Set());
+  const [imgErr, setImgErr] = useState(() => new Set());
+  const [callIdx, setCallIdx] = useState(-1);     // 지금까지 부른 횟수(-1=시작 전)
+  const [current, setCurrent] = useState(null);    // 현재 부른 단어 {word,ko,emoji,cellIndex}
+  const [bingoCount, setBingoCount] = useState(0);
+  const [done, setDone] = useState(false);
+  const [confettiTrigger, setConfettiTrigger] = useState(0);
+  const [msg, setMsg] = useState("시작을 누르면 단어를 불러줄게요!");
+  const [waiting, setWaiting] = useState(false);   // 부른 단어 찾는 중
+
+  const cells = setup.cells;
+
+  function callNext() {
+    if (done || waiting) return;
+    const nextCall = callIdx + 1;
+    if (nextCall >= setup.callOrder.length) {
+      // 다 불렀는데 안 끝났으면(이론상 거의 없음) 종료 처리
+      finish();
+      return;
+    }
+    const cellIndex = setup.callOrder[nextCall];
+    const w = cells[cellIndex];
+    setCallIdx(nextCall);
+    setCurrent({ ...w, cellIndex });
+    setMsg(`🔊 "${w.word}" — 어디 있을까요?`);
+    setWaiting(true);
+    speakWord(w.word);
+  }
+
+  function clickCell(i) {
+    if (done || !waiting || !current) return;
+    if (marked.has(i)) return;
+    if (i === current.cellIndex) {
+      // 정답 — 표시
+      const nm = new Set(marked); nm.add(i);
+      setMarked(nm);
+      onCorrect();
+      recordReview(studentName, getFirstLetter(current.word), true);
+      setWaiting(false);
+
+      // 빙고 줄 수 확인
+      const newBingo = BINGO_LINES.filter(line => line.every(idx => nm.has(idx))).length;
+      if (newBingo > bingoCount) {
+        setBingoCount(newBingo);
+        setMsg(`🎉 빙고! (${newBingo}줄)`);
+        setConfettiTrigger(t => t + 1);
+        setTimeout(() => angela.show("perfect"), 200);
+      } else {
+        setMsg("잘 찾았어요! 다음 단어 들어볼까요?");
+        setTimeout(() => angela.show("happy"), 150);
+      }
+
+      // 9칸 다 채웠거나 빙고가 났으면 종료 판단
+      if (nm.size >= 9) {
+        setTimeout(() => finishWin(newBingo), 1000);
+      }
+    } else {
+      // 오답 — 흔들기 느낌(메시지)
+      onWrong();
+      setMsg("거기가 아니에요! 다시 들어볼까요?");
+      setTimeout(() => angela.show("oops"), 100);
+    }
+  }
+
+  function finishWin(bingoLines) {
+    setDone(true);
+    saveProgress(studentName, gameId, levelId, 1, 1);
+    setConfettiTrigger(t => t + 1);
+    setTimeout(() => angela.show("perfect"), 300);
+    onFinish(1, 1);
+  }
+  function finish() {
+    setDone(true);
+    saveProgress(studentName, gameId, levelId, 1, 1);
+    onFinish(1, 1);
+  }
+
+  if (done) {
+    return <FinishScreen score={1} total={1} levelId={levelId} onBack={onBack} onExit={onExit} />;
+  }
+
+  if (!cells || cells.length < 9) {
+    return <EmptyPoolMessage onBack={onBack} message="빙고를 만들 단어가 부족해요 (9개 필요)" />;
+  }
+
+  return (
+    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
+      <FullScreenConfetti trigger={confettiTrigger} />
+      <angela.AngelaComponent />
+      <GameHeader
+        onBack={onBack}
+        title="🎱 단어 빙고"
+        progress={marked.size}
+        total={9}
+      />
+
+      {bingoCount > 0 && (
+        <div style={{
+          textAlign: "center", marginBottom: 8, fontSize: 14, fontWeight: 900, color: T.green
+        }}>
+          ⭐ {bingoCount}줄 빙고!
+        </div>
+      )}
+
+      {/* 빙고판 3×3 */}
+      <div style={{
+        display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 14
+      }}>
+        {cells.map((w, i) => {
+          const isMarked = marked.has(i);
+          const url = getCuratedImageUrl(w.word);
+          const showImg = url && !imgErr.has(i);
+          return (
+            <div key={i} onClick={() => clickCell(i)}
+              style={{
+                aspectRatio: "1", borderRadius: T.radius, cursor: waiting ? "pointer" : "default",
+                background: isMarked ? T.green : T.card,
+                border: `2px solid ${isMarked ? T.green : T.border}`,
+                display: "flex", flexDirection: "column",
+                alignItems: "center", justifyContent: "center", gap: 2,
+                position: "relative", overflow: "hidden", transition: "all 0.15s",
+                padding: 4,
+              }}>
+              <div style={{
+                width: 48, height: 48, borderRadius: 8, overflow: "hidden",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: isMarked ? "rgba(255,255,255,0.25)" : T.bgSoft,
+              }}>
+                {showImg ? (
+                  <img src={url} alt={w.word} loading="lazy"
+                    onError={() => setImgErr(prev => new Set(prev).add(i))}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                ) : (
+                  <span style={{ fontSize: 30 }}>{w.emoji || "🔤"}</span>
+                )}
+              </div>
+              <span style={{
+                fontSize: 13, fontWeight: 800,
+                color: isMarked ? "white" : T.text
+              }}>{w.word}</span>
+              {isMarked && (
+                <div style={{ position: "absolute", top: 3, right: 5, fontSize: 16 }}>✓</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 부르기 패널 */}
+      <div style={{
+        background: T.bgSoft, borderRadius: T.radiusLg, padding: 16, textAlign: "center"
+      }}>
+        <div style={{
+          fontSize: 15, fontWeight: 800, color: T.textMid, minHeight: 40,
+          display: "flex", alignItems: "center", justifyContent: "center"
+        }}>{msg}</div>
+        {waiting && current ? (
+          <Btn v="ghost" size="sm" onClick={() => speakWord(current.word)}>
+            🔊 다시 듣기
+          </Btn>
+        ) : (
+          <Btn v="primary" size="lg" onClick={callNext}>
+            {callIdx < 0 ? "🎤 시작!" : "🎤 다음 단어"}
+          </Btn>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//   GAME 10: 🁢 끝소리 잇기 도미노 (끝 글자로 시작하는 단어 잇기)
+// ══════════════════════════════════════════════════════════════════════════
+const DOMINO_GOAL = 6; // 목표 연결 개수
+
+function dLast(w) { return (w.word || "").trim().toLowerCase().slice(-1); }
+function dFirst(w) { return (w.word || "").trim().toLowerCase()[0]; }
+
+// 미리 이어지는 체인을 만들어둠 (중간에 막히지 않게)
+function buildChain(pool, goalLen) {
+  const usable = pool.filter(w => w && w.word && w.word.length >= 2);
+  if (usable.length === 0) return [];
+  // 여러 시작점을 시도해 가장 긴 체인 확보
+  let best = [];
+  const tries = shuffle(usable).slice(0, Math.min(8, usable.length));
+  for (const startW of tries) {
+    const chain = [startW];
+    const used = new Set([startW.word]);
+    let cur = startW;
+    while (chain.length < goalLen + 1) {
+      const target = dLast(cur);
+      const cands = shuffle(usable.filter(w =>
+        dFirst(w) === target && !used.has(w.word)
+      ));
+      if (cands.length === 0) break;
+      cur = cands[0];
+      chain.push(cur);
+      used.add(cur.word);
+    }
+    if (chain.length > best.length) best = chain;
+    if (best.length >= goalLen + 1) break;
+  }
+  return best;
+}
+
+function DominoGame({ studentName, levelId, gameId, onBack, onExit }) {
+  const angela = useAngela();
+
+  const chain = useMemo(() => {
+    const src = (getPhonicsWords(levelId) || []).filter(w => w && w.word);
+    return buildChain(src, DOMINO_GOAL);
+  }, [levelId]);
+
+  const poolAll = useMemo(
+    () => (getPhonicsWords(levelId) || []).filter(w => w && w.word),
+    [levelId]
+  );
+
+  const [step, setStep] = useState(0);  // 현재까지 이어붙인 개수 (체인 인덱스)
+  const [feedback, setFeedback] = useState(null); // null|correct|wrong
+  const [done, setDone] = useState(false);
+  const [confettiTrigger, setConfettiTrigger] = useState(0);
+
+  // 현재 단어 = chain[step], 다음 정답 = chain[step+1]
+  const cur = chain[step];
+  const answer = chain[step + 1];
+
+  // 보기: 정답 1개 + 오답 3개 (오답은 끝소리가 다른 단어들)
+  const choices = useMemo(() => {
+    if (!answer) return [];
+    const wrongs = shuffle(
+      poolAll.filter(w => w.word !== answer.word && w.word !== (cur && cur.word)
+        && dFirst(w) !== dLast(cur || {}))
+    ).slice(0, 3);
+    // 오답이 부족하면 아무 단어로 채움
+    if (wrongs.length < 3) {
+      const extra = shuffle(poolAll.filter(w =>
+        w.word !== answer.word && !wrongs.find(x => x.word === w.word)
+      )).slice(0, 3 - wrongs.length);
+      wrongs.push(...extra);
+    }
+    return shuffle([answer, ...wrongs]);
+  }, [step, answer, cur, poolAll]);
+
+  useEffect(() => {
+    if (cur && cur.word) {
+      const t = setTimeout(() => speakWord(cur.word), 300);
+      return () => clearTimeout(t);
+    }
+  }, [step]);
+
+  function choose(w) {
+    if (feedback === "correct" || !answer) return;
+    if (w.word === answer.word) {
+      setFeedback("correct");
+      onCorrect();
+      recordReview(studentName, dLast(cur), true); // 끝소리 글자 기록
+      speakWord(w.word);
+      setTimeout(() => {
+        const nextStep = step + 1;
+        // 목표 달성 또는 체인 끝 도달
+        if (nextStep >= DOMINO_GOAL || nextStep >= chain.length - 1) {
+          setStep(nextStep);
+          setDone(true);
+          saveProgress(studentName, gameId, levelId, nextStep, DOMINO_GOAL);
+          setConfettiTrigger(t => t + 1);
+          setTimeout(() => angela.show("perfect"), 300);
+          onFinish(nextStep, DOMINO_GOAL);
+        } else {
+          setStep(nextStep);
+          setFeedback(null);
+          setTimeout(() => angela.show("happy"), 100);
+        }
+      }, 1000);
+    } else {
+      setFeedback("wrong");
+      onWrong();
+      recordReview(studentName, dLast(cur), false);
+      setTimeout(() => angela.show("oops"), 100);
+      setTimeout(() => setFeedback(null), 800);
+    }
+  }
+
+  if (done) {
+    return <FinishScreen score={step} total={DOMINO_GOAL} levelId={levelId} onBack={onBack} onExit={onExit} />;
+  }
+  // 체인을 충분히 못 만들면(단어 풀 부족) 안내
+  if (!chain || chain.length < 2) {
+    return <EmptyPoolMessage onBack={onBack} message="끝소리로 이을 단어가 부족해요" />;
+  }
+
+  const endCh = dLast(cur || {});
+
+  return (
+    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
+      <FullScreenConfetti trigger={confettiTrigger} />
+      <angela.AngelaComponent />
+      <GameHeader
+        onBack={onBack}
+        title="🁢 끝소리 잇기"
+        progress={step}
+        total={DOMINO_GOAL}
+      />
+
+      {/* 지금까지 이어진 도미노 띠 */}
+      <div style={{
+        display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14,
+        justifyContent: "center", minHeight: 40
+      }}>
+        {chain.slice(0, step + 1).map((w, i) => (
+          <div key={i} style={{
+            display: "flex", alignItems: "center", gap: 4
+          }}>
+            <span style={{
+              padding: "6px 12px", borderRadius: T.radiusSm,
+              background: i === step ? T.accent : T.green, color: "white",
+              fontSize: 14, fontWeight: 800
+            }}>{w.word}</span>
+            {i < step && <span style={{ color: T.textDim, fontSize: 12 }}>→</span>}
+          </div>
+        ))}
+      </div>
+
+      {/* 현재 단어 + 끝소리 강조 */}
+      <div style={{
+        background: `linear-gradient(135deg, ${T.yellowLight}, ${T.pinkLight})`,
+        borderRadius: T.radiusXl, padding: "20px 16px", textAlign: "center", marginBottom: 16
+      }}>
+        <div style={{ fontSize: 13, color: T.textMid, fontWeight: 700, marginBottom: 6 }}>
+          이 단어의 끝소리로 시작하는 단어는?
+        </div>
+        <div style={{ fontSize: 36, fontWeight: 900, color: T.text, letterSpacing: 1 }}>
+          {cur.word.slice(0, -1)}
+          <span style={{ color: T.accent }}>{cur.word.slice(-1)}</span>
+        </div>
+        <button onClick={() => speakWord(cur.word)} style={{
+          background: "none", border: "none", color: T.accent, fontSize: 13,
+          fontWeight: 700, cursor: "pointer", marginTop: 6
+        }}>🔊 다시 듣기 (끝소리 /{endCh}/)</button>
+      </div>
+
+      {/* 보기 */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        {choices.map((w) => {
+          const isAns = answer && w.word === answer.word;
+          let bg = T.card, bc = T.border, col = T.text;
+          if (feedback === "correct" && isAns) { bg = T.green; col = "white"; bc = T.green; }
+          if (feedback === "wrong" && isAns) { /* 정답은 그대로 */ }
+          const url = getCuratedImageUrl(w.word);
+          return (
+            <button key={w.word} onClick={() => choose(w)}
+              disabled={feedback === "correct"}
+              style={{
+                padding: "12px", background: bg, color: col,
+                border: `2px solid ${bc}`, borderRadius: T.radius, cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 8
+              }}>
+              <span style={{ fontSize: 24 }}>{w.emoji || "🔤"}</span>
+              <span style={{ fontSize: 18, fontWeight: 900 }}>{w.word}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 

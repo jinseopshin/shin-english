@@ -9,9 +9,11 @@ import {
   ScheduleManager, ScheduleBanner,
   StudentDetailReport,
   StatsDashboard, StudentDetailModal,
-  computeStudentStats, getLevel, LEVEL_INFO,
-  CustomExamManager, CustomExamPrint, CustomExamBanner, CustomExamPlay
+  computeStudentStats, getLevel, LEVEL_INFO
 } from "./features";
+import {
+  CustomExamManager, CustomExamPrint, CustomExamBanner, CustomExamPlay
+} from "./CustomExam";
 import {
   WordHomeworkManager, WordHomeworkPrint, WordHomeworkBanner,
   getActiveHomeworkWords, updateWordMastery

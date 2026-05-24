@@ -9,9 +9,9 @@ import {
 import {
   BadgeDisplay, BadgeCelebration, getEarnedBadges,
   NoticeBanner, StudentGoalWidget, SentenceGame,
-  ScheduleBanner,
-  CustomExamBanner, CustomExamPlay
+  ScheduleBanner
 } from "./features";
+import { CustomExamBanner, CustomExamPlay } from "./CustomExam";
 import { WordHomeworkBanner } from "./WordHomework";
 import {
   MemoryCardGame, DailyChallenge, WrongNoteGame, AnagramGame,

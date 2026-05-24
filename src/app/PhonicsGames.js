@@ -13,6 +13,7 @@ import { useAngela, getComboReaction, getFinishReaction, FullScreenConfetti } fr
 import { PhonicsClassMode } from "./PhonicsClassMode";
 import { getCuratedImageUrl, hasCuratedImage, preloadImages } from "./phonicsImages";
 import { getLetterStrokes, GUIDE_LINES } from "./letterStrokes";
+import { getSoundHint } from "./soundHints";
 
 // ══════════════════════════════════════════════════════════════════════════
 //   🔤 PhonicsGames.js v2.0 — 유치부 파닉스 게임 5종
@@ -533,6 +534,7 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
 
   const current = order[idx];
   const imageUrl = useMemo(() => current ? getCuratedImageUrl(current.word) : null, [current]);
+  const hint = useMemo(() => current ? getSoundHint(current.letter) : null, [current]);
 
   useEffect(() => { setImageError(false); }, [idx]);
 
@@ -597,6 +599,21 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
         <div style={{ fontSize: 18, opacity: 0.9, marginBottom: 16 }}>
           {current.sound}
         </div>
+
+        {hint && (
+          <div style={{
+            background: "rgba(255,255,255,0.22)",
+            borderRadius: T.radius, padding: "10px 14px", marginBottom: 16,
+            maxWidth: 320, marginLeft: "auto", marginRight: "auto"
+          }}>
+            <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 2, opacity: 0.95 }}>
+              👄 이렇게 소리 내요
+            </div>
+            <div style={{ fontSize: 14, lineHeight: 1.4, opacity: 0.95 }}>
+              {hint.mouth}
+            </div>
+          </div>
+        )}
 
         <div style={{
           width: 150, height: 150, margin: "0 auto 8px",

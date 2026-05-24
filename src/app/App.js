@@ -7,13 +7,14 @@ import {
   NoticeManager, NoticeBanner, GoalManager, StudentGoalWidget,
   WeeklyLeague, SentenceGame, ParentViewer, ReportPrint,
   ScheduleManager, ScheduleBanner,
-  StudentDetailReport, AttendanceManager,
+  StudentDetailReport,
   StatsDashboard, StudentDetailModal,
   computeStudentStats, getLevel, LEVEL_INFO,
   WordHomeworkManager, WordHomeworkPrint, WordHomeworkBanner,
   getActiveHomeworkWords, updateWordMastery,
   CustomExamManager, CustomExamPrint, CustomExamBanner, CustomExamPlay
 } from "./features";
+import { AttendanceManager } from "./AttendanceManager";
 import {
   MemoryCardGame, DailyChallenge, WrongNoteGame, AnagramGame,
   TypingRace, WordRelay, WordTwenty, WordWorldRPG, recordWrong,

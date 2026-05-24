@@ -524,10 +524,14 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
   const [order] = useState(() => shuffle(ALPHABET_DATA));
   const [idx, setIdx] = useState(0);
   const [done, setDone] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const angela = useAngela();
   const [confettiTrigger, setConfettiTrigger] = useState(0);
 
   const current = order[idx];
+  const imageUrl = useMemo(() => current ? getCuratedImageUrl(current.word) : null, [current]);
+
+  useEffect(() => { setImageError(false); }, [idx]);
 
   useEffect(() => {
     if (current) {
@@ -591,7 +595,20 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
           {current.sound}
         </div>
 
-        <div style={{ fontSize: 90, marginBottom: 8 }}>{current.emoji}</div>
+        <div style={{
+          width: 150, height: 150, margin: "0 auto 8px",
+          borderRadius: T.radius, overflow: "hidden",
+          background: "rgba(255,255,255,0.25)",
+          display: "flex", alignItems: "center", justifyContent: "center"
+        }}>
+          {imageUrl && !imageError ? (
+            <img src={imageUrl} alt={current.word} loading="lazy"
+              onError={() => setImageError(true)}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          ) : (
+            <div style={{ fontSize: 90, lineHeight: 1 }}>{current.emoji}</div>
+          )}
+        </div>
         <div style={{ fontSize: 24, fontWeight: 900 }}>{current.word}</div>
         <div style={{ fontSize: 14, opacity: 0.85, marginTop: 4 }}>{current.ko}</div>
       </div>
@@ -630,11 +647,15 @@ function FirstSoundGame({ studentName, levelId, gameId, onBack, onExit, customWo
   const [combo, setCombo] = useState(0);
   const [feedback, setFeedback] = useState(null);
   const [done, setDone] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const angela = useAngela();
   const [confettiTrigger, setConfettiTrigger] = useState(0);
 
   const current = rounds[idx];
   const choices = useMemo(() => current ? makeAlphabetChoices(getFirstLetter(current.word)) : [], [current]);
+  const imageUrl = useMemo(() => current ? getCuratedImageUrl(current.word) : null, [current]);
+
+  useEffect(() => { setImageError(false); }, [idx]);
 
   useEffect(() => {
     if (current && !feedback) {
@@ -702,7 +723,21 @@ function FirstSoundGame({ studentName, levelId, gameId, onBack, onExit, customWo
         background: T.card, borderRadius: T.radiusXl, padding: "30px 20px",
         textAlign: "center", marginBottom: 16, border: `2px solid ${T.border}`
       }}>
-        <div style={{ fontSize: 100, marginBottom: 8 }}>{current.emoji}</div>
+        <div style={{
+          width: 160, height: 160, margin: "0 auto 8px",
+          borderRadius: T.radius, overflow: "hidden",
+          background: "rgba(255,255,255,0.5)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)"
+        }}>
+          {imageUrl && !imageError ? (
+            <img src={imageUrl} alt={current.word} loading="lazy"
+              onError={() => setImageError(true)}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          ) : (
+            <div style={{ fontSize: 100, lineHeight: 1 }}>{current.emoji}</div>
+          )}
+        </div>
         <button onClick={() => speakWord(current.word)}
           style={{
             background: T.accent, color: "white",
@@ -757,11 +792,13 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
   const [combo, setCombo] = useState(0);
   const [feedback, setFeedback] = useState(null);
   const [done, setDone] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const angela = useAngela();
   const [confettiTrigger, setConfettiTrigger] = useState(0);
 
   const current = rounds[idx];
   const parts = useMemo(() => current ? makeCVCBlank(current.word) : null, [current]);
+  const imageUrl = useMemo(() => current ? getCuratedImageUrl(current.word) : null, [current]);
 
   const choices = useMemo(() => {
     if (!parts) return [];
@@ -777,6 +814,8 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
       return () => clearTimeout(t);
     }
   }, [idx, feedback]);
+
+  useEffect(() => { setImageError(false); }, [idx]);
 
   const handleChoice = (vowel) => {
     if (feedback) return;
@@ -837,7 +876,21 @@ function CVCBlankGame({ studentName, levelId, gameId, onBack, onExit }) {
         background: T.card, borderRadius: T.radiusXl, padding: "30px 20px",
         textAlign: "center", marginBottom: 16, border: `2px solid ${T.border}`
       }}>
-        <div style={{ fontSize: 80, marginBottom: 12 }}>{current.emoji}</div>
+        <div style={{
+          width: 140, height: 140, margin: "0 auto 12px",
+          borderRadius: T.radius, overflow: "hidden",
+          background: "rgba(255,255,255,0.5)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)"
+        }}>
+          {imageUrl && !imageError ? (
+            <img src={imageUrl} alt={current.word} loading="lazy"
+              onError={() => setImageError(true)}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          ) : (
+            <div style={{ fontSize: 80, lineHeight: 1 }}>{current.emoji}</div>
+          )}
+        </div>
         <div style={{ fontSize: 14, color: T.textMid, marginBottom: 4 }}>{current.ko}</div>
 
         <div style={{
@@ -1127,10 +1180,12 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
   const [feedback, setFeedback] = useState(null);
   const [builtLetters, setBuiltLetters] = useState([]);
   const [done, setDone] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const angela = useAngela();
   const [confettiTrigger, setConfettiTrigger] = useState(0);
 
   const current = rounds[idx];
+  const imageUrl = useMemo(() => current ? getCuratedImageUrl(current.word) : null, [current]);
   const targetWord = current?.word.toLowerCase() || "";
 
   const letterChoices = useMemo(() => {
@@ -1156,6 +1211,8 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
       return () => clearTimeout(t);
     }
   }, [idx, feedback]);
+
+  useEffect(() => { setImageError(false); }, [idx]);
 
   const handleLetterClick = (entry) => {
     if (feedback) return;
@@ -1232,7 +1289,21 @@ function BuildWordGame({ studentName, levelId, gameId, onBack, onExit, customWor
         background: T.card, borderRadius: T.radiusXl, padding: "24px 16px",
         textAlign: "center", marginBottom: 16, border: `2px solid ${T.border}`
       }}>
-        <div style={{ fontSize: 80, marginBottom: 6 }}>{current.emoji}</div>
+        <div style={{
+          width: 130, height: 130, margin: "0 auto 6px",
+          borderRadius: T.radius, overflow: "hidden",
+          background: "rgba(255,255,255,0.5)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)"
+        }}>
+          {imageUrl && !imageError ? (
+            <img src={imageUrl} alt={current.word} loading="lazy"
+              onError={() => setImageError(true)}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          ) : (
+            <div style={{ fontSize: 80, lineHeight: 1 }}>{current.emoji}</div>
+          )}
+        </div>
         <div style={{ fontSize: 12, color: T.textMid, marginBottom: 12 }}>{current.ko}</div>
 
         <button onClick={() => speakWord(current.word)}

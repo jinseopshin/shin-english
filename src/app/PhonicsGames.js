@@ -14,6 +14,7 @@ import { PhonicsClassMode } from "./PhonicsClassMode";
 import { getCuratedImageUrl, hasCuratedImage, preloadImages } from "./phonicsImages";
 import { getLetterStrokes, GUIDE_LINES } from "./letterStrokes";
 import { getSoundHint } from "./soundHints";
+import { recordReview, getDueItems, getNewItems, getReviewStats } from "./reviewSystem";
 
 // ══════════════════════════════════════════════════════════════════════════
 //   🔤 PhonicsGames.js v2.0 — 유치부 파닉스 게임 5종
@@ -405,6 +406,7 @@ function PhonicsGameMenu({ studentName, levelId, onBack, onExit }) {
       { id: "picture-letter",  icon: "🖼️", label: "그림 보고 첫글자",   desc: "그림 보고 알파벳 고르기", levels: ["alphabet", "cvc", "blends", "sight"] },
       { id: "build-word",      icon: "🧩", label: "단어 만들기",        desc: "소리 듣고 순서대로 클릭", levels: ["cvc", "magic-e", "blends"] },
       { id: "letter-write",    icon: "✍️", label: "글자 따라쓰기",      desc: "획순 따라 손가락으로 쓰기", levels: ["alphabet", "cvc", "magic-e", "blends", "sight"] },
+      { id: "review",          icon: "🔁", label: "오늘의 복습",        desc: "복습할 때가 된 글자 다시 쓰기", levels: ["alphabet", "cvc", "magic-e", "blends", "sight"] },
     ];
     return all.filter(g => g.levels.includes(levelId));
   }, [levelId]);
@@ -517,6 +519,7 @@ function PhonicsGameRunner({ studentName, levelId, gameId, onBack, onExit }) {
     case "picture-letter":  return <PictureLetterGame {...props} />;
     case "build-word":      return <BuildWordGame {...props} />;
     case "letter-write":    return <LetterWriteGame {...props} />;
+    case "review":          return <ReviewGame {...props} />;
     default: return <div>지원하지 않는 게임</div>;
   }
 }
@@ -688,6 +691,7 @@ function FirstSoundGame({ studentName, levelId, gameId, onBack, onExit, customWo
     if (feedback) return;
     const correct = letter === getFirstLetter(current.word);
     setFeedback(correct ? "correct" : "wrong");
+    recordReview(studentName, getFirstLetter(current.word), correct);
     if (correct) {
       onCorrect();
       const newCombo = combo + 1;
@@ -1008,6 +1012,7 @@ function PictureLetterGame({ studentName, levelId, gameId, onBack, onExit, custo
     if (feedback) return;
     const correct = letter === getFirstLetter(current.word);
     setFeedback(correct ? "correct" : "wrong");
+    recordReview(studentName, getFirstLetter(current.word), correct);
     if (correct) {
       onCorrect();
       const newCombo = combo + 1;
@@ -1425,9 +1430,10 @@ function speakLetterName(ch) {
   window.speechSynthesis.speak(u);
 }
 
-function LetterWriteGame({ studentName, levelId, gameId, onBack, onExit }) {
-  // 세션 글자 목록: 대소문자 짝을 펼쳐서 [A,a,B,b,...] 순서
+function LetterWriteGame({ studentName, levelId, gameId, onBack, onExit, letterPool, titleOverride }) {
+  // 세션 글자 목록: letterPool이 주어지면 그걸 쓰고, 없으면 랜덤 5쌍
   const [letters] = useState(() => {
+    if (Array.isArray(letterPool) && letterPool.length > 0) return letterPool;
     const start = Math.floor(Math.random() * (PAIRS.length - PAIRS_PER_SESSION + 1));
     const chosen = PAIRS.slice(start, start + PAIRS_PER_SESSION);
     return chosen.flat();
@@ -1528,6 +1534,7 @@ function LetterWriteGame({ studentName, levelId, gameId, onBack, onExit }) {
       } else {
         // 글자 완성
         onCorrect();
+        recordReview(studentName, letter, true);
         speakLetterName(letter);
         setMsg(`완성! ${letter} 잘 썼어요 ⭐`); setMsgKind("done");
         setTimeout(() => angela.show("correct"), 300);
@@ -1598,7 +1605,7 @@ function LetterWriteGame({ studentName, levelId, gameId, onBack, onExit }) {
       <angela.AngelaComponent />
       <GameHeader
         onBack={onBack}
-        title="✍️ 글자 따라쓰기"
+        title={titleOverride || "✍️ 글자 따라쓰기"}
         progress={idx + 1}
         total={letters.length}
       />
@@ -1684,6 +1691,59 @@ function LetterWriteGame({ studentName, levelId, gameId, onBack, onExit }) {
         </div>
       </div>
     </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//   GAME 7: 🔁 오늘의 복습 (간격 반복 — 복습할 때가 된 글자 다시 쓰기)
+// ══════════════════════════════════════════════════════════════════════════
+function ReviewGame({ studentName, levelId, gameId, onBack, onExit }) {
+  // 복습 대상 글자: 오늘 due인 것 우선, 부족하면 새 글자로 채움
+  const [pool] = useState(() => {
+    const allLetters = [
+      ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""),
+      ..."abcdefghijklmnopqrstuvwxyz".split(""),
+    ];
+    const due = getDueItems(studentName, allLetters, 10);
+    if (due.length >= 3) return due;
+    // 복습할 게 적으면 안 배운 글자로 보충
+    const fresh = getNewItems(studentName, allLetters, 10 - due.length);
+    return [...due, ...fresh];
+  });
+
+  if (!pool || pool.length === 0) {
+    return (
+      <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
+        <GameHeader onBack={onBack} title="🔁 오늘의 복습" progress={0} total={1} />
+        <div style={{
+          marginTop: 40, textAlign: "center",
+          background: T.card, borderRadius: T.radiusLg, padding: 32, boxShadow: T.shadow
+        }}>
+          <div style={{ fontSize: 56, marginBottom: 12 }}>🎉</div>
+          <div style={{ fontSize: 18, fontWeight: 900, color: T.text, marginBottom: 6 }}>
+            지금 복습할 글자가 없어요!
+          </div>
+          <div style={{ fontSize: 13, color: T.textMid, marginBottom: 20, lineHeight: 1.5 }}>
+            글자 게임을 더 하면, 익힌 글자를<br />
+            알맞은 때에 다시 복습으로 꺼내줄게요.
+          </div>
+          <Btn v="primary" size="lg" onClick={onExit}>홈으로</Btn>
+        </div>
+      </div>
+    );
+  }
+
+  // 복습은 따라쓰기 형식 재사용
+  return (
+    <LetterWriteGame
+      studentName={studentName}
+      levelId={levelId}
+      gameId={gameId}
+      onBack={onBack}
+      onExit={onExit}
+      letterPool={pool}
+      titleOverride="🔁 오늘의 복습"
+    />
   );
 }
 

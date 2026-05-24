@@ -32,16 +32,79 @@ export function setVolume(vol) {
 // ══════════════════════════════════════════════════════════════════════════
 //   사운드 파일 캐싱 (Audio 객체 미리 로딩)
 // ══════════════════════════════════════════════════════════════════════════
-const SOUND_FILES = {
-  correct: "/correct.wav",
-  wrong: "/wrong.wav",
-  combo3: "/combo3.wav",
-  combo5: "/combo5.wav",
-  combo10: "/combo10.wav",
-  finishPerfect: "/finish-perfect.wav",
-  finishGood: "/finish-good.wav",
-  click: "/click.wav",
+// ── 확장자 없는 기본 경로 (public/ 폴더 기준) ───────────────────────────
+//   파일이 mp3든 wav든 ogg든, 같은 이름이면 알아서 재생됩니다.
+//   예: public/correct.mp3 또는 public/correct.wav 둘 중 있는 걸 사용
+const SOUND_BASE = {
+  correct: "/correct",
+  wrong: "/wrong",
+  combo3: "/combo3",
+  combo5: "/combo5",
+  combo10: "/combo10",
+  finishPerfect: "/finish-perfect",
+  finishGood: "/finish-good",
+  click: "/click",
 };
+
+// ── 브라우저가 재생 가능한 확장자를 선호 순서대로 시도 ──────────────────
+//   mp3를 우선으로, 안 되면 wav, 그 다음 ogg.
+//   (대부분의 브라우저는 셋 다 지원하므로 mp3가 먼저 잡힘)
+const EXT_PREFERENCE = ["mp3", "wav", "ogg"];
+
+// canPlayType으로 이 브라우저가 어떤 확장자를 지원하는지 한 번만 계산
+let _supportedExts = null;
+function getSupportedExts() {
+  if (_supportedExts) return _supportedExts;
+  if (typeof document === "undefined") return EXT_PREFERENCE;
+  const probe = document.createElement("audio");
+  const mime = { mp3: "audio/mpeg", wav: "audio/wav", ogg: "audio/ogg" };
+  _supportedExts = EXT_PREFERENCE.filter(ext => {
+    try {
+      const can = probe.canPlayType(mime[ext]);
+      return can === "probably" || can === "maybe";
+    } catch {
+      return false;
+    }
+  });
+  // 혹시 아무것도 못 잡으면 전체 순서로 폴백
+  if (_supportedExts.length === 0) _supportedExts = EXT_PREFERENCE;
+  return _supportedExts;
+}
+
+// 사운드 key별로 "실제 작동한 확장자"를 기억해 다음부터 바로 사용
+const resolvedExt = {};
+
+// 새 Audio 인스턴스 생성: 지원 확장자를 순서대로 후보로 설정
+function createAudio(key) {
+  const base = SOUND_BASE[key];
+  const exts = getSupportedExts();
+  // 이미 작동 확인된 확장자가 있으면 그걸 바로 사용
+  const ext = resolvedExt[key] || exts[0];
+  const audio = new Audio(`${base}.${ext}`);
+  audio.preload = "auto";
+
+  // 첫 확장자 로드 실패 시, 다음 후보 확장자로 자동 교체
+  let tried = exts.indexOf(ext);
+  audio.addEventListener("error", function onErr() {
+    tried += 1;
+    if (tried < exts.length) {
+      const nextExt = exts[tried];
+      resolvedExt[key] = nextExt;
+      audio.src = `${base}.${nextExt}`;
+      audio.load();
+    } else {
+      // 모든 후보 실패 — 조용히 포기 (소리만 안 날 뿐 앱은 정상)
+      audio.removeEventListener("error", onErr);
+    }
+  });
+  // 성공적으로 재생 가능해지면 그 확장자를 기억
+  audio.addEventListener("canplaythrough", () => {
+    const m = audio.src.match(/\.([a-z0-9]+)(\?.*)?$/i);
+    if (m) resolvedExt[key] = m[1].toLowerCase();
+  }, { once: true });
+
+  return audio;
+}
 
 // 사운드별 Audio 풀 (동시 재생 위해 여러 인스턴스)
 const audioPool = {};
@@ -59,8 +122,7 @@ function getAudioInstance(key) {
 
   // 풀이 비었거나 모두 재생 중이면 새로 생성 (최대 3개까지)
   if (audioPool[key].length < 3) {
-    const audio = new Audio(SOUND_FILES[key]);
-    audio.preload = "auto";
+    const audio = createAudio(key);
     audioPool[key].push(audio);
     return audio;
   }

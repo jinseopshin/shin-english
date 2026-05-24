@@ -1828,6 +1828,15 @@ function BoardGame({ studentName, levelId, gameId, onBack, onExit }) {
   const posRef = useRef(0);
   useEffect(() => { posRef.current = pos; }, [pos]);
 
+  // 안전 타이머: 진행 중 타이머를 모아 언마운트 시 일괄 정리 (게임 도중 나가도 안전)
+  const timersRef = useRef([]);
+  const safeTimeout = (fn, ms) => {
+    const id = setTimeout(fn, ms);
+    timersRef.current.push(id);
+    return id;
+  };
+  useEffect(() => () => { timersRef.current.forEach(clearTimeout); }, []);
+
   const DICE_FACES = ["", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
 
   // 칸 도착 처리
@@ -1839,7 +1848,7 @@ function BoardGame({ studentName, levelId, gameId, onBack, onExit }) {
       setDone(true);
       saveProgress(studentName, gameId, levelId, 1, 1);
       setConfettiTrigger(t => t + 1);
-      setTimeout(() => angela.show("perfect"), 300);
+      safeTimeout(() => angela.show("perfect"), 300);
       onFinish(1, 1);
       setBusy(false);
       return;
@@ -1847,7 +1856,7 @@ function BoardGame({ studentName, levelId, gameId, onBack, onExit }) {
     if (cell.type === "word") {
       setMsg(`📖 "${cell.w.word}" 소리 내어 읽어요!`);
       speakWord(cell.w.word);
-      setTimeout(() => angela.show("happy"), 200);
+      safeTimeout(() => angela.show("happy"), 200);
       setBusy(false);
       return;
     }
@@ -1863,9 +1872,9 @@ function BoardGame({ studentName, levelId, gameId, onBack, onExit }) {
     }
     if (cell.type === "bonus") {
       setMsg(`⬆️ 보너스! ${cell.n}칸 더 앞으로!`);
-      setTimeout(() => angela.show("happy"), 100);
+      safeTimeout(() => angela.show("happy"), 100);
       onCorrect();
-      setTimeout(() => {
+      safeTimeout(() => {
         const next = Math.min(BOARD_SIZE - 1, at + cell.n);
         moveTo(at, next, () => resolveCell(next));
       }, 800);
@@ -1873,8 +1882,8 @@ function BoardGame({ studentName, levelId, gameId, onBack, onExit }) {
     }
     if (cell.type === "trap") {
       setMsg(`⬇️ 앗! ${Math.abs(cell.n)}칸 뒤로...`);
-      setTimeout(() => angela.show("oops"), 100);
-      setTimeout(() => {
+      safeTimeout(() => angela.show("oops"), 100);
+      safeTimeout(() => {
         const next = Math.max(0, at + cell.n);
         moveBack(at, next, () => resolveCell(next));
       }, 800);
@@ -1889,7 +1898,7 @@ function BoardGame({ studentName, levelId, gameId, onBack, onExit }) {
     const next = from + 1;
     setPos(next);
     if (next >= to) { after && after(); return; }
-    setTimeout(() => moveTo(next, to, after), 260);
+    safeTimeout(() => moveTo(next, to, after), 260);
   }
   // 뒤로 이동
   function moveBack(from, to, after) {
@@ -1897,7 +1906,7 @@ function BoardGame({ studentName, levelId, gameId, onBack, onExit }) {
     const next = from - 1;
     setPos(next);
     if (next <= to) { after && after(); return; }
-    setTimeout(() => moveBack(next, to, after), 220);
+    safeTimeout(() => moveBack(next, to, after), 220);
   }
 
   function rollDice() {
@@ -1914,7 +1923,7 @@ function BoardGame({ studentName, levelId, gameId, onBack, onExit }) {
         setRollCount(c => c + 1);
         setMsg(`${n}칸 이동!`);
         playClick();
-        setTimeout(() => {
+        safeTimeout(() => {
           const target = Math.min(BOARD_SIZE - 1, posRef.current + n);
           moveTo(posRef.current, target, () => resolveCell(target));
         }, 450);
@@ -1929,16 +1938,16 @@ function BoardGame({ studentName, levelId, gameId, onBack, onExit }) {
       onCorrect();
       recordReview(studentName, quiz.answer, true);
       setMsg(`정답! "${quiz.word}"의 첫 글자는 ${quiz.answer} ⭐`);
-      setTimeout(() => angela.show("happy"), 100);
-      setTimeout(() => { setQuiz(null); setQuizFeedback(null); setBusy(false); }, 1100);
+      safeTimeout(() => angela.show("happy"), 100);
+      safeTimeout(() => { setQuiz(null); setQuizFeedback(null); setBusy(false); }, 1100);
     } else {
       setQuizFeedback("wrong");
       onWrong();
       recordReview(studentName, quiz.answer, false);
       setMsg("아쉬워요! 다시 골라볼까요?");
-      setTimeout(() => angela.show("oops"), 100);
+      safeTimeout(() => angela.show("oops"), 100);
       // 제자리 멈춤: 다시 고를 수 있게 wrong 표시만 잠깐
-      setTimeout(() => setQuizFeedback(null), 700);
+      safeTimeout(() => setQuizFeedback(null), 700);
     }
   }
 
@@ -2071,6 +2080,14 @@ const BINGO_LINES = [
 function BingoGame({ studentName, levelId, gameId, onBack, onExit }) {
   const angela = useAngela();
 
+  const timersRef = useRef([]);
+  const safeTimeout = (fn, ms) => {
+    const id = setTimeout(fn, ms);
+    timersRef.current.push(id);
+    return id;
+  };
+  useEffect(() => () => { timersRef.current.forEach(clearTimeout); }, []);
+
   // 9칸 채울 단어 + 부르는 순서
   const setup = useMemo(() => {
     const src = (getPhonicsWords(levelId) || []).filter(w => w && w.word);
@@ -2127,21 +2144,21 @@ function BingoGame({ studentName, levelId, gameId, onBack, onExit }) {
         setBingoCount(newBingo);
         setMsg(`🎉 빙고! (${newBingo}줄)`);
         setConfettiTrigger(t => t + 1);
-        setTimeout(() => angela.show("perfect"), 200);
+        safeTimeout(() => angela.show("perfect"), 200);
       } else {
         setMsg("잘 찾았어요! 다음 단어 들어볼까요?");
-        setTimeout(() => angela.show("happy"), 150);
+        safeTimeout(() => angela.show("happy"), 150);
       }
 
       // 9칸 다 채웠거나 빙고가 났으면 종료 판단
       if (nm.size >= 9) {
-        setTimeout(() => finishWin(newBingo), 1000);
+        safeTimeout(() => finishWin(newBingo), 1000);
       }
     } else {
       // 오답 — 흔들기 느낌(메시지)
       onWrong();
       setMsg("거기가 아니에요! 다시 들어볼까요?");
-      setTimeout(() => angela.show("oops"), 100);
+      safeTimeout(() => angela.show("oops"), 100);
     }
   }
 
@@ -2149,7 +2166,7 @@ function BingoGame({ studentName, levelId, gameId, onBack, onExit }) {
     setDone(true);
     saveProgress(studentName, gameId, levelId, 1, 1);
     setConfettiTrigger(t => t + 1);
-    setTimeout(() => angela.show("perfect"), 300);
+    safeTimeout(() => angela.show("perfect"), 300);
     onFinish(1, 1);
   }
   function finish() {
@@ -2289,6 +2306,14 @@ function buildChain(pool, goalLen) {
 function DominoGame({ studentName, levelId, gameId, onBack, onExit }) {
   const angela = useAngela();
 
+  const timersRef = useRef([]);
+  const safeTimeout = (fn, ms) => {
+    const id = setTimeout(fn, ms);
+    timersRef.current.push(id);
+    return id;
+  };
+  useEffect(() => () => { timersRef.current.forEach(clearTimeout); }, []);
+
   const chain = useMemo(() => {
     const src = (getPhonicsWords(levelId) || []).filter(w => w && w.word);
     return buildChain(src, DOMINO_GOAL);
@@ -2327,7 +2352,7 @@ function DominoGame({ studentName, levelId, gameId, onBack, onExit }) {
 
   useEffect(() => {
     if (cur && cur.word) {
-      const t = setTimeout(() => speakWord(cur.word), 300);
+      const t = safeTimeout(() => speakWord(cur.word), 300);
       return () => clearTimeout(t);
     }
   }, [step]);
@@ -2339,7 +2364,7 @@ function DominoGame({ studentName, levelId, gameId, onBack, onExit }) {
       onCorrect();
       recordReview(studentName, dLast(cur), true); // 끝소리 글자 기록
       speakWord(w.word);
-      setTimeout(() => {
+      safeTimeout(() => {
         const nextStep = step + 1;
         // 목표 달성 또는 체인 끝 도달
         if (nextStep >= DOMINO_GOAL || nextStep >= chain.length - 1) {
@@ -2347,20 +2372,20 @@ function DominoGame({ studentName, levelId, gameId, onBack, onExit }) {
           setDone(true);
           saveProgress(studentName, gameId, levelId, nextStep, DOMINO_GOAL);
           setConfettiTrigger(t => t + 1);
-          setTimeout(() => angela.show("perfect"), 300);
+          safeTimeout(() => angela.show("perfect"), 300);
           onFinish(nextStep, DOMINO_GOAL);
         } else {
           setStep(nextStep);
           setFeedback(null);
-          setTimeout(() => angela.show("happy"), 100);
+          safeTimeout(() => angela.show("happy"), 100);
         }
       }, 1000);
     } else {
       setFeedback("wrong");
       onWrong();
       recordReview(studentName, dLast(cur), false);
-      setTimeout(() => angela.show("oops"), 100);
-      setTimeout(() => setFeedback(null), 800);
+      safeTimeout(() => angela.show("oops"), 100);
+      safeTimeout(() => setFeedback(null), 800);
     }
   }
 

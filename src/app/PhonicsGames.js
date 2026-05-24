@@ -568,6 +568,7 @@ function AlphabetSoundGame({ studentName, levelId, gameId, onBack, onExit }) {
   return (
     <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
       <FullScreenConfetti trigger={confettiTrigger} />
+      <angela.AngelaComponent />
       <GameHeader
         onBack={onBack}
         title="🔊 알파벳 소리 듣기"

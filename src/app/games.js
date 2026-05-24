@@ -1729,6 +1729,8 @@ export function WordMatchLines({ name, setStudents, onExit }) {
   const [matched, setMatched] = useState({});    // {leftIdx: rightIdx}
   const [wrong, setWrong] = useState(null);      // 틀린 쌍 표시용
   const [done, setDone] = useState(false);
+  const [angelaState, setAngelaState] = useState("thinking"); // Angela 즉시 반응용
+  const [showAngela, setShowAngela] = useState(false); // Angela 팝업 표시 여부
   const awardedRef = useRef(false);
 
   const ROUNDS = 3;
@@ -1764,8 +1766,14 @@ export function WordMatchLines({ name, setStudents, onExit }) {
       setMatched(m => ({...m, [selLeft]: idx}));
       setScore(s => s+1);
       setSelLeft(null);
+      setAngelaState("happy");
+      setShowAngela(true);
+      setTimeout(() => setShowAngela(false), 600);
     } else {
       setWrong({left:selLeft, right:idx});
+      setAngelaState("oops");
+      setShowAngela(true);
+      setTimeout(() => setShowAngela(false), 800);
       setTimeout(() => { setWrong(null); setSelLeft(null); }, 600);
     }
   };
@@ -1848,6 +1856,27 @@ export function WordMatchLines({ name, setStudents, onExit }) {
           {round<ROUNDS-1?"다음 라운드 →":"결과 보기 🎉"}
         </Btn>
       )}
+
+      {showAngela && (
+        <div style={{
+          position:"fixed",
+          top:"25%",
+          left:0,right:0,
+          display:"flex",
+          alignItems:"center",
+          justifyContent:"center",
+          pointerEvents:"none",
+          zIndex:1000,
+        }}>
+          <AngelaCharacter
+            state={angelaState}
+            size={angelaState==="happy"?160:220}
+            style={{
+              animation: "angela-popup 0.6s cubic-bezier(.34,1.56,.64,1)"
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -1906,6 +1935,8 @@ export function WordSearchGame({ name, setStudents, onExit }) {
   const [found, setFound] = useState([]); // [wordStr]
   const [done, setDone] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  const [angelaState, setAngelaState] = useState("thinking"); // Angela 즉시 반응용
+  const [showAngela, setShowAngela] = useState(false); // Angela 팝업 표시 여부
   const timerRef = useRef(null);
   const awardedRef = useRef(false);
 
@@ -1960,7 +1991,12 @@ export function WordSearchGame({ name, setStudents, onExit }) {
       word+=grid[r][c];
     }
     const hit=placed.find(p=>p.word===word&&!found.includes(p.word));
-    if (hit) setFound(f=>[...f,hit.word]);
+    if (hit) {
+      setFound(f=>[...f,hit.word]);
+      setAngelaState("happy");
+      setShowAngela(true);
+      setTimeout(() => setShowAngela(false), 800);
+    }
   };
 
   const selected = getSelected();
@@ -2047,6 +2083,27 @@ export function WordSearchGame({ name, setStudents, onExit }) {
           </span>
         ))}
       </div>
+
+      {showAngela && (
+        <div style={{
+          position:"fixed",
+          top:"25%",
+          left:0,right:0,
+          display:"flex",
+          alignItems:"center",
+          justifyContent:"center",
+          pointerEvents:"none",
+          zIndex:1000,
+        }}>
+          <AngelaCharacter
+            state={angelaState}
+            size={200}
+            style={{
+              animation: "angela-popup 0.6s cubic-bezier(.34,1.56,.64,1)"
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
